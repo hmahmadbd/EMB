@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>লেনদেন পেজ - Firestore</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <style>
+    body { font-family: 'Arial', sans-serif; }
+    .modal { display: none; position: fixed; z-index: 100; inset: 0; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; }
+    .notification { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 6px; font-weight: 600; color: white; z-index: 9999; opacity: 0; transform: translateY(-20px); transition: all 0.4s ease; }
+    .notification.show { opacity: 1; transform: translateY(0); }
+    .notification.success { background: #16a34a; }
+    .notification.error { background: #dc2626; }
+    .notification.info { background: #2563eb; }
+    
+    .table-cell-nowrap th, .table-cell-nowrap td {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-5">
+
+<div id="header-placeholder"></div>
+
+<div class="container mx-auto max-w-7xl bg-white p-8 rounded-xl shadow-lg mt-20">
+  <h1 class="text-3xl font-bold text-center text-teal-600 mb-8">লেনদেন পেজ</h1>
+
+  <div class="flex flex-col gap-4 mb-8">
+    <div class="bg-blue-50 p-4 rounded-lg shadow-md flex justify-between">
+      <h3 class="text-lg font-semibold text-blue-800">মোট জমা</h3>
+      <p id="total-credit" class="text-2xl font-bold text-blue-600">৳ ০</p>
+    </div>
+    <div class="bg-red-50 p-4 rounded-lg shadow-md flex justify-between">
+      <h3 class="text-lg font-semibold text-red-800">মোট খরচ</h3>
+      <p id="total-debit" class="text-2xl font-bold text-red-600">৳ ০</p>
+    </div>
+    <div class="bg-green-50 p-4 rounded-lg shadow-md flex justify-between">
+      <h3 class="text-lg font-semibold text-green-800">মোট ব্যালেন্স</h3>
+      <p id="total-balance" class="text-2xl font-bold text-green-600">৳ ০</p>
+    </div>
+  </div>
+
+  <div class="bg-gray-50 p-6 rounded-lg shadow-inner mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">ক্যাটাগরি</label>
+        <select id="category" class="w-full p-2 border rounded-md" onchange="filterTransactions()">
+          <option value="">সব</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">নাম</label>
+        <select id="name" class="w-full p-2 border rounded-md" onchange="filterTransactions()">
+          <option value="">নাম নির্বাচন করুন</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">শুরুর তারিখ</label>
+        <input type="date" id="start_date" class="w-full p-2 border rounded-md" onchange="filterTransactions()">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">শেষ তারিখ</label>
+        <input type="date" id="end_date" class="w-full p-2 border rounded-md" onchange="filterTransactions()">
+      </div>
+    </div>
+    <div class="flex justify-end gap-4">
+      <button onclick="clearFilters()" class="px-6 py-2 bg-gray-500 text-white rounded-md flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+      </button>
+      <button onclick="shareFilteredData()" class="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+        
+      </button>
+      <button id="newEntryBtn" onclick="openEntryForm()" class="px-6 py-2 bg-teal-500 text-white rounded-md hidden flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg shadow-md">
+    <table class="w-full text-left table-auto">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="px-6 py-3">তারিখ</th>
+          <th class="px-6 py-3">নাম</th>
+          <th class="px-6 py-3">বিবরণ</th>
+          <th class="px-6 py-3">জমা</th>
+          <th class="px-6 py-3">খরচ</th>
+          <th class="px-6 py-3">ব্যালেন্স</th>
+          <th class="px-6 py-3">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody id="transaction-list" class="bg-white divide-y divide-gray-200"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="entry-modal" class="modal">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
+    <h2 id="modal-title" class="text-2xl font-bold mb-4 text-center">নতুন লেনদেন যোগ করুন</h2>
+    <form id="entry-form">
+      <div class="mb-4">
+        <label class="block text-sm mb-1">ক্যাটাগরি</label>
+        <select id="entry-category" class="w-full p-2 border rounded-md" required onchange="toggleNewCategoryAndName()">
+          <option value="">নির্বাচন করুন</option>
+        </select>
+        <div id="new-category-input" class="hidden mt-2">
+          <input type="text" id="new-category-name" class="w-full p-2 border rounded-md" placeholder="নতুন ক্যাটাগরি নাম">
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm mb-1">নাম</label>
+        <select id="entry-name" class="w-full p-2 border rounded-md" required onchange="toggleNewNameInput()">
+          <option value="">নির্বাচন করুন</option>
+        </select>
+        <div id="new-name-input" class="hidden mt-2">
+          <input type="text" id="new-name-name" class="w-full p-2 border rounded-md" placeholder="নতুন নাম">
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm mb-1">লেনদেনের ধরন</label>
+        <select id="entry-type" class="w-full p-2 border rounded-md" required>
+          <option value="credit">জমা</option>
+          <option value="debit">খরচ</option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm mb-1">পরিমাণ (৳)</label>
+        <input type="number" id="entry-amount" class="w-full p-2 border rounded-md" required>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm mb-1">বিবরণ</label>
+        <input type="text" id="entry-description" class="w-full p-2 border rounded-md">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm mb-1">তারিখ</label>
+        <input type="date" id="entry-date" class="w-full p-2 border rounded-md" required>
+      </div>
+      <div class="flex justify-end gap-4">
+        <button type="button" onclick="closeEntryForm()" class="px-4 py-2 bg-gray-400 text-white rounded-md">বাতিল</button>
+        <button type="submit" id="submitBtn" class="px-4 py-2 bg-teal-500 text-white rounded-md">যোগ করুন</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="notification-container"></div>
+
+<div id="footer-placeholder"></div>
+
+<script src="include-loader.js"></script>
+<script>
+  // ✅ Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+    authDomain: "asembroidery-5cd5e.firebaseapp.com",
+    projectId: "asembroidery-5cd5e",
+    storageBucket: "asembroidery-5cd5e.appspot.com",
+    messagingSenderId: "592758047307",
+    appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let transactionsData = [];
+  let categoriesData = {};
+  let peopleData = {};
+  let isAdmin = false;
+
+  // ✅ Notification
+  function showNotification(message, type="info") {
+    const container = document.getElementById("notification-container");
+    const div = document.createElement("div");
+    div.className = `notification ${type}`;
+    div.textContent = message;
+    container.appendChild(div);
+    setTimeout(() => div.classList.add("show"), 100);
+    setTimeout(() => {
+      div.classList.remove("show");
+      setTimeout(() => div.remove(), 400);
+    }, 3000);
+  }
+
+  // ✅ Modal
+  function openEntryForm() { 
+    document.getElementById('entry-form').reset();
+    document.getElementById('entry-modal').dataset.docId = '';
+    document.getElementById('modal-title').textContent = 'নতুন লেনদেন যোগ করুন';
+    document.getElementById('submitBtn').textContent = 'যোগ করুন';
+    document.getElementById('entry-form').onsubmit = submitNewEntry;
+    
+    document.getElementById('entry-category').value = '';
+    document.getElementById('new-category-input').classList.add('hidden');
+    document.getElementById('new-name-input').classList.add('hidden');
+    document.getElementById('entry-modal').style.display = 'flex'; 
+    updateCategoryOptions('entry-category');
+  }
+
+  function closeEntryForm() { 
+    document.getElementById('entry-modal').style.display = 'none'; 
+    document.getElementById('entry-form').reset(); 
+  }
+  
+  // New functions to toggle input fields
+  function toggleNewCategoryAndName() {
+    const categorySelect = document.getElementById('entry-category');
+    const newCategoryInput = document.getElementById('new-category-input');
+    
+    if (categorySelect.value === 'new-category') {
+        newCategoryInput.classList.remove('hidden');
+    } else {
+        newCategoryInput.classList.add('hidden');
+    }
+    updateNameOptions('entry-name', categorySelect.value);
+  }
+
+  function toggleNewNameInput() {
+    const nameSelect = document.getElementById('entry-name');
+    const newNameInput = document.getElementById('new-name-input');
+    
+    if (nameSelect.value === 'new-name') {
+        newNameInput.classList.remove('hidden');
+    } else {
+        newNameInput.classList.add('hidden');
+    }
+  }
+
+  // ✅ Render Transactions
+  function renderTransactions(transactions) {
+    const tbody = document.getElementById("transaction-list");
+    tbody.innerHTML = "";
+    let totalCredit = 0, totalDebit = 0;
+    const peopleBalances = {};
+
+    transactions.forEach(tx => {
+      if (tx.type === "credit") {
+        totalCredit += tx.amount;
+      } else {
+        totalDebit += tx.amount;
+      }
+
+      if (!peopleBalances[tx.name_key]) {
+        peopleBalances[tx.name_key] = 0;
+      }
+      if (tx.type === "credit") {
+        peopleBalances[tx.name_key] += tx.amount;
+      } else {
+        peopleBalances[tx.name_key] -= tx.amount;
+      }
+    });
+
+    transactions.forEach(tx => {
+      const row = document.createElement("tr");
+      row.className = "table-cell-nowrap";
+      const balanceAmount = peopleBalances[tx.name_key];
+      const balanceClass = balanceAmount >= 0 ? 'text-green-600' : 'text-red-600';
+      const balanceText = balanceAmount >= 0 ? `৳ ${balanceAmount}` : `৳ ${Math.abs(balanceAmount)}`;
+      
+      const actions = isAdmin ? `
+        <button onclick="openEditForm('${tx.id}')" class="text-blue-600 hover:underline mr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pen"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/><path d="m15 5 3 3"/></svg>
+        </button>
+        <button onclick="viewPersonHistory('${tx.name_key}')" class="text-teal-600 hover:underline">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      ` : `
+        <button onclick="viewPersonHistory('${tx.name_key}')" class="text-teal-600 hover:underline">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      `;
+
+      row.innerHTML = `
+        <td class="px-6 py-2">${tx.date}</td>
+        <td class="px-6 py-2">${tx.name}</td>
+        <td class="px-6 py-2">${tx.description}</td>
+        <td class="px-6 py-2 ${tx.type==="credit"?"text-green-600":"text-gray-400"}">৳ ${tx.type==="credit" ? tx.amount : 0}</td>
+        <td class="px-6 py-2 ${tx.type==="debit"?"text-red-600":"text-gray-400"}">৳ ${tx.type==="debit" ? tx.amount : 0}</td>
+        <td class="px-6 py-2 ${balanceClass}">${balanceText}</td>
+        <td class="px-6 py-2">${actions}</td>
+      `;
+      tbody.appendChild(row);
+    });
+    document.getElementById("total-credit").textContent = `৳ ${totalCredit}`;
+    document.getElementById("total-debit").textContent = `৳ ${totalDebit}`;
+    document.getElementById("total-balance").textContent = `৳ ${totalCredit-totalDebit}`;
+  }
+
+  // ✅ New Filter & History Link
+  function viewPersonHistory(nameKey) {
+    const url = new URL(window.location);
+    if(nameKey) {
+        url.searchParams.set('name_key', nameKey);
+    } else {
+        url.searchParams.delete('name_key');
+    }
+    window.history.pushState({}, '', url);
+    document.getElementById('name').value = nameKey;
+    filterTransactions();
+  }
+
+  // ✅ Share Filtered Data
+  function shareFilteredData() {
+      const url = new URL(window.location);
+      const nameKey = document.getElementById('name').value;
+      if (nameKey) {
+          url.searchParams.set('name_key', nameKey);
+      } else {
+          url.searchParams.delete('name_key');
+      }
+
+      navigator.clipboard.writeText(url.href).then(() => {
+          showNotification("✅ ফিল্টার করা লিংক কপি করা হয়েছে!", "success");
+      }).catch(err => {
+          showNotification("❌ লিংক কপি করতে সমস্যা হয়েছে: " + err, "error");
+      });
+  }
+
+  // ✅ Edit Form Functions
+  function openEditForm(docId) {
+    const transaction = transactionsData.find(tx => tx.id === docId);
+    if (!transaction) {
+      showNotification("❌ লেনদেন খুঁজে পাওয়া যায়নি।", "error");
+      return;
+    }
+
+    document.getElementById('modal-title').textContent = 'লেনদেন এডিট করুন';
+    document.getElementById('submitBtn').textContent = 'আপডেট করুন';
+    document.getElementById('entry-form').onsubmit = (e) => updateEntry(e, docId);
+
+    // Populate the form with data
+    document.getElementById('entry-category').value = transaction.category_key;
+    document.getElementById('entry-name').value = transaction.name_key;
+    document.getElementById('entry-type').value = transaction.type;
+    document.getElementById('entry-amount').value = transaction.amount;
+    document.getElementById('entry-description').value = transaction.description;
+    document.getElementById('entry-date').value = transaction.date;
+    
+    // Update name dropdown options for selected category
+    updateNameOptions('entry-name', transaction.category_key);
+
+    document.getElementById('new-category-input').classList.add('hidden');
+    document.getElementById('new-name-input').classList.add('hidden');
+    
+    document.getElementById('entry-modal').style.display = 'flex';
+  }
+
+  async function updateEntry(e, docId) {
+    e.preventDefault();
+    const updatedData = {
+      category_key: document.getElementById("entry-category").value,
+      category_name: categoriesData[document.getElementById("entry-category").value].name,
+      name_key: document.getElementById("entry-name").value,
+      name: peopleData[document.getElementById("entry-category").value][document.getElementById("entry-name").value].name,
+      type: document.getElementById("entry-type").value,
+      amount: parseFloat(document.getElementById("entry-amount").value),
+      description: document.getElementById("entry-description").value,
+      date: document.getElementById("entry-date").value,
+    };
+
+    try {
+      await db.collection("transactions").doc(docId).update(updatedData);
+      showNotification("✅ লেনদেন সফলভাবে আপডেট হয়েছে!", "success");
+      closeEntryForm();
+    } catch (err) {
+      showNotification("❌ Error: " + err.message, "error");
+    }
+  }
+
+  // Original submit function for new entries
+  async function submitNewEntry(e) {
+    e.preventDefault();
+    const entryCategory = document.getElementById("entry-category");
+    const entryName = document.getElementById("entry-name");
+    let categoryKey = entryCategory.value;
+    let categoryName = entryCategory.options[entryCategory.selectedIndex] ? entryCategory.options[entryCategory.selectedIndex].textContent : document.getElementById("new-category-name").value;
+    let nameKey = entryName.value;
+    let nameName = entryName.options[entryName.selectedIndex] ? entryName.options[entryName.selectedIndex].textContent : document.getElementById("new-name-name").value;
+
+    if (categoryKey === "new-category") {
+      categoryName = document.getElementById("new-category-name").value.trim();
+      if (!categoryName) { alert('নতুন ক্যাটাগরি নাম লিখুন।'); return; }
+      const newCatRef = await db.collection("categories").add({ name: categoryName });
+      categoryKey = newCatRef.id;
+    }
+    
+    if (nameKey === "new-name") {
+      nameName = document.getElementById("new-name-name").value.trim();
+      if (!nameName) { alert('নতুন নাম লিখুন।'); return; }
+      const newNameRef = await db.collection("people").add({ category_key: categoryKey, name: nameName });
+      nameKey = newNameRef.id;
+    }
+
+    const tx = {
+      category_key: categoryKey,
+      category_name: categoryName,
+      name_key: nameKey,
+      name: nameName,
+      type: document.getElementById("entry-type").value,
+      amount: parseFloat(document.getElementById("entry-amount").value),
+      description: document.getElementById("entry-description").value,
+      date: document.getElementById("entry-date").value,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    db.collection("transactions").add(tx).then(() => {
+      showNotification("✅ লেনদেন সফলভাবে যোগ হয়েছে!", "success");
+      closeEntryForm();
+    }).catch(err => {
+      showNotification("❌ Error: "+err.message, "error");
+    });
+  }
+
+  // ✅ Load Data and Populate Filters
+  function updateCategoryOptions(selectId) {
+    const select = document.getElementById(selectId);
+    let currentVal = select.value;
+    select.innerHTML = '';
+    const defaultOption = selectId === 'category' ? 'সব' : 'নির্বাচন করুন';
+    const allOption = document.createElement('option');
+    allOption.value = '';
+    allOption.textContent = defaultOption;
+    select.appendChild(allOption);
+    
+    for (const key in categoriesData) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = categoriesData[key].name;
+        select.appendChild(option);
+    }
+    
+    const newCatOption = document.createElement('option');
+    newCatOption.value = 'new-category';
+    newCatOption.textContent = 'নতুন ক্যাটাগরি যোগ করুন';
+    if(selectId === 'entry-category') select.appendChild(newCatOption);
+    
+    select.value = currentVal;
+    if (select.value === 'new-category' && selectId === 'entry-category') {
+      document.getElementById('new-category-input').classList.remove('hidden');
+    } else {
+      document.getElementById('new-category-input').classList.add('hidden');
+    }
+  }
+
+  function updateNameOptions(selectId, categoryId) {
+    const select = document.getElementById(selectId);
+    let currentVal = select.value;
+    select.innerHTML = '';
+    const defaultOption = selectId === 'name' ? 'নাম নির্বাচন করুন' : 'নির্বাচন করুন';
+    const allOption = document.createElement('option');
+    allOption.value = '';
+    allOption.textContent = defaultOption;
+    select.appendChild(allOption);
+    
+    if (categoryId && peopleData[categoryId]) {
+        for (const key in peopleData[categoryId]) {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = peopleData[categoryId][key].name;
+            select.appendChild(option);
+        }
+    } else {
+        const allNames = {};
+        for (const catId in peopleData) {
+            for(const personId in peopleData[catId]){
+                if(!allNames[personId]){
+                    allNames[personId] = peopleData[catId][personId].name;
+                }
+            }
+        }
+        for(const personId in allNames){
+            const option = document.createElement('option');
+            option.value = personId;
+            option.textContent = allNames[personId];
+            select.appendChild(option);
+        }
+    }
+    
+    const newNameOption = document.createElement('option');
+    newNameOption.value = 'new-name';
+    newNameOption.textContent = 'নতুন নাম যোগ করুন';
+    if(selectId === 'entry-name') select.appendChild(newNameOption);
+
+    select.value = currentVal;
+    if (select.value === 'new-name' && selectId === 'entry-name') {
+      document.getElementById('new-name-input').classList.remove('hidden');
+    } else {
+      document.getElementById('new-name-input').classList.add('hidden');
+    }
+  }
+
+  // ✅ Load initial data and set up listeners
+  db.collection('categories').onSnapshot(snap => {
+    categoriesData = {};
+    snap.forEach(doc => {
+      categoriesData[doc.id] = doc.data();
+    });
+    updateCategoryOptions('category');
+    updateCategoryOptions('entry-category');
+  });
+
+  db.collection('people').onSnapshot(snap => {
+    peopleData = {};
+    snap.forEach(doc => {
+      const data = doc.data();
+      if (!peopleData[data.category_key]) {
+        peopleData[data.category_key] = {};
+      }
+      peopleData[data.category_key][doc.id] = data;
+    });
+    updateNameOptions('name', document.getElementById('category').value);
+  });
+
+  db.collection("transactions").orderBy("createdAt", "desc").onSnapshot(snap => {
+    transactionsData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    filterTransactions();
+  });
+  
+  // ✅ Role Check & URL Param Check
+  auth.onAuthStateChanged(async user => {
+    if (user) {
+      try {
+        const snap = await db.collection("users").where("uid", "==", user.uid).limit(1).get();
+        if (snap.empty) {
+          console.warn("⚠️ User document পাওয়া যায়নি। UID:", user.uid);
+          showNotification("⚠️ আপনার প্রোফাইল খুঁজে পাওয়া যায়নি।", "error");
+          return;
+        }
+        const userData = snap.docs[0].data();
+        if (userData.role && userData.role.toLowerCase() === "admin") {
+          isAdmin = true;
+          document.getElementById("newEntryBtn").classList.remove("hidden");
+          showNotification("✅ অ্যাডমিন হিসেবে লগইন সফল", "success");
+        } else {
+          isAdmin = false;
+          document.getElementById("newEntryBtn").classList.add("hidden");
+          showNotification("⚠️ আপনার কেবল ভিউ করার অনুমতি আছে।", "error");
+        }
+        // Check for URL parameters on page load
+        const urlParams = new URLSearchParams(window.location.search);
+        const nameKey = urlParams.get('name_key');
+        if (nameKey) {
+            document.getElementById('name').value = nameKey;
+            filterTransactions();
+        } else {
+            filterTransactions(); // Initial rendering without filter
+        }
+      } catch (err) {
+        console.error("User role check failed:", err);
+        showNotification("❌ ইউজার ডাটা লোডে সমস্যা: " + err.message, "error");
+      }
+    } else {
+      window.location.href = "login.html";
+    }
+  });
+
+  // ✅ Filters
+  function clearFilters() { 
+    document.getElementById("category").value = ""; 
+    document.getElementById("name").value = ""; 
+    document.getElementById("start_date").value = ""; 
+    document.getElementById("end_date").value = ""; 
+    viewPersonHistory('');
+  }
+
+  function filterTransactions() {
+    const categoryKey = document.getElementById('category').value;
+    const nameKey = document.getElementById('name').value;
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    
+    let filteredTransactions = transactionsData.filter(tx => {
+        const txDate = new Date(tx.date);
+        const isCategoryMatch = !categoryKey || tx.category_key === categoryKey;
+        const isNameMatch = !nameKey || tx.name_key === nameKey;
+        const isStartDateMatch = !startDate || txDate >= new Date(startDate);
+        const isEndDateMatch = !endDate || txDate <= new Date(endDate);
+        return isCategoryMatch && isNameMatch && isStartDateMatch && isEndDateMatch;
+    });
+
+    renderTransactions(filteredTransactions);
+  }
+
+  // ✅ Header/Footer Include
+  includeHTML("header.html", "header-placeholder", () => {
+    setupHeaderAndSidebar();
+  });
+  includeHTML("footer.html", "footer-placeholder");
+</script>
+</body>
+</html>

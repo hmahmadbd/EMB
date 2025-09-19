@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>প্রোডাকশন লিস্ট</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6 mt-12">
+<div id="header-placeholder"></div>
+<div id="loader" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
+<div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600"></div>
+</div>
+
+<div class="max-w-6xl mx-auto hidden" id="mainContent">
+
+<div class="bg-white shadow-lg rounded-lg p-4 mb-6">
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 justify-items-center">
+
+<div class="w-full max-w-[140px]">
+<label class="block text-gray-600 mb-1 text-sm">কর্মচারী</label>
+<select id="filterWorker" class="border rounded p-2 w-full text-sm">
+<option value="">সব</option>
+</select>
+</div>
+
+<div class="w-full max-w-[140px]">
+<label class="block text-gray-600 mb-1 text-sm">মেশিন</label>
+<select id="filterMachine" class="border rounded p-2 w-full text-sm">
+<option value="">সব</option>
+</select>
+</div>
+
+<div class="w-full max-w-[140px]">
+<label class="block text-gray-600 mb-1 text-sm">মাস</label>
+<select id="filterMonth" class="border rounded p-2 w-full text-sm"></select>
+</div>
+
+<div class="w-full max-w-[140px]">
+<label class="block text-gray-600 mb-1 text-sm">বছর</label>
+<select id="filterYear" class="border rounded p-2 w-full text-sm"></select>
+</div>
+
+<div class="w-full max-w-[140px]">
+<label class="block text-gray-600 mb-1 text-sm">থেকে</label>
+<input type="date" id="filterFrom" class="border rounded p-2 w-full text-sm">
+</div>
+
+<div class="w-full max-w-[140px]">
+<label class="block text-gray-600 mb-1 text-sm">পর্যন্ত</label>
+<input type="date" id="filterTo" class="border rounded p-2 w-full text-sm">
+</div>
+
+<div class="w-full max-w-[140px] flex justify-center items-end">
+<button id="clearFilter" class="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 w-full text-sm">
+রিসেট
+</button>
+</div>
+
+<div class="w-full max-w-[140px] flex justify-center items-end hidden" id="addStitchButton">
+<a href="add-stitch.html" class="px-3 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 w-full text-sm text-center">
+যুক্ত করুন
+</a>
+</div>
+
+</div>
+</div>
+
+<div id="summaryCards" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+<div id="totalProductionCard" class="bg-white shadow rounded p-4 text-center">
+<h3 class="text-gray-500 text-sm">মোট প্রোডাকশন</h3>
+<p id="totalProductionValue" class="text-2xl font-bold text-indigo-700">0</p>
+
+</div>
+<div id="averageProductionCard" class="bg-white shadow rounded p-4 text-center">
+<h3 class="text-gray-500 text-sm">গড় প্রোডাকশন</h3>
+<p id="averageProductionValue" class="text-2xl font-bold text-green-600">0</p>
+</div>
+
+<div id="workdayProductionCard" class="bg-white shadow rounded p-4 text-center">
+<h3 class="text-gray-500 text-sm">মোট কাজের দিন</h3>
+<p id="workdayProductionValue" class="text-2xl font-bold text-indigo-700">0</p>
+
+</div>
+<div id="targetProductionCard" class="bg-white shadow rounded p-4 text-center">
+<h3 class="text-gray-500 text-sm">টার্গেট প্রোডাকশন</h3>
+<p id="targetProductionValue" class="text-2xl font-bold text-green-600">0</p>
+</div>
+</div>
+
+<div class="bg-white shadow-lg rounded-lg p-6 text-center">
+
+<h2 class="text-xl font-bold text-indigo-700 mb-4 text-center" id="tableTitle">📋 প্রোডাকশন লিস্ট</h2>
+
+<div class="overflow-x-auto">
+
+<table class="w-full border table-auto">
+
+<thead>
+
+<tr class="bg-gray-200 text-left text-sm">
+
+<th class="p-2 border whitespace-nowrap">তারিখ</th>
+
+<th class="p-2 border whitespace-nowrap">কর্মচারী</th>
+
+<th class="p-2 border whitespace-nowrap">মেশিন</th>
+
+<th class="p-2 border whitespace-nowrap">মোট স্টিচ</th>
+
+<th class="p-2 border whitespace-nowrap">গড় প্রোডাকশন</th>
+
+<th class="p-2 border whitespace-nowrap">র‍্যাঙ্ক</th>
+
+<th class="p-2 border whitespace-nowrap">কর্ম</th>
+
+</tr>
+
+</thead>
+
+<tbody id="productionList" class="text-sm"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+
+<div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg overflow-y-auto max-h-[80vh]">
+
+<h3 class="text-lg font-bold mb-4">প্রোডাকশন বিস্তারিত</h3>
+
+<div id="modalContent" class="space-y-2"></div>
+
+<div class="text-right mt-4">
+
+<button onclick="closeModal()" class="px-4 py-2 bg-red-500 text-white rounded">বন্ধ করুন</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="include-loader.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, getDocs, query, where, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+        authDomain: "asembroidery-5cd5e.firebaseapp.com",
+        projectId: "asembroidery-5cd5e",
+        storageBucket: "asembroidery-5cd5e.appspot.com",
+        messagingSenderId: "592758047307",
+        appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const productionList = document.getElementById("productionList");
+    const filterFrom = document.getElementById("filterFrom");
+    const filterTo = document.getElementById("filterTo");
+    const filterMachine = document.getElementById("filterMachine");
+    const filterWorker = document.getElementById("filterWorker");
+    const filterMonth = document.getElementById("filterMonth");
+    const filterYear = document.getElementById("filterYear");
+    const clearFilter = document.getElementById("clearFilter");
+    const tableTitle = document.getElementById("tableTitle");
+    const loader = document.getElementById("loader");
+    const mainContent = document.getElementById("mainContent");
+    const addStitchButton = document.getElementById("addStitchButton");
+    const targetProductionValue = document.getElementById("targetProductionValue");
+
+    const monthNames = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+
+    let allProductions = [];
+    let allWorkers = [];
+    let defaultAdminTarget = "0"; 
+
+    async function loadWorkers() {
+        // Dropdown পরিষ্কার করা হচ্ছে
+        filterWorker.innerHTML = `<option value="">সব</option>`;
+        
+        allWorkers = [];
+        const q = query(collection(db, "users"), where("role", "==", "user"));
+        const snapshot = await getDocs(q);
+        snapshot.forEach(docSnap => {
+            const user = docSnap.data();
+            user.id = docSnap.id;
+            allWorkers.push(user);
+            const opt = document.createElement("option");
+            opt.value = docSnap.id;
+            opt.textContent = user.name;
+            filterWorker.appendChild(opt);
+        });
+    }
+
+    function loadMonthYearFilters() {
+        const now = new Date();
+        monthNames.forEach((name, i) => {
+            const opt = document.createElement("option");
+            opt.value = i;
+            opt.text = name;
+            filterMonth.appendChild(opt);
+        });
+        filterMonth.value = now.getMonth();
+        for (let y = now.getFullYear(); y >= now.getFullYear() - 3; y--) {
+            const opt = document.createElement("option");
+            opt.value = y;
+            opt.text = y;
+            filterYear.appendChild(opt);
+        }
+        filterYear.value = now.getFullYear();
+    }
+
+    function populateMachines(productions) {
+        const machines = [...new Set(productions.map(p => p.machine))];
+        filterMachine.innerHTML = `<option value="">সব</option>`;
+        machines.forEach(m => {
+            const opt = document.createElement("option");
+            opt.value = m;
+            opt.textContent = m;
+            filterMachine.appendChild(opt);
+        });
+    }
+
+    async function fetchProductions() {
+        loader.style.display = "flex";
+        try {
+            const q = query(collection(db, "productions"), orderBy("date", "desc"));
+            const snapshot = await getDocs(q);
+            allProductions = [];
+            snapshot.forEach(docSnap => {
+                let p = docSnap.data();
+                p.id = docSnap.id;
+                allProductions.push(p);
+            });
+            populateMachines(allProductions);
+            renderProductions();
+        } catch (err) {
+            console.error("Firebase ডেটা লোড করতে সমস্যা হয়েছে: ", err);
+            productionList.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-red-500">ডেটা লোড করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।</td></tr>`;
+        } finally {
+            loader.style.display = "none";
+            mainContent.classList.remove("hidden");
+        }
+    }
+
+    async function setTargetValue(workerId) {
+        if (workerId) {
+            const worker = allWorkers.find(w => w.id === workerId);
+            targetProductionValue.textContent = (worker && worker.target) ? worker.target : "0";
+        } else {
+            targetProductionValue.textContent = defaultAdminTarget;
+        }
+    }
+
+    async function renderProductions() {
+        productionList.innerHTML = "";
+        const monthFilter = filterMonth.value !== "" ? parseInt(filterMonth.value) : null;
+        const yearFilter = filterYear.value !== "" ? parseInt(filterYear.value) : null;
+        const startDate = filterFrom.value ? new Date(filterFrom.value + "T00:00:00") : null;
+        const endDate = filterTo.value ? new Date(filterTo.value + "T23:59:59") : null;
+        const machineFilter = filterMachine.value;
+        const workerFilter = filterWorker.value;
+
+        const filtered = allProductions
+            .filter(p => {
+                const dateObj = new Date(p.date);
+                if (monthFilter !== null && dateObj.getMonth() !== monthFilter) return false;
+                if (yearFilter !== null && dateObj.getFullYear() !== yearFilter) return false;
+                if (startDate && dateObj < startDate) return false;
+                if (endDate && dateObj > endDate) return false;
+                if (machineFilter && p.machine !== machineFilter) return false;
+                if (workerFilter && p.workerId !== workerFilter) return false;
+                return true;
+            });
+
+        const monthName = monthFilter !== null ? monthNames[monthFilter] : "সব মাস";
+        tableTitle.textContent = `📋 ${monthName} · প্রোডাকশন লিস্ট`;
+
+        const groupedData = filtered.reduce((acc, p) => {
+            const dateKey = new Date(p.date).toISOString().split('T')[0];
+            const workerKey = p.workerId;
+            const uniqueKey = `${workerKey}-${dateKey}`;
+
+            if (!acc[uniqueKey]) {
+                acc[uniqueKey] = {
+                    ...p,
+                    date: dateKey,
+                    grandTotal: parseFloat(p.grandTotal),
+                    works: [...p.works],
+                    id: p.id
+                };
+            } else {
+                acc[uniqueKey].grandTotal += parseFloat(p.grandTotal);
+                acc[uniqueKey].works.push(...p.works);
+            }
+            return acc;
+        }, {});
+
+        const groupedArray = Object.values(groupedData);
+
+        if (groupedArray.length === 0) {
+            productionList.innerHTML = `<tr><td colspan="7" class="text-center py-4">কোনো ডেটা পাওয়া যায়নি।</td></tr>`;
+            document.getElementById("totalProductionValue").textContent = "0";
+            document.getElementById("averageProductionValue").textContent = "0";
+            document.getElementById("workdayProductionValue").textContent = "0";
+            return;
+        }
+
+        const monthlyTotals = groupedArray
+            .reduce((acc, p) => {
+                if (!acc[p.workerId]) acc[p.workerId] = { total: 0, count: 0 };
+                acc[p.workerId].total += p.grandTotal;
+                acc[p.workerId].count++;
+                return acc;
+            }, {});
+
+        const monthlyRanking = Object.entries(monthlyTotals)
+            .sort(([, a], [, b]) => b.total - a.total)
+            .map(([workerId, data], index) => ({ workerId, rank: index + 1 }));
+
+        let rankMap = {};
+        monthlyRanking.forEach(r => rankMap[r.workerId] = r.rank);
+
+        let cumulativeTotals = {};
+        let cumulativeCounts = {};
+        let prevAverages = {};
+        let prevGrandTotals = {};
+
+        const sortedByDate = [...groupedArray].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        sortedByDate.forEach(p => {
+            const wid = p.workerId;
+            const grandTotal = p.grandTotal;
+
+            if (!cumulativeTotals[wid]) cumulativeTotals[wid] = 0;
+            if (!cumulativeCounts[wid]) cumulativeCounts[wid] = 0;
+
+            cumulativeTotals[wid] += grandTotal;
+            cumulativeCounts[wid]++;
+            const avg = (cumulativeTotals[wid] / cumulativeCounts[wid]).toFixed(2);
+
+            let avgColorClass = "";
+            if (prevAverages[wid] !== undefined) {
+                if (parseFloat(avg) > parseFloat(prevAverages[wid])) avgColorClass = "text-green-600 font-bold";
+                else if (parseFloat(avg) < parseFloat(prevAverages[wid])) avgColorClass = "text-red-600 font-bold";
+            }
+            prevAverages[wid] = avg;
+
+            let totalColorClass = "";
+            if (prevGrandTotals[wid] !== undefined) {
+                if (grandTotal > prevGrandTotals[wid]) totalColorClass = "text-green-600 font-bold";
+                else if (grandTotal < prevGrandTotals[wid]) totalColorClass = "text-red-600 font-bold";
+            }
+            prevGrandTotals[wid] = grandTotal;
+
+            p.cumulativeAvg = avg;
+            p.avgColorClass = avgColorClass;
+            p.totalColorClass = totalColorClass;
+        });
+
+        const sortedForDisplay = sortedByDate.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        sortedForDisplay.forEach(p => {
+            const tr = document.createElement("tr");
+            const date = new Date(p.date);
+            const formattedDate = date.toLocaleDateString('bn-BD');
+
+            tr.innerHTML = `
+                <td class="p-2 border">${formattedDate}</td>
+                <td class="p-2 border">${p.workerName}</td>
+                <td class="p-2 border">${p.machine}</td>
+                <td class="p-2 border ${p.totalColorClass}">${p.grandTotal}</td>
+                <td class="p-2 border ${p.avgColorClass}">${p.cumulativeAvg}</td>
+                <td class="p-2 border font-bold">${rankMap[p.workerId] || '-'}</td>
+                <td class="p-2 border">
+                    <button onclick="viewProduction('${p.id}')" class="text-indigo-600 underline">দেখুন</button>
+                </td>
+            `;
+            productionList.appendChild(tr);
+        });
+
+        let totalProduction = groupedArray.reduce((sum, p) => sum + p.grandTotal, 0);
+        let totalWorkdays = groupedArray.length;
+        let averageProduction = 0;
+        if (totalWorkdays > 0) {
+            averageProduction = (totalProduction / totalWorkdays).toFixed(2);
+        }
+
+        document.getElementById("totalProductionValue").textContent = totalProduction;
+        document.getElementById("averageProductionValue").textContent = averageProduction;
+        document.getElementById("workdayProductionValue").textContent = totalWorkdays;
+        
+    }
+
+    window.viewProduction = async function (id) {
+        const production = allProductions.find(p => p.id === id);
+
+        if (production) {
+            document.getElementById("modalContent").innerHTML = `
+                <p><strong>তারিখ:</strong> ${new Date(production.date).toLocaleString('bn-BD')}</p>
+                <p><strong>কর্মচারী:</strong> ${production.workerName}</p>
+                <p><strong>মেশিন:</strong> ${production.machine}</p>
+                <p><strong>মোট স্টিচ:</strong> ${production.grandTotal}</p>
+                <hr class="my-2">
+                <h4 class="font-bold">কাজের বিস্তারিত:</h4>
+                ${production.works.map(w => `
+                    <div class="border p-2 mb-2 rounded">
+                        <p>পণ্য: ${w.product}</p>
+                        <p>পর্ব: ${w.stage}</p>
+                        <p>গণনা: ${w.count}</p>
+                        <p>মোট: ${w.total}</p>
+                    </div>
+                `).join("")}
+            `;
+            document.getElementById("modal").classList.remove("hidden");
+            document.getElementById("modal").classList.add("flex");
+        } else {
+            const docSnap = await getDoc(doc(db, "productions", id));
+            if (docSnap.exists()) {
+                const p = docSnap.data();
+                document.getElementById("modalContent").innerHTML = `
+                    <p><strong>তারিখ:</strong> ${new Date(p.date).toLocaleString('bn-BD')}</p>
+                    <p><strong>কর্মচারী:</strong> ${p.workerName}</p>
+                    <p><strong>মেশিন:</strong> ${p.machine}</p>
+                    <p><strong>সর্বমোট স্টিচ:</strong> ${p.grandTotal}</p>
+                    <hr class="my-2">
+                    <h4 class="font-bold">কাজের বিস্তারিত:</h4>
+                    ${p.works.map(w => `
+                        <div class="border p-2 mb-2 rounded">
+                            <p>বিবরণ: ${w.product}</p>
+                            <p>স্টিচ: ${w.stage}</p>
+                            <p>বেস: ${w.count}</p>
+                            <p>মোট: ${w.total}</p>
+                        </div>
+                    `).join("")}
+                `;
+                document.getElementById("modal").classList.remove("hidden");
+                document.getElementById("modal").classList.add("flex");
+            }
+        }
+    }
+
+    window.closeModal = function () {
+        document.getElementById("modal").classList.add("hidden");
+        document.getElementById("modal").classList.remove("flex");
+    }
+    
+    // Auth state changes
+    onAuthStateChanged(auth, async user => {
+        if (user) {
+            await includeHTML("header.html", "header-placeholder");
+            await includeHTML("footer.html", "footer-placeholder");
+            setupHeaderAndSidebar();
+            
+            const adminQuery = query(collection(db, "users"), where("role", "==", "admin"));
+            const adminSnapshot = await getDocs(adminQuery);
+            if (!adminSnapshot.empty) {
+                defaultAdminTarget = adminSnapshot.docs[0].data().target || "0";
+            }
+            
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists() && userDoc.data().role === "admin") {
+                addStitchButton.classList.remove("hidden");
+            } else {
+                addStitchButton.classList.add("hidden");
+            }
+
+            loadMonthYearFilters();
+            await loadWorkers();
+            await fetchProductions();
+            setTargetValue(null);
+            
+            loader.style.display = "none";
+            mainContent.classList.remove("hidden");
+            lucide.createIcons();
+
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    // Event listeners
+    filterFrom.addEventListener("change", renderProductions);
+    filterTo.addEventListener("change", renderProductions);
+    filterMachine.addEventListener("change", renderProductions);
+    filterMonth.addEventListener("change", renderProductions);
+    filterYear.addEventListener("change", renderProductions);
+    
+    filterWorker.addEventListener("change", async () => {
+        await renderProductions();
+        await setTargetValue(filterWorker.value);
+    });
+    
+    clearFilter.addEventListener("click", () => {
+        const now = new Date();
+        filterFrom.value = "";
+        filterTo.value = "";
+        filterMachine.value = "";
+        filterWorker.value = "";
+        filterMonth.value = now.getMonth();
+        filterYear.value = now.getFullYear();
+        setTargetValue(null);
+        renderProductions();
+    });
+</script>
+</body>
+</html>

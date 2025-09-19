@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>আমার প্রোফাইল - এ এস এমব্রয়ডারি</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Loader -->
+  <div id="loader" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600"></div>
+  </div>
+
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+
+  <!-- Main Content -->
+  <main class="pl-4 pr-4 md:pl-72 pt-24 pb-16 max-w-4xl mx-auto hidden" id="mainContent">
+    <h2 class="text-3xl font-bold text-blue-700 mb-6 flex items-center gap-2">
+      <i data-lucide="user" class="w-7 h-7 text-blue-700 text-center"></i> আমার প্রোফাইল
+    </h2>
+
+    <div class="bg-white shadow rounded p-6 space-y-6">
+      <!-- Profile Header -->
+      <div class="flex items-center gap-6">
+        <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
+          <i data-lucide="user" class="w-10 h-10 text-gray-500"></i>
+        </div>
+        <div>
+          <h3 id="userName" class="text-2xl font-semibold text-gray-800">...</h3>
+          <p id="userRole" class="text-gray-600">...</p>
+          <p id="userJoined" class="text-gray-500 text-sm">...</p>
+        </div>
+      </div>
+
+      <!-- Form Fields -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm text-gray-500">নাম</label>
+          <input id="nameInput" type="text" disabled class="w-full mt-1 px-3 py-2 border rounded text-gray-700" />
+        </div>
+        <div>
+          <label class="text-sm text-gray-500">ইমেইল</label>
+          <input id="emailInput" type="email" disabled class="w-full mt-1 px-3 py-2 border rounded text-gray-700" />
+        </div>
+        <div>
+          <label class="text-sm text-gray-500">ফোন</label>
+          <input id="phoneInput" type="text" disabled class="w-full mt-1 px-3 py-2 border rounded text-gray-700" />
+        </div>
+        <div>
+          <label class="text-sm text-gray-500">টার্গেট প্রোডাকশন</label>
+          <input id="targetInput" type="text" disabled class="w-full mt-1 px-3 py-2 border rounded text-gray-700" />
+        </div>
+      </div>
+
+      <!-- Edit Button -->
+      <div class="pt-6 text-center">
+        <button id="editSaveBtn" class="px-5 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 flex items-center gap-2 justify-center mx-auto">
+          <i data-lucide="edit-3"></i> এডিট
+        </button>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Include Loader -->
+  <script src="include-loader.js"></script>
+
+  <!-- Firebase & Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { 
+      getFirestore, collection, query, where, getDocs, 
+      setDoc, updateDoc, doc 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+      authDomain: "asembroidery-5cd5e.firebaseapp.com",
+      projectId: "asembroidery-5cd5e",
+      storageBucket: "asembroidery-5cd5e.appspot.com",
+      messagingSenderId: "592758047307",
+      appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const nameInput = document.getElementById("nameInput");
+    const emailInput = document.getElementById("emailInput");
+    const phoneInput = document.getElementById("phoneInput");
+    const targetInput = document.getElementById("targetInput");
+
+    const userName = document.getElementById("userName");
+    const userRole = document.getElementById("userRole");
+    const userJoined = document.getElementById("userJoined");
+    const mainContent = document.getElementById("mainContent");
+    const loader = document.getElementById("loader");
+
+    const editSaveBtn = document.getElementById("editSaveBtn");
+    let isEditMode = false;
+    let currentUserDocRef = null;
+
+    function toggleEditMode(enable) {
+      nameInput.disabled = !enable;
+      emailInput.disabled = !enable;
+      phoneInput.disabled = !enable;
+      targetInput.disabled = !enable;
+
+      isEditMode = enable;
+      editSaveBtn.innerHTML = enable
+        ? `<i data-lucide="save"></i> সংরক্ষণ করুন`
+        : `<i data-lucide="edit-3"></i> এডিট`;
+
+      lucide.createIcons();
+    }
+
+    async function fetchUserProfile(user) {
+      try {
+        console.log("🔍 খোঁজা হচ্ছে UID:", user.uid);
+
+        // uid দিয়ে খুঁজবো
+        const q = query(collection(db, "users"), where("uid", "==", user.uid));
+        const querySnap = await getDocs(q);
+
+        if (!querySnap.empty) {
+          const docSnap = querySnap.docs[0];
+          currentUserDocRef = docSnap.ref;
+          const userData = docSnap.data();
+
+          console.log("✅ প্রোফাইল ডাটা:", userData);
+
+          nameInput.value = userData.name ?? "";
+          emailInput.value = userData.email ?? "";
+          phoneInput.value = userData.mobile ?? "";
+          targetInput.value = userData.productionTarget ?? "";
+
+          userName.textContent = userData.name ?? "অজানা ব্যবহারকারী";
+          userRole.textContent = userData.role ?? "পদবী নেই";
+          userJoined.textContent = userData.joinedDate
+            ? new Date(userData.joinedDate).toLocaleDateString("bn-BD", { year: "numeric", month: "long", day: "numeric" })
+            : "তারিখ নেই";
+
+        } else {
+          console.warn("⚠️ কোনো প্রোফাইল পাওয়া যায়নি, নতুন তৈরি হচ্ছে...");
+          const newDocRef = doc(collection(db, "users"));
+          currentUserDocRef = newDocRef;
+          await setDoc(newDocRef, {
+            uid: user.uid,
+            name: "",
+            email: `${user.phoneNumber}@asembroidery.com`,
+            mobile: user.phoneNumber ?? "",
+            productionTarget: "",
+            role: "user",
+            joinedDate: Date.now(),
+          });
+        }
+      } catch (error) {
+        console.error("❌ Error fetching profile:", error);
+      }
+    }
+
+    editSaveBtn.addEventListener("click", async () => {
+      if (!isEditMode) {
+        toggleEditMode(true);
+      } else {
+        const updatedData = {
+          name: nameInput.value.trim(),
+          email: emailInput.value.trim(),
+          mobile: phoneInput.value.trim(),
+          productionTarget: targetInput.value.trim()
+        };
+
+        try {
+          await updateDoc(currentUserDocRef, updatedData);
+          alert("✅ সফলভাবে সংরক্ষণ হয়েছে!");
+          userName.textContent = updatedData.name; // নামও আপডেট হবে উপরে
+          toggleEditMode(false);
+        } catch (error) {
+          console.error("Update error:", error);
+          alert("❌ সংরক্ষণে সমস্যা হয়েছে!");
+        }
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Header & Footer load
+        await includeHTML("header.html", "header-placeholder");
+        await includeHTML("footer.html", "footer-placeholder");
+        setupHeaderAndSidebar();
+        
+        // Load Profile
+        await fetchUserProfile(user);
+        
+        loader.style.display = "none";
+        mainContent.classList.remove("hidden");
+        lucide.createIcons();
+        toggleEditMode(false);
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Loader fallback
+    setTimeout(() => {
+      if (loader.style.display !== "none") {
+        loader.innerHTML = "<p class='text-gray-600 text-lg'>লোড হচ্ছে... একটু ধৈর্য ধরুন</p>";
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

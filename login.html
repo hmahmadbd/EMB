@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authentication - A S Embroidery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-blue-50">
+  <div id="loader" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50 hidden">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600"></div>
+  </div>
+
+  <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md">
+    <h1 class="text-xl font-semibold">A S Embroidery</h1>
+    <nav>
+      <button id="toggleAuthModeBtn" class="px-4 py-2 rounded-full bg-blue-500 hover:bg-blue-700 transition-colors">
+        Register
+      </button>
+    </nav>
+  </header>
+
+  <main class="flex items-center justify-center min-h-[calc(100vh-128px)] pt-12" id="mainContent">
+    <!-- Login Form -->
+    <div id="loginFormContainer" class="w-full max-w-md bg-white p-8 rounded-xl shadow-md">
+      <div class="flex justify-center mb-6">
+        <i data-lucide="lock" class="w-8 h-8 text-blue-600"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">Login</h2>
+
+      <form id="loginForm">
+        <div class="mb-4">
+          <label class="block text-gray-700">Phone Number</label>
+          <input type="tel" id="loginPhoneInput" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Password</label>
+          <input type="password" id="loginPasswordInput" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <p id="loginErrorMsg" class="text-red-500 text-sm mb-4 hidden"></p>
+        <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Login</button>
+      </form>
+
+      <div class="text-center text-sm text-gray-600 mt-4">
+        <a href="#" id="forgotPasswordLink" class="text-blue-600 hover:underline">Forgot Password?</a>
+      </div>
+
+      <p class="text-center text-sm text-gray-600 mt-4">
+        Don't have an account? <a href="#" id="switchToRegisterLink" class="text-blue-600 hover:underline">Register</a>
+      </p>
+    </div>
+
+    <!-- Register Form -->
+    <div id="registerFormContainer" class="w-full max-w-md bg-white p-8 rounded-xl shadow-md hidden">
+      <div class="flex justify-center mb-6">
+        <i data-lucide="user-plus" class="w-8 h-8 text-blue-600"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">Register</h2>
+
+      <form id="registerForm">
+        <div class="mb-4">
+          <label class="block text-gray-700">Full Name</label>
+          <input type="text" id="registerNameInput" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Phone Number</label>
+          <input type="tel" id="registerPhoneInput" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Password</label>
+          <input type="password" id="registerPasswordInput" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Confirm Password</label>
+          <input type="password" id="registerConfirmPasswordInput" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <p id="registerErrorMsg" class="text-red-500 text-sm mb-4 hidden"></p>
+        <button type="submit" id="registerBtn" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Register</button>
+      </form>
+      
+      <p class="text-center text-sm text-gray-600 mt-4">
+        Already have an account? <a href="#" id="switchToLoginLink" class="text-blue-600 hover:underline">Login</a>
+      </p>
+    </div>
+  </main>
+
+  <!-- Reset Modal -->
+  <div id="resetModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
+      <button id="closeModal" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+        <i data-lucide="lock-question" class="w-5 h-5 text-blue-600"></i> Reset Password
+      </h3>
+      <form id="resetForm" class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-700">Enter your phone number</label>
+          <input type="tel" id="resetPhoneInput" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Send Reset Link</button>
+      </form>
+      <p id="resetMsg" class="text-sm mt-4 hidden"></p>
+    </div>
+  </div>
+
+  <footer class="bg-gray-200 text-center p-4 text-gray-600 mt-10">
+    &copy; 2025 A S Embroidery. All rights reserved.
+  </footer>
+
+  <!-- Firebase Auth & Firestore -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc, runTransaction, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+      authDomain: "asembroidery-5cd5e.firebaseapp.com",
+      projectId: "asembroidery-5cd5e",
+      storageBucket: "asembroidery-5cd5e.appspot.com",
+      messagingSenderId: "592758047307",
+      appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    lucide.createIcons();
+
+    const loader = document.getElementById('loader');
+    const loginFormContainer = document.getElementById('loginFormContainer');
+    const registerFormContainer = document.getElementById('registerFormContainer');
+    const toggleAuthModeBtn = document.getElementById('toggleAuthModeBtn');
+    const switchToRegisterLink = document.getElementById('switchToRegisterLink');
+    const switchToLoginLink = document.getElementById('switchToLoginLink');
+
+    // Toggle between forms
+    function toggleForms() {
+      const isLoginMode = loginFormContainer.classList.contains('hidden');
+      if (isLoginMode) {
+        loginFormContainer.classList.remove('hidden');
+        registerFormContainer.classList.add('hidden');
+        toggleAuthModeBtn.textContent = 'Register';
+      } else {
+        loginFormContainer.classList.add('hidden');
+        registerFormContainer.classList.remove('hidden');
+        toggleAuthModeBtn.textContent = 'Login';
+      }
+    }
+
+    toggleAuthModeBtn.addEventListener('click', toggleForms);
+    switchToRegisterLink.addEventListener('click', (e) => { e.preventDefault(); toggleForms(); });
+    switchToLoginLink.addEventListener('click', (e) => { e.preventDefault(); toggleForms(); });
+
+    // Phone → Email conversion
+    function convertPhoneToEmail(phone) {
+      return phone.replace(/[^0-9]/g, '') + "@asembroidery.com";
+    }
+
+    // --- Login Form ---
+    const loginForm = document.getElementById('loginForm');
+    const loginPhoneInput = document.getElementById('loginPhoneInput');
+    const loginPasswordInput = document.getElementById('loginPasswordInput');
+    const loginErrorMsg = document.getElementById('loginErrorMsg');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loader.classList.remove('hidden');
+      loginErrorMsg.classList.add('hidden');
+
+      const phone = loginPhoneInput.value.trim();
+      const password = loginPasswordInput.value.trim();
+      const email = convertPhoneToEmail(phone);
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Check user role
+        const userSnapshot = await getDocs(query(collection(db, "users"), where("uid", "==", user.uid)));
+        
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data();
+          if (userData.role === 'admin') {
+            window.location.href = "index.html";
+          } else if (userData.role === 'user') {
+            window.location.href = "index.html";
+          } else {
+            loginErrorMsg.textContent = "আপনার অ্যাকাউন্টের রোল নির্ধারণ করা নেই।";
+            loginErrorMsg.classList.remove('hidden');
+            await signOut(auth);
+          }
+        } else {
+          loginErrorMsg.textContent = "এই অ্যাকাউন্টের তথ্য পাওয়া যায়নি।";
+          loginErrorMsg.classList.remove('hidden');
+          await signOut(auth);
+        }
+      } catch (error) {
+        let message = "লগইন ব্যর্থ হয়েছে।";
+        if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+          message = "ভুল মোবাইল নাম্বার বা পাসওয়ার্ড।";
+        }
+        loginErrorMsg.textContent = message;
+        loginErrorMsg.classList.remove('hidden');
+      } finally {
+        loader.classList.add('hidden');
+      }
+    });
+
+    // --- Register Form ---
+    const registerForm = document.getElementById('registerForm');
+    const registerNameInput = document.getElementById('registerNameInput');
+    const registerPhoneInput = document.getElementById('registerPhoneInput');
+    const registerPasswordInput = document.getElementById('registerPasswordInput');
+    const registerConfirmPasswordInput = document.getElementById('registerConfirmPasswordInput');
+    const registerErrorMsg = document.getElementById('registerErrorMsg');
+
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        loader.classList.remove('hidden');
+        registerErrorMsg.classList.add('hidden');
+
+        const name = registerNameInput.value.trim();
+        const phone = registerPhoneInput.value.trim();
+        const password = registerPasswordInput.value.trim();
+        const confirmPassword = registerConfirmPasswordInput.value.trim();
+
+        if (password !== confirmPassword) {
+            registerErrorMsg.textContent = "পাসওয়ার্ড দুটি মিলছে না।";
+            registerErrorMsg.classList.remove('hidden');
+            loader.classList.add('hidden');
+            return;
+        }
+
+        const email = convertPhoneToEmail(phone);
+
+        try {
+            // Check existing user
+            const existingUserQuery = query(collection(db, "users"), where("mobile", "==", phone));
+            const existingUserSnapshot = await getDocs(existingUserQuery);
+
+            if (!existingUserSnapshot.empty) {
+              registerErrorMsg.textContent = "এই মোবাইল নাম্বারটি ইতিমধ্যেই নিবন্ধিত।";
+              registerErrorMsg.classList.remove('hidden');
+              loader.classList.add('hidden');
+              return;
+            }
+
+            // Create Firebase Auth user
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Generate sequential UserID
+            const newUserId = await runTransaction(db, async (transaction) => {
+              const counterRef = doc(db, "counters", "userCounter");
+              const counterDoc = await transaction.get(counterRef);
+
+              let newIdNumber = 1;
+              if (counterDoc.exists()) {
+                newIdNumber = counterDoc.data().currentId + 1;
+              }
+
+              const newUserId = "U" + newIdNumber.toString().padStart(3, '0');
+              transaction.set(counterRef, { currentId: newIdNumber });
+              return newUserId;
+            });
+
+            // Save user data
+            await setDoc(doc(db, "users", newUserId), {
+              uid: user.uid,
+              userId: newUserId,
+              name: name,
+              mobile: phone,
+              email: email,
+              role: "user",
+              joinedDate: Date.now()
+            });
+
+            alert("✅ রেজিস্ট্রেশন সফল হয়েছে! এখন লগইন করুন।");
+            toggleForms(); 
+
+        } catch (error) {
+            let message = "রেজিস্ট্রেশন ব্যর্থ হয়েছে।";
+            if (error.code === 'auth/email-already-in-use') {
+                message = "এই মোবাইল নাম্বারটি ইতিমধ্যেই নিবন্ধিত।";
+            } else if (error.code === 'auth/weak-password') {
+                message = "পাসওয়ার্ড খুবই দুর্বল। কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড ব্যবহার করুন।";
+            }
+            registerErrorMsg.textContent = message;
+            registerErrorMsg.classList.remove('hidden');
+        } finally {
+            loader.classList.add('hidden');
+        }
+    });
+
+    // --- Forgot password ---
+    const modal = document.getElementById('resetModal');
+    const openBtn = document.getElementById('forgotPasswordLink');
+    const closeBtn = document.getElementById('closeModal');
+    const resetForm = document.getElementById('resetForm');
+    const resetPhoneInput = document.getElementById('resetPhoneInput');
+    const resetMsg = document.getElementById('resetMsg');
+
+    openBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.classList.remove('hidden');
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+      resetMsg.classList.add('hidden');
+      resetForm.reset();
+    });
+
+    resetForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      resetMsg.classList.add('hidden');
+      
+      const phone = resetPhoneInput.value.trim();
+      const email = convertPhoneToEmail(phone);
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        resetMsg.textContent = "✅ পাসওয়ার্ড রিসেট লিঙ্ক পাঠানো হয়েছে।";
+        resetMsg.classList.remove('hidden');
+        resetMsg.classList.add('text-green-600');
+      } catch (error) {
+        let message = "পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে।";
+        if (error.code === 'auth/user-not-found') {
+          message = "এই মোবাইল নাম্বারে কোনো ইউজার নেই।";
+        }
+        resetMsg.textContent = message;
+        resetMsg.classList.remove('hidden');
+        resetMsg.classList.add('text-red-500');
+      }
+    });
+  </script>
+</body>
+</html>
