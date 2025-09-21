@@ -34,11 +34,11 @@
 
   <div class="flex flex-col gap-4 mb-8">
     <div class="bg-blue-50 p-4 rounded-lg shadow-md flex justify-between">
-      <h3 class="text-lg font-semibold text-blue-800">মোট জমা</h3>
+      <h3 class="text-lg font-semibold text-blue-800">মোট পেলাম</h3>
       <p id="total-credit" class="text-2xl font-bold text-blue-600">৳ ০</p>
     </div>
     <div class="bg-red-50 p-4 rounded-lg shadow-md flex justify-between">
-      <h3 class="text-lg font-semibold text-red-800">মোট খরচ</h3>
+      <h3 class="text-lg font-semibold text-red-800">মোট দিলাম</h3>
       <p id="total-debit" class="text-2xl font-bold text-red-600">৳ ০</p>
     </div>
     <div class="bg-green-50 p-4 rounded-lg shadow-md flex justify-between">
@@ -51,7 +51,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
       <div>
         <label class="block text-sm font-medium mb-1">ক্যাটাগরি</label>
-        <select id="category" class="w-full p-2 border rounded-md" onchange="filterTransactions()">
+        <select id="category" class="w-full p-2 border rounded-md" onchange="updateNameAndFilter()">
           <option value="">সব</option>
         </select>
       </div>
@@ -73,6 +73,7 @@
     <div class="flex justify-end gap-4">
       <button onclick="clearFilters()" class="px-6 py-2 bg-gray-500 text-white rounded-md flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+        
       </button>
       <button onclick="shareFilteredData()" class="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
@@ -92,8 +93,8 @@
           <th class="px-6 py-3">তারিখ</th>
           <th class="px-6 py-3">নাম</th>
           <th class="px-6 py-3">বিবরণ</th>
-          <th class="px-6 py-3">জমা</th>
-          <th class="px-6 py-3">খরচ</th>
+          <th class="px-6 py-3">পেলাম</th>
+          <th class="px-6 py-3">দিলাম</th>
           <th class="px-6 py-3">ব্যালেন্স</th>
           <th class="px-6 py-3">অ্যাকশন</th>
         </tr>
@@ -128,8 +129,8 @@
       <div class="mb-4">
         <label class="block text-sm mb-1">লেনদেনের ধরন</label>
         <select id="entry-type" class="w-full p-2 border rounded-md" required>
-          <option value="credit">জমা</option>
-          <option value="debit">খরচ</option>
+          <option value="credit">পেলাম</option>
+          <option value="debit">দিলাম</option>
         </select>
       </div>
       <div class="mb-4">
@@ -144,9 +145,11 @@
         <label class="block text-sm mb-1">তারিখ</label>
         <input type="date" id="entry-date" class="w-full p-2 border rounded-md" required>
       </div>
-      <div class="flex justify-end gap-4">
+      <div class="flex justify-between gap-4">
         <button type="button" onclick="closeEntryForm()" class="px-4 py-2 bg-gray-400 text-white rounded-md">বাতিল</button>
-        <button type="submit" id="submitBtn" class="px-4 py-2 bg-teal-500 text-white rounded-md">যোগ করুন</button>
+        <div id="edit-buttons-container" class="flex gap-4">
+          <button type="submit" id="submitBtn" class="px-4 py-2 bg-teal-500 text-white rounded-md">যোগ করুন</button>
+        </div>
       </div>
     </form>
   </div>
@@ -198,6 +201,9 @@
     document.getElementById('submitBtn').textContent = 'যোগ করুন';
     document.getElementById('entry-form').onsubmit = submitNewEntry;
     
+    // Hide delete button and show only submit button
+    document.getElementById('edit-buttons-container').innerHTML = `<button type="submit" id="submitBtn" class="px-4 py-2 bg-teal-500 text-white rounded-md">যোগ করুন</button>`;
+
     document.getElementById('entry-category').value = '';
     document.getElementById('new-category-input').classList.add('hidden');
     document.getElementById('new-name-input').classList.add('hidden');
@@ -234,6 +240,12 @@
     }
   }
 
+  // ✅ Format Date Function (DD/MM/YY)
+  function formatDate(dateString) {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${parseInt(month, 10)}/${year.slice(-2)}`;
+  }
+
   // ✅ Render Transactions
   function renderTransactions(transactions) {
     const tbody = document.getElementById("transaction-list");
@@ -241,13 +253,8 @@
     let totalCredit = 0, totalDebit = 0;
     const peopleBalances = {};
 
+    // First pass to calculate balances for all transactions
     transactions.forEach(tx => {
-      if (tx.type === "credit") {
-        totalCredit += tx.amount;
-      } else {
-        totalDebit += tx.amount;
-      }
-
       if (!peopleBalances[tx.name_key]) {
         peopleBalances[tx.name_key] = 0;
       }
@@ -257,8 +264,18 @@
         peopleBalances[tx.name_key] -= tx.amount;
       }
     });
+    
+    // Sort transactions by date descending
+    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+    // Second pass to render and calculate totals
     transactions.forEach(tx => {
+      if (tx.type === "credit") {
+        totalCredit += tx.amount;
+      } else {
+        totalDebit += tx.amount;
+      }
+
       const row = document.createElement("tr");
       row.className = "table-cell-nowrap";
       const balanceAmount = peopleBalances[tx.name_key];
@@ -279,7 +296,7 @@
       `;
 
       row.innerHTML = `
-        <td class="px-6 py-2">${tx.date}</td>
+        <td class="px-6 py-2">${formatDate(tx.date)}</td>
         <td class="px-6 py-2">${tx.name}</td>
         <td class="px-6 py-2">${tx.description}</td>
         <td class="px-6 py-2 ${tx.type==="credit"?"text-green-600":"text-gray-400"}">৳ ${tx.type==="credit" ? tx.amount : 0}</td>
@@ -336,6 +353,12 @@
     document.getElementById('submitBtn').textContent = 'আপডেট করুন';
     document.getElementById('entry-form').onsubmit = (e) => updateEntry(e, docId);
 
+    // Add delete button dynamically
+    document.getElementById('edit-buttons-container').innerHTML = `
+      <button type="button" onclick="deleteEntry('${docId}')" class="px-4 py-2 bg-red-500 text-white rounded-md">ডিলিট করুন</button>
+      <button type="submit" id="submitBtn" class="px-4 py-2 bg-teal-500 text-white rounded-md">আপডেট করুন</button>
+    `;
+
     // Populate the form with data
     document.getElementById('entry-category').value = transaction.category_key;
     document.getElementById('entry-name').value = transaction.name_key;
@@ -373,6 +396,19 @@
     } catch (err) {
       showNotification("❌ Error: " + err.message, "error");
     }
+  }
+
+  // ✅ Delete Function
+  async function deleteEntry(docId) {
+      if (confirm("আপনি কি নিশ্চিত এই লেনদেনটি মুছে ফেলতে চান? এটি স্থায়ীভাবে মুছে যাবে।")) {
+          try {
+              await db.collection("transactions").doc(docId).delete();
+              showNotification("✅ লেনদেন সফলভাবে মুছে ফেলা হয়েছে!", "success");
+              closeEntryForm();
+          } catch (err) {
+              showNotification("❌ লেনদেন মুছে ফেলতে সমস্যা হয়েছে: " + err.message, "error");
+          }
+      }
   }
 
   // Original submit function for new entries
@@ -450,6 +486,7 @@
     }
   }
 
+  // ✅ Updated function to handle dynamic name list
   function updateNameOptions(selectId, categoryId) {
     const select = document.getElementById(selectId);
     let currentVal = select.value;
@@ -461,13 +498,15 @@
     select.appendChild(allOption);
     
     if (categoryId && peopleData[categoryId]) {
+        // Show names only for the selected category
         for (const key in peopleData[categoryId]) {
             const option = document.createElement('option');
             option.value = key;
             option.textContent = peopleData[categoryId][key].name;
             select.appendChild(option);
         }
-    } else {
+    } else if (!categoryId && selectId === 'name') {
+        // If "সব" is selected, show all names from all categories
         const allNames = {};
         for (const catId in peopleData) {
             for(const personId in peopleData[catId]){
@@ -495,6 +534,14 @@
     } else {
       document.getElementById('new-name-input').classList.add('hidden');
     }
+  }
+
+  // ✅ New function to handle both dropdown change and filtering
+  function updateNameAndFilter() {
+    const categoryId = document.getElementById('category').value;
+    document.getElementById('name').value = ''; 
+    updateNameOptions('name', categoryId);
+    filterTransactions();
   }
 
   // ✅ Load initial data and set up listeners
@@ -568,6 +615,7 @@
     document.getElementById("name").value = ""; 
     document.getElementById("start_date").value = ""; 
     document.getElementById("end_date").value = ""; 
+    updateNameOptions('name', ''); // Reset names to show all
     viewPersonHistory('');
   }
 
