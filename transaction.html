@@ -27,9 +27,13 @@
 </head>
 <body class="bg-gray-100 text-gray-800 p-5">
 
+<div id="loader" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
+  <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-teal-600"></div>
+</div>
+
 <div id="header-placeholder"></div>
 
-<div class="container mx-auto max-w-7xl bg-white p-8 rounded-xl shadow-lg mt-20">
+<div class="container mx-auto max-w-7xl bg-white p-8 rounded-xl shadow-lg mt-20 hidden" id="mainContent">
   <h1 class="text-3xl font-bold text-center text-teal-600 mb-8">লেনদেন পেজ</h1>
 
   <div class="flex flex-col gap-4 mb-8">
@@ -47,7 +51,7 @@
     </div>
   </div>
 
-  <div class="bg-gray-50 p-6 rounded-lg shadow-inner mb-8">
+  <div id="filter-section" class="bg-gray-50 p-6 rounded-lg shadow-inner mb-8">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
       <div>
         <label class="block text-sm font-medium mb-1">ক্যাটাগরি</label>
@@ -71,17 +75,17 @@
       </div>
     </div>
     <div class="flex justify-end gap-4">
-      <button onclick="clearFilters()" class="px-6 py-2 bg-gray-500 text-white rounded-md flex items-center gap-2">
+      <button onclick="clearFilters()" id="clearFiltersBtn" class="px-6 py-2 bg-gray-500 text-white rounded-md flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-        
+        ফিল্টার ক্লিয়ার
       </button>
-      <button onclick="shareFilteredData()" class="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center gap-2">
+      <button onclick="shareFilteredData()" id="shareBtn" class="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
-        
+        শেয়ার করুন
       </button>
       <button id="newEntryBtn" onclick="openEntryForm()" class="px-6 py-2 bg-teal-500 text-white rounded-md hidden flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-        
+        নতুন এন্ট্রি
       </button>
     </div>
   </div>
@@ -179,6 +183,20 @@
   let peopleData = {};
   let isAdmin = false;
 
+  // ✅ Loader Logic
+  const loader = document.getElementById("loader");
+  const mainContent = document.getElementById("mainContent");
+
+  function showLoader() {
+    loader.style.display = "flex";
+    mainContent.classList.add("hidden");
+  }
+
+  function hideLoader() {
+    loader.style.display = "none";
+    mainContent.classList.remove("hidden");
+  }
+
   // ✅ Notification
   function showNotification(message, type="info") {
     const container = document.getElementById("notification-container");
@@ -252,6 +270,8 @@
     tbody.innerHTML = "";
     let totalCredit = 0, totalDebit = 0;
     const peopleBalances = {};
+    const urlParams = new URLSearchParams(window.location.search);
+    const isViewMode = urlParams.get('mode') === 'view';
 
     // First pass to calculate balances for all transactions
     transactions.forEach(tx => {
@@ -282,7 +302,11 @@
       const balanceClass = balanceAmount >= 0 ? 'text-green-600' : 'text-red-600';
       const balanceText = balanceAmount >= 0 ? `৳ ${balanceAmount}` : `৳ ${Math.abs(balanceAmount)}`;
       
-      const actions = isAdmin ? `
+      const actions = isViewMode ? `
+        <button onclick="viewPersonHistory('${tx.name_key}')" class="text-teal-600 hover:underline">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      ` : isAdmin ? `
         <button onclick="openEditForm('${tx.id}')" class="text-blue-600 hover:underline mr-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pen"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/><path d="m15 5 3 3"/></svg>
         </button>
@@ -309,6 +333,11 @@
     document.getElementById("total-credit").textContent = `৳ ${totalCredit}`;
     document.getElementById("total-debit").textContent = `৳ ${totalDebit}`;
     document.getElementById("total-balance").textContent = `৳ ${totalCredit-totalDebit}`;
+    
+    // ✅ ভিউ মোড UI নিষ্ক্রিয় করা
+    if (isViewMode) {
+        disableViewModeUI();
+    }
   }
 
   // ✅ New Filter & History Link
@@ -327,12 +356,18 @@
   // ✅ Share Filtered Data
   function shareFilteredData() {
       const url = new URL(window.location);
+      const categoryKey = document.getElementById('category').value;
       const nameKey = document.getElementById('name').value;
-      if (nameKey) {
-          url.searchParams.set('name_key', nameKey);
-      } else {
-          url.searchParams.delete('name_key');
-      }
+      const startDate = document.getElementById('start_date').value;
+      const endDate = document.getElementById('end_date').value;
+
+      if (categoryKey) url.searchParams.set('category_key', categoryKey);
+      if (nameKey) url.searchParams.set('name_key', nameKey);
+      if (startDate) url.searchParams.set('start_date', startDate);
+      if (endDate) url.searchParams.set('end_date', endDate);
+
+      // ✅ নতুন 'mode' প্যারামিটার যোগ করা হলো
+      url.searchParams.set('mode', 'view');
 
       navigator.clipboard.writeText(url.href).then(() => {
           showNotification("✅ ফিল্টার করা লিংক কপি করা হয়েছে!", "success");
@@ -414,6 +449,11 @@
   // Original submit function for new entries
   async function submitNewEntry(e) {
     e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) {
+        showNotification("❌ আপনি লগইন করেননি।", "error");
+        return;
+    }
     const entryCategory = document.getElementById("entry-category");
     const entryName = document.getElementById("entry-name");
     let categoryKey = entryCategory.value;
@@ -568,7 +608,7 @@
 
   db.collection("transactions").orderBy("createdAt", "desc").onSnapshot(snap => {
     transactionsData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-    filterTransactions();
+    filterTransactionsFromUrl(); // ✅ লিংকের প্যারামিটার থেকে ডেটা লোড করার জন্য নতুন কল
   });
   
   // ✅ Role Check & URL Param Check
@@ -591,23 +631,35 @@
           document.getElementById("newEntryBtn").classList.add("hidden");
           showNotification("⚠️ আপনার কেবল ভিউ করার অনুমতি আছে।", "error");
         }
-        // Check for URL parameters on page load
-        const urlParams = new URLSearchParams(window.location.search);
-        const nameKey = urlParams.get('name_key');
-        if (nameKey) {
-            document.getElementById('name').value = nameKey;
-            filterTransactions();
-        } else {
-            filterTransactions(); // Initial rendering without filter
-        }
       } catch (err) {
         console.error("User role check failed:", err);
         showNotification("❌ ইউজার ডাটা লোডে সমস্যা: " + err.message, "error");
       }
+      
+      // ✅ Hide loader after everything is loaded
+      lucide.createIcons();
+      hideLoader();
+      
     } else {
       window.location.href = "login.html";
     }
   });
+
+  function disableViewModeUI() {
+    // ✅ ফিল্টার সেকশন সম্পূর্ণ হাইড করার জন্য নতুন লজিক
+    document.getElementById('filter-section').classList.add('hidden');
+    
+    // এডিট/ডিলিট বোতামগুলোও হাইড করতে হবে
+    const actionCells = document.querySelectorAll('#transaction-list td:last-child');
+    actionCells.forEach(cell => {
+        cell.classList.add('hidden');
+    });
+
+    const actionHeader = document.querySelector('#transaction-list th:last-child');
+    if (actionHeader) {
+        actionHeader.classList.add('hidden');
+    }
+  }
 
   // ✅ Filters
   function clearFilters() { 
@@ -635,6 +687,28 @@
     });
 
     renderTransactions(filteredTransactions);
+  }
+
+  // ✅ New function to filter from URL parameters
+  function filterTransactionsFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryKey = urlParams.get('category_key');
+    const nameKey = urlParams.get('name_key');
+    const startDate = urlParams.get('start_date');
+    const endDate = urlParams.get('end_date');
+    const isViewMode = urlParams.get('mode') === 'view';
+
+    // Populate the dropdowns and inputs based on URL params
+    if (categoryKey) document.getElementById('category').value = categoryKey;
+    if (nameKey) {
+        document.getElementById('name').value = nameKey;
+        updateNameOptions('name', categoryKey);
+    }
+    if (startDate) document.getElementById('start_date').value = startDate;
+    if (endDate) document.getElementById('end_date').value = endDate;
+    
+    // Call the main filter function
+    filterTransactions();
   }
 
   // ✅ Header/Footer Include
