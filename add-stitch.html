@@ -9,29 +9,49 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
   body { display: none; }
+  /* নতুন CSS: এডিট আইকনকে বাটন থেকে আইকনে পরিণত করা */
+  #editTargetBtn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 0.5rem; /* টাইটেল থেকে সামান্য দূরত্ব */
+    color: #4f46e5; /* Tailwind indigo-600 */
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  #editTargetBtn:hover {
+    color: #3730a3; /* Tailwind indigo-800 */
+  }
 </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
 
-<!-- Loader -->
 <div id="loader" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
   <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600"></div>
 </div>
 
 <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-3xl mb-6" id="mainContent">
-<h1 class="text-2xl font-bold text-center text-indigo-700 mb-6">➕ Add Production</h1>
+
+<div class="flex items-center justify-center mb-6">
+  <h1 class="text-2xl font-bold text-center text-indigo-700">➕ Add Production</h1>
+  <button type="button" id="editTargetBtn" title="প্রোডাকশন টার্গেট ও বেতন সেট করুন">
+      <i data-lucide="edit" class="w-5 h-5"></i>
+  </button>
+</div>
+
 
 <form id="productionForm" class="space-y-4 hidden">
 
-  <!-- User + Machine -->
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
   <div class="grid grid-cols-2 gap-2 w-full">
-  <div>
-  <label class="block text-gray-600 mb-1 text-center">ওয়ার্কার</label>
-  <select id="worker" class="w-full border rounded p-2 text-center" required>
-  <option value="">ওয়ার্কার</option>
-  </select>
+  
+  <div class="w-full">
+    <label class="block text-gray-600 mb-1 text-center">ওয়ার্কার</label>
+    <select id="worker" class="w-full border rounded p-2 text-center" required>
+      <option value="">ওয়ার্কার</option>
+    </select>
   </div>
+  
   <div>
   <label class="block text-gray-600 mb-1 text-center">মিশিন</label>
   <select id="machine" class="w-full border rounded p-2 text-center" required>
@@ -44,7 +64,6 @@
   </div>
   </div>
   
-  <!-- Date + Work Time -->
   <div class="grid grid-cols-2 gap-2 w-full text-center">
   <div>
   <label class="block text-gray-600 mb-1 text-center">তারিখ</label>
@@ -57,16 +76,13 @@
   </div>
   </div>
 
-  <!-- Work Details -->
   <div class="text-gray-600 font-semibold mb-2 text-center">কাজের বিবরণ</div>
   <div id="stageContainer" class="flex flex-col gap-4"></div>
 
-  <!-- Grand Total -->
   <div class="text-center font-bold text-lg text-green-700 mt-4">
     সর্বমোট: <span id="grandTotal">0</span>
   </div>
 
-  <!-- Save -->
   <div>
     <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 w-full">সংরক্ষণ করুন</button>
   </div>
@@ -75,10 +91,42 @@
 <p id="accessDenied" class="text-red-600 text-center mt-4 hidden">❌ Only admin can access this page.</p>
 </div>
 
+<div id="targetModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+    <h2 class="text-xl font-bold text-indigo-700 mb-4">টার্গেট ও বেতন আপডেট</h2>
+    
+    <div class="space-y-4">
+      <div>
+        <label for="targetWorkerSelect" class="block text-gray-600 mb-1">ওয়ার্কার নির্বাচন করুন</label>
+        <select id="targetWorkerSelect" class="w-full border rounded p-2 text-center">
+          <option value="">ওয়ার্কার</option>
+        </select>
+      </div>
+      
+      <div id="targetInputContainer" class="hidden space-y-4">
+        <div>
+            <label for="productionTarget" class="block text-gray-600 mb-1">প্রোডাকশন টার্গেট (স্টিজ)</label>
+            <input type="number" id="productionTarget" class="w-full border rounded p-2" placeholder="যেমন: 5000" step="1">
+        </div>
+
+        <div>
+            <label for="fixedSalary" class="block text-gray-600 mb-1">নির্ধারিত বেতন (টাকা)</label>
+            <input type="number" id="fixedSalary" class="w-full border rounded p-2" placeholder="যেমন: 15000" step="100">
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-6 flex justify-end space-x-3">
+      <button type="button" id="closeModalBtn" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">বাতিল</button>
+      <button type="button" id="saveTargetBtn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400" disabled>আপডেট করুন</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
@@ -93,15 +141,27 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const WORKER_CATEGORY_KEY = "6TeDHhrINuMH5SxU6dAr";
+
 const productionForm = document.getElementById("productionForm");
 const workerSelect = document.getElementById("worker");
 const stageContainer = document.getElementById("stageContainer");
 const grandTotalSpan = document.getElementById("grandTotal");
 const loader = document.getElementById("loader");
 
+// Modal উপাদান
+const targetModal = document.getElementById("targetModal");
+const editTargetBtn = document.getElementById("editTargetBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const targetWorkerSelect = document.getElementById("targetWorkerSelect");
+const productionTargetInput = document.getElementById("productionTarget");
+const fixedSalaryInput = document.getElementById("fixedSalary"); // নতুন
+const targetInputContainer = document.getElementById("targetInputContainer");
+const saveTargetBtn = document.getElementById("saveTargetBtn");
+
 let authChecked = false;
 
-// Create Work Row
+// Create Work Row (No Change)
 function createRow() {
   const row = document.createElement("div");
   row.className = "border rounded p-2 flex flex-col gap-2";
@@ -149,7 +209,7 @@ function createRow() {
   addRowBtn.addEventListener("click", createRow);
 }
 
-// এই ফাংশনটি এখন সমস্ত ইনপুট ফিল্ড থেকে সরাসরি মোট যোগফল হিসাব করবে।
+// Grand Total Calculation (No Change)
 function calculateGrandTotal() {
   let sum = 0;
   document.querySelectorAll("#stageContainer > div").forEach(row => {
@@ -162,20 +222,106 @@ function calculateGrandTotal() {
 
 createRow();
 
-// Load Users
-async function loadUsers() {
-  const q = query(collection(db, "users"), where("role", "==", "user"));
+// Load Users for both main form and modal
+async function loadUsers(targetSelectElement) {
+  const peopleRef = collection(db, "people");
+  const q = query(peopleRef, where("category_key", "==", WORKER_CATEGORY_KEY)); 
+  
   const snapshot = await getDocs(q);
+  
+  targetSelectElement.innerHTML = '<option value="">ওয়ার্কার</option>';
+  
   snapshot.forEach(docSnap => {
     const user = docSnap.data();
     const opt = document.createElement("option");
-    opt.value = docSnap.id;
+    
+    opt.value = docSnap.id; 
     opt.textContent = user.name;
-    workerSelect.appendChild(opt);
+    
+    // টার্গেট এবং বেতন দুটিই ডেটা-অ্যাট্রিবিউট এ সেভ করা হচ্ছে
+    if (user.productionTarget) {
+        opt.dataset.target = user.productionTarget;
+    }
+    if (user.fixedSalary) {
+        opt.dataset.salary = user.fixedSalary; 
+    }
+    
+    targetSelectElement.appendChild(opt);
   });
 }
 
-// Save Production
+// =========================================================
+// টার্গেট ও বেতন আপডেট লজিক
+// =========================================================
+
+// Modal ওপেন করা (No Change)
+editTargetBtn.addEventListener('click', () => {
+    loadUsers(targetWorkerSelect);
+    targetModal.style.display = 'flex';
+    productionTargetInput.value = '';
+    fixedSalaryInput.value = ''; // নতুন
+    targetInputContainer.classList.add("hidden");
+    saveTargetBtn.disabled = true;
+});
+
+// Modal বন্ধ করা (No Change)
+closeModalBtn.addEventListener('click', () => {
+    targetModal.style.display = 'none';
+});
+
+// ওয়ার্কার নির্বাচন করলে টার্গেট ও বেতন দেখানো
+targetWorkerSelect.addEventListener('change', async (e) => {
+    const workerId = e.target.value;
+    
+    if (workerId) {
+        targetInputContainer.classList.remove("hidden");
+        saveTargetBtn.disabled = false;
+        
+        const selectedOption = targetWorkerSelect.options[targetWorkerSelect.selectedIndex];
+        
+        // টার্গেট ও বেতন লোড করে ইনপুটে সেট করা
+        const currentTarget = selectedOption.dataset.target || '';
+        const currentSalary = selectedOption.dataset.salary || ''; 
+        
+        productionTargetInput.value = currentTarget;
+        fixedSalaryInput.value = currentSalary; // নতুন
+    } else {
+        targetInputContainer.classList.add("hidden");
+        saveTargetBtn.disabled = true;
+    }
+});
+
+// টার্গেট ও বেতন ফায়ারস্টোরে আপডেট করা
+saveTargetBtn.addEventListener('click', async () => {
+    const workerId = targetWorkerSelect.value;
+    const targetValue = parseFloat(productionTargetInput.value) || 0;
+    const salaryValue = parseFloat(fixedSalaryInput.value) || 0; // নতুন
+
+    if (!workerId || targetValue < 0 || salaryValue < 0) {
+        Swal.fire('ত্রুটি','বৈধ মান দিন।','error');
+        return;
+    }
+
+    try {
+        const workerDocRef = doc(db, "people", workerId);
+        await updateDoc(workerDocRef, {
+            productionTarget: targetValue,
+            fixedSalary: salaryValue // নতুন ফিল্ড আপডেট
+        });
+
+        Swal.fire('সংরক্ষিত!','টার্গেট ও বেতন সফলভাবে আপডেট হয়েছে।','success');
+        
+        // Modal বন্ধ করার আগে উভয় ড্রপডাউন রিফ্রেশ করা
+        await loadUsers(workerSelect);
+        targetModal.style.display = 'none';
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire('ত্রুটি','টার্গেট ও বেতন আপডেট করা যায়নি।','error');
+    }
+});
+
+// Save Production (No Change)
 productionForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   let incomplete = false;
@@ -226,7 +372,7 @@ productionForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Auth Check
+// Auth Check (No Change)
 onAuthStateChanged(auth, async user => {
   if (authChecked) return;
   authChecked = true;
@@ -235,18 +381,39 @@ onAuthStateChanged(auth, async user => {
     window.location.href = "/account";
     return;
   }
+  
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, where("userId", "==", user.uid)); 
+  
+  try {
+    const snapshot = await getDocs(q);
 
-  const userDoc = await getDoc(doc(db, "users", user.uid));
-  if (userDoc.exists() && userDoc.data().role === "admin") {
-    productionForm.classList.remove("hidden");
-    document.getElementById("accessDenied").classList.add("hidden");
-    await loadUsers();
-  } else {
+    let isAdmin = false;
+
+    if (!snapshot.empty) {
+      const userDoc = snapshot.docs[0];
+      const role = userDoc.data().role;
+      
+      if (role && role.toLowerCase() === "admin") {
+        isAdmin = true;
+      }
+    }
+
+    if (isAdmin) {
+      productionForm.classList.remove("hidden");
+      document.getElementById("accessDenied").classList.add("hidden");
+      await loadUsers(workerSelect); 
+    } else {
+      document.getElementById("accessDenied").classList.remove("hidden");
+    }
+
+  } catch (error) {
+    console.error("Error fetching user role:", error);
     document.getElementById("accessDenied").classList.remove("hidden");
+  } finally {
+    loader.style.display = "none";
+    document.body.style.display = "flex";
   }
-
-  loader.style.display = "none";
-  document.body.style.display = "flex";
 });
 </script>
 </body>
