@@ -8,24 +8,20 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
     /* কাস্টম স্টাইল: কাজের ইনপুটগুলির জন্য */
-    /* 💡 ফিক্সড: কাজের এন্ট্রি গ্রিডকে ছোট স্ক্রিনের জন্য অপটিমাইজ করা হয়েছে */
     .work-entry {
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* ছোট স্ক্রিনে 2 কলাম */
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
         align-items: center;
         margin-bottom: 8px;
         padding-bottom: 8px;
         border-bottom: 1px solid #eee;
     }
-    /* বড় স্ক্রিনের জন্য কাস্টম গ্রিড লেআউট */
     @media (min-width: 640px) {
         .work-entry {
-            grid-template-columns: 2fr 1fr 1fr 1fr 20px; /* 5 কলাম: বিবরণ, স্টিচ, ব্যাস, মোট, ডিলিট */
+            grid-template-columns: 2fr 1fr 1fr 1fr 20px;
         }
     }
-    
-    /* 💡 নতুন স্টাইল: কার্ড স্টাইল লিস্ট */
     .production-card {
         cursor: pointer; 
         transition: transform 0.1s;
@@ -34,14 +30,10 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-    
-    /* মডালের ভেতরের ইনপুটগুলির জন্য ছোট ফন্ট */
     .modal-input {
         padding: 6px;
         font-size: 0.875rem; /* text-sm */
     }
-
-    /* মডাল কাজের ইনপুটগুলির জন্য রেসপনসিভ ফিক্স */
     .work-input-grid {
         display: grid;
         grid-template-columns: 1fr;
@@ -100,13 +92,17 @@
 </div>
 
 <div class="w-full max-w-[140px] flex gap-2 justify-center items-end">
-    <button id="clearFilter" class="px-3 py-2 bg-indigo-500 rounded hover:bg-gray-400 text-white text-sm">
-       🔁 রিসেট
+    <button id="clearFilter" type="button" class="addRowBtn px-2 py-1 bg-red-600 text-white rounded hover:bg-indigo-700 flex items-center justify-center">
+    <i data-lucide="x-circle" class="w-5 h-5 mr-1"></i>
+    ক্লিয়ার
     </button>
 </div>
-<div class="w-full max-w-[140px] flex gap-2 justify-center items-end">
-    <a id="addStitchButton" href="add-stitch.html" class="px-3 py-2 bg-indigo-500 rounded hover:bg-gray-400 text-white text-sm text-center hidden">
-        ➕ যুক্ত করুন
+<div class="w-full max-w-[140px] flex gap-2 justify-center items-end whitespace-nowrap ">
+    <a id="addStitchButton" href="add-stitch.html" class="hidden">
+        <button type="button" class="addRowBtn px-2 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center justify-center">
+        <i data-lucide="plus-circle" class="w-5 h-5 mr-1"></i>
+        যুক্ত করুন
+        </button>
     </a>
 </div>
 
@@ -210,10 +206,6 @@
 <div id="footer-placeholder"></div>
 <script src="include-loader.js"></script>
 <script type="module">
-// ---------------------------------------------------------------------------------------------------------
-// 💡 নোট: শুধুমাত্র দুটি ফাংশন (renderProductions এবং renderWorksContainer) আপডেট করা হয়েছে।
-// ---------------------------------------------------------------------------------------------------------
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, getDocs, query, where, orderBy, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -261,24 +253,64 @@ let currentUserRole = "";
 // 🎯 কনস্ট্যান্ট (একই)
 const WORKER_CATEGORY_ID = "6TeDHhrINuMH5SxU6dAr"; 
 const TARGET_FIELD_NAME = "productionTarget";
-const MONTHLY_TOTAL_DAYS = 25; 
+// 🎯 র‍্যাঙ্ক, স্যালারি গণনা ফাংশন (র‍্যাঙ্ক ও পার্সেন্টেজ লজিক আপডেট)
+function calculateCumulativeRank(cumulativeTotal, dailyFixedProduction) { 
+    const TARGET_DAYS_FOR_RANK = 28; 
+    if (dailyFixedProduction === 0 || dailyFixedProduction === null || isNaN(dailyFixedProduction)) {
+        return { rankTitle: '-', rankTargetPercent: 0 }; 
+    }
+    // ২৮ দিনের মোট ফিক্সড টার্গেট গণনা
+    const monthlyTarget = dailyFixedProduction * TARGET_DAYS_FOR_RANK;
+    const rankStep = monthlyTarget / 5; // মোট টার্গেটের ২০%
+    const comparisonValue = cumulativeTotal; // বিগত ৩২ দিনের মোট উৎপাদন
+    if (rankStep === 0) {
+        return { rankTitle: '-', rankTargetPercent: 0 }; 
+    }
+    
+    let rankTitle = "নতুন";
+    let requiredTarget = 0; // পরবর্তী ধাপের টার্গেট
+    let previousTarget = 0; // বর্তমান ধাপের শুরু
 
-// -----------------------------------------------------------------------
-// 🎯 র‍্যাঙ্ক, স্যালারি গণনা ফাংশন (পূর্বের মতোই)
-// -----------------------------------------------------------------------
-function calculateCumulativeRank(cumulativeTotal, dailyTarget) {
-    if (dailyTarget === 0 || dailyTarget === null || isNaN(dailyTarget)) return '-'; 
-    const monthlyTarget = dailyTarget * MONTHLY_TOTAL_DAYS;
-    const rankStep = monthlyTarget / 5; 
-
-    if (rankStep === 0) return '-'; 
-    const comparisonValue = cumulativeTotal;
-
-    if (comparisonValue >= rankStep * 4) return "অপারেটর"; 
-    else if (comparisonValue >= rankStep * 3) return "সহকারী"; 
-    else if (comparisonValue >= rankStep * 2) return "হেলপার"; 
-    else if (comparisonValue >= rankStep * 1) return "সফল"; 
-    else return "বিফল"; 
+    // র‍্যাঙ্ক নির্ধারণ এবং পরবর্তী টার্গেট সেট করা
+    if (comparisonValue >= rankStep * 4) {
+        rankTitle = "সুপারভাইজার";
+        // 'অপারেটর'-এর উপরে কোনো র‍্যাঙ্ক নেই, তাই পরবর্তী টার্গেট মাসিক টার্গেট হিসাবে ধরা হলো
+        requiredTarget = monthlyTarget * 1.25; // পরবর্তী কল্পিত ধাপ
+        previousTarget = rankStep * 4;
+    } else if (comparisonValue >= rankStep * 3) {
+        rankTitle = "অপারেটর";
+        requiredTarget = rankStep * 4; // পরবর্তী ধাপ: অপারেটর
+        previousTarget = rankStep * 3;
+    } else if (comparisonValue >= rankStep * 2) {
+        rankTitle = "সহকারী";
+        requiredTarget = rankStep * 3; // পরবর্তী ধাপ: সহকারী
+        previousTarget = rankStep * 2;
+    } else if (comparisonValue >= rankStep * 1) {
+        rankTitle = "হেলপার";
+        requiredTarget = rankStep * 2; // পরবর্তী ধাপ: হেলপার
+        previousTarget = rankStep * 1;
+    } else {
+        rankTitle = "নতুন";
+        requiredTarget = rankStep * 1; // পরবর্তী ধাপ: স্বাভাবিক
+        previousTarget = 0;
+    }
+    
+    let completionPercent = 0;
+    
+    const currentStepRange = requiredTarget - previousTarget;
+    const progressInStep = comparisonValue - previousTarget;
+    
+    if (currentStepRange > 0) {
+        // progressInStep / currentStepRange * 100
+        completionPercent = Math.min(100, (progressInStep / currentStepRange) * 100).toFixed(0);
+    } else {
+        completionPercent = 100; // অপারেটরের জন্য বা টার্গেট 0 হলে
+    }
+    
+    return { 
+        rankTitle: rankTitle, 
+        rankTargetPercent: Math.max(0, completionPercent) // নেগেটিভ মান এড়ানো
+    };
 }
 
 function calculateDailySalary(monthlySalary, month, year) {
@@ -295,7 +327,7 @@ function calculateEarnedSalary(cumulativeAvg, dailyTarget, totalWorkingDays, det
 }
 // -----------------------------------------------------------------------
 
-// 🔹 Load Workers Dropdown (পূর্বের মতোই)
+// 🔹 Load Workers Dropdown (ফিক্সড প্রোডাকশন লোডিং এর জন্য আপডেট)
 async function loadWorkers() {
     filterWorker.innerHTML = `<option value="">সব</option>`;
     allWorkers = [];
@@ -307,13 +339,20 @@ async function loadWorkers() {
             const user = docSnap.data();
             user.id = docSnap.id;
             
+            // 💡 বেতনের জন্য টার্গেট প্রোডাকশন
             let targetValue = user[TARGET_FIELD_NAME];
             if (targetValue === undefined || targetValue === null) targetValue = 0;
             else targetValue = parseFloat(targetValue);
             user.productionTarget = isNaN(targetValue) ? 0 : targetValue; 
             
-            let salaryValue = user.fixedSalary !== undefined ? parseFloat(user.fixedSalary) : 0;
-            user.fixedSalary = isNaN(salaryValue) ? 0 : salaryValue;
+            // 💡 র‍্যাঙ্কিং-এর জন্য ফিক্সড প্রোডাকশন লোড করা
+            let fixedValue = user.fixedProduction; // ফিক্সড প্রোডাকশন ফিল্ড নেম ব্যবহার
+            if (fixedValue === undefined || fixedValue === null) fixedValue = 0;
+            else fixedValue = parseFloat(fixedValue);
+            user.fixedRankTarget = isNaN(fixedValue) ? 0 : fixedValue;
+            
+            let salaryValue = user.achievedSalary !== undefined ? parseFloat(user.achievedSalary) : 0;
+            user.achievedSalary = isNaN(salaryValue) ? 0 : salaryValue;
             
             allWorkers.push(user); 
             const opt = document.createElement("option");
@@ -379,7 +418,7 @@ async function fetchProductions() {
     } 
 }
 
-// 🔹 💡 আপডেট করা Render Productions (কার্ড লেআউট ফিক্স)
+// 🔹 💡 আপডেট করা Render Productions (৩২ দিনের র‍্যাঙ্কিং সহ)
 function renderProductions() {
     productionList.innerHTML = "";
     const monthFilter = filterMonth.value !== "" ? parseInt(filterMonth.value) : null;
@@ -406,8 +445,11 @@ function renderProductions() {
     
     const workerNameMap = allWorkers.reduce((map, worker) => {
         map[worker.id] = worker.name;
+        // 💡 বেতনের জন্য টার্গেট প্রোডাকশন
         map[`target-${worker.id}`] = worker.productionTarget || 0; 
-        map[`salary-${worker.id}`] = worker.fixedSalary || 0;
+        // 💡 র‍্যাঙ্কিংয়ের জন্য ফিক্সড প্রোডাকশন
+        map[`fixedTarget-${worker.id}`] = worker.fixedRankTarget || 0; 
+        map[`salary-${worker.id}`] = worker.achievedSalary || 0;
         return map;
     }, {});
 
@@ -425,6 +467,7 @@ function renderProductions() {
                 works: [...p.works],
                 id: p.id,
                 workerName: workerNameMap[p.workerId] || "অজানা কর্মী",
+                // 💡 বেতনের জন্য টার্গেট প্রোডাকশন ব্যবহার
                 dailyTarget: workerNameMap[`target-${p.workerId}`] || 0,
                 monthlySalary: workerNameMap[`salary-${p.workerId}`] || 0
             };
@@ -437,7 +480,7 @@ function renderProductions() {
 
     const groupedArray = Object.values(groupedData);
 
-    // ডিফল্ট কার্ড মান রিসেট (পূর্বের মতোই)
+// ডিফল্ট কার্ড মান রিসেট (পূর্বের মতোই)
     document.getElementById("totalProductionValue").textContent = "0";
     document.getElementById("averageProductionValue").textContent = "0";
     document.getElementById("workdayProductionValue").textContent = "0";
@@ -450,50 +493,71 @@ function renderProductions() {
         return;
     }
 
-    let cumulativeTotals = {};
-    let cumulativeCounts = {}; 
-    let prevGrandTotals = {};
-    
+    // 💡 র‍্যাঙ্কিংয়ের জন্য নতুন কনস্ট্যান্ট
+    const ROLLING_DAYS_COUNT = 32; 
+
+    // র‍্যাঙ্কিংয়ের জন্য ডেটা তারিখ অনুযায়ী সাজানো
     const sortedByDate = [...groupedArray].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    sortedByDate.forEach(p => {
+    
+    // 💡 ফাইনাল লুপ: প্রতিটি এন্ট্রির জন্য ৩২ দিনের ডেটা বিশ্লেষণ এবং র‍্যাঙ্ক নির্ধারণ
+    sortedByDate.forEach((p, index) => {
         const wid = p.workerId;
-        const grandTotal = p.grandTotal;
-
-        if (!cumulativeTotals[wid]) cumulativeTotals[wid] = 0;
-        if (!cumulativeCounts[wid]) cumulativeCounts[wid] = 0;
+        const entryDate = new Date(p.date); // বর্তমান কার্ডের এন্ট্রির তারিখ
         
-        cumulativeTotals[wid] += grandTotal;
-        cumulativeCounts[wid]++;
+        // ৩২ দিন আগের তারিখ গণনা
+        const rollingStartDate = new Date(entryDate);
+        rollingStartDate.setDate(entryDate.getDate() - ROLLING_DAYS_COUNT);
+        rollingStartDate.setHours(0, 0, 0, 0); 
         
-        const dailyAvg = cumulativeTotals[wid] / cumulativeCounts[wid];
-
-        p.cumulativeTotal = cumulativeTotals[wid]; 
-        p.cumulativeAvg = dailyAvg;
+        let rollingCumulativeTotal = 0;
+        let rollingWorkingDays = 0;
         
-        let totalColorClass = "";
-        if (prevGrandTotals[wid] !== undefined) {
-            if (grandTotal > prevGrandTotals[wid]) totalColorClass = "text-green-600 font-bold";
-            else if (grandTotal < prevGrandTotals[wid]) totalColorClass = "text-red-600 font-bold";
-        }
-        prevGrandTotals[wid] = grandTotal;
+        // 💡 ওই কর্মীর সমস্ত গ্রুপ করা এন্ট্রি খোঁজা
+        const allWorkerGroupedEntries = groupedArray.filter(entry => entry.workerId === wid);
+        
+        allWorkerGroupedEntries.forEach(entry => {
+            const currentEntryDate = new Date(entry.date);
+            
+            // যদি এন্ট্রিটি রোলিং উইন্ডোর মধ্যে থাকে (বিগত ৩২ দিন)
+            if (currentEntryDate >= rollingStartDate && currentEntryDate <= entryDate) {
+                rollingCumulativeTotal += entry.grandTotal;
+                rollingWorkingDays++;
+            }
+        });
 
-        p.totalColorClass = totalColorClass;
-        p.totalRank = calculateCumulativeRank(p.cumulativeTotal, p.dailyTarget);
+        // 💡 র‍্যাঙ্কিং গণনা
+        const fixedTarget = workerNameMap[`fixedTarget-${p.workerId}`] || 0;
+        
+        // 💡 ফাংশন এখন একটি অবজেক্ট রিটার্ন করছে
+        const rankResult = calculateCumulativeRank(
+            rollingCumulativeTotal, // বিগত ৩২ দিনের মোট উৎপাদন
+            fixedTarget // 💡 ফিক্সড প্রোডাকশন টার্গেট ব্যবহার করা হলো
+        );
+        
+        p.totalRank = rankResult.rankTitle; // র‍্যাঙ্ক টাইটেল
+        p.rankTargetPercent = rankResult.rankTargetPercent; // পরবর্তী ধাপের শতাংশ
+
+        // 💡 বেতনের লজিকের জন্য প্রয়োজনীয় ডেটা সেট করা
+        p.cumulativeTotal = rollingCumulativeTotal; 
+        p.totalWorkDays = rollingWorkingDays; 
+        p.cumulativeAvg = rollingWorkingDays > 0 ? p.cumulativeTotal / rollingWorkingDays : 0;
+        p.dailyTarget = workerNameMap[`target-${p.workerId}`]; 
+        
+        p.totalColorClass = "text-gray-800 font-bold"; 
     });
 
-    const sortedForDisplay = sortedByDate.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sortedForDisplay = groupedArray.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // 💡 কার্ড আকারে ডেটা রেন্ডার করা (আপনার সর্বশেষ লেআউট)
+    // 💡 কার্ড আকারে ডেটা রেন্ডার করা (আপডেট করা ডিজাইন)
     sortedForDisplay.forEach(p => {
         const card = document.createElement("div");
         card.className = "production-card bg-white shadow rounded-lg p-4 border border-gray-200";
         card.onclick = () => viewProduction(p.id); 
 
         const date = new Date(p.date);
-        // 💡 তারিখের ফরম্যাট: শুধু দিন ও মাস
         const formattedDate = date.toLocaleDateString('bn-BD', { day: 'numeric', month: 'short' }); 
         
+        // 💡 ডিসপ্লে কোড আপডেট: নাম ও মোট প্রোডাকশন এক লাইনে
         card.innerHTML = `
             <div class="flex justify-between items-center mb-2 border-b pb-2">
                 <span class="text-sm font-semibold text-gray-700">${formattedDate}</span>
@@ -501,25 +565,32 @@ function renderProductions() {
                 <span class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">${p.totalRank}</span>
             </div>
             
-            <div class="flex justify-center items-end gap-2 text-sm">
-                <div>
+            <div class="flex flex-col gap-2 text-sm">
+                <div class="flex justify-between items-center w-full">
                     <span class="text-sm text-gray-500">ওয়ার্কারঃ <span class="font-bold text-gray-800">${p.workerName}</span></span>
+                    <span class="text-sm text-gray-500">মোটঃ <span class="font-bold text-gray-800">${p.grandTotal}</span></span>
                 </div>
                 
-                <div class="text-right">
-                    <span class="text-sm text-gray-500">মোটঃ <span class="font-bold text-gray-800">${p.grandTotal}</span></span>
+                <div class="flex flex-col w-full pt-1">
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-green-500 h-2.5 rounded-full" style="width: ${p.rankTargetPercent}%;"></div>
+                    </div>
+                    <p class="text-xs text-center mt-1 text-gray-500">
+                        পরবর্তী র‍্যাঙ্কে অগ্রগতি: 
+                        <span class="font-bold text-green-600">${p.rankTargetPercent}%</span>
+                    </p>
                 </div>
             </div>
         `;
         productionList.appendChild(card);
     });
 
-    // ... (কার্ডের মান আপডেট লজিক একই থাকবে) ...
+    // ... (কার্ডের মান আপডেট লজিক) ...
     let totalProduction = groupedArray.reduce((sum, p) => sum + p.grandTotal, 0);
     let totalWorkdays = groupedArray.length;
     let averageProduction = totalWorkdays > 0 ? totalProduction / totalWorkdays : 0;
     
-    // ... (স্যালারি গণনা লজিক একই থাকবে) ...
+    // ... (স্যালারি গণনা লজিক) ...
     const currentMonth = filterMonth.value !== "" ? parseInt(filterMonth.value) : new Date().getMonth();
     const currentYear = filterYear.value !== "" ? parseInt(filterYear.value) : new Date().getFullYear();
     let totalDeterminedSalary = 0; 
@@ -533,8 +604,8 @@ function renderProductions() {
     }
 
     workersToCalculate.forEach(worker => {
-        const monthlySalary = worker.fixedSalary || 0; 
-        const dailyTarget = worker.productionTarget || 0; 
+        const monthlySalary = worker.achievedSalary || 0; 
+        const dailyTarget = worker.productionTarget || 0; // বেতনের জন্য টার্গেট প্রোডাকশন ব্যবহার
         totalTarget += dailyTarget;
         totalDeterminedSalary += monthlySalary; 
 
@@ -617,7 +688,6 @@ function renderWorksContainer(works, isEditable) {
     
     works.forEach((w, index) => {
         const div = document.createElement("div");
-        // 💡 ছোট স্ক্রিনে ২ কলাম, বড় স্ক্রিনে ৪ কলাম + ডিলিট বাটন
         div.className = "work-entry border-b pb-2"; 
         
         div.innerHTML = `
@@ -657,16 +727,13 @@ function renderWorksContainer(works, isEditable) {
     });
 
     if (isEditable) {
-    // একটি কন্টেইনার তৈরি করা হলো বাটনটিকে মাঝখানে আনার জন্য
     const buttonContainer = document.createElement("div");
-    // flex এবং justify-center ক্লাস ব্যবহার করে মাঝখানে আনা হলো
     buttonContainer.className = "flex justify-center pt-4"; 
     
     const addButton = document.createElement("button");
     addButton.type = "button";
     addButton.textContent = "+ নতুন এন্ট্রি যোগ করুন";
     
-    // 💡 আপডেট করা ক্লাস: বাটন স্টাইল, মাঝখানে টেক্সট, হোভার ইফেক্ট
     addButton.className = "px-4 py-2 bg-indigo-500 text-white rounded-lg text-sm font-semibold hover:bg-indigo-600 transition duration-150 shadow-md";
     
     addButton.onclick = addWorkEntry;
@@ -674,7 +741,7 @@ function renderWorksContainer(works, isEditable) {
     buttonContainer.appendChild(addButton);
     modalWorksContainer.appendChild(buttonContainer);
     }
-    }
+}
 
 // 💡 এডিট মোড সক্ষম করা (পূর্বের মতোই)
 window.enableEditMode = function() {
@@ -729,6 +796,7 @@ window.removeWorkEntry = function(buttonElement) {
 window.calculateModalTotal = function() {
     let grandTotal = 0;
     const workEntries = modalWorksContainer.querySelectorAll('.work-entry');
+    // 💡 এখানে একটি ফিক্স আনা হয়েছে: লুপ শুরু করার আগে currentProductionData.works রিসেট করা
     currentProductionData.works = []; 
 
     workEntries.forEach((entry) => {
@@ -738,7 +806,7 @@ window.calculateModalTotal = function() {
         const totalInput = entry.querySelector('[data-field="total"]');
 
         if (!productInput || !stageInput || !countInput || !totalInput) return; // সেফটি চেক
-
+        
         const product = productInput.value;
         const stage = parseFloat(stageInput.value) || 0;
         const count = parseFloat(countInput.value) || 0;
@@ -777,7 +845,7 @@ async function updateProduction() {
     const newWorks = currentProductionData.works;
     
     if (!docId || newWorks.length === 0) {
-        alert("আপডেটের জন্য প্রোডাকশন আইডি বা কাজের ডেটা পাওয়া যায়নি!");
+        alert("আপডেটের জন্য প্রোডাকশন আইডি বা কাজের ডেটা পাওয়া যায়নি!");
         loader.style.display = "none";
         return;
     }

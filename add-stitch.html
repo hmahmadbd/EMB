@@ -32,48 +32,47 @@
 
 <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-3xl mb-6" id="mainContent">
 
-<div class="flex items-center justify-center mb-6">
-  <h1 class="text-2xl font-bold text-center text-indigo-700">➕ Add Production</h1>
-  <button type="button" id="editTargetBtn" title="প্রোডাকশন টার্গেট ও বেতন সেট করুন">
-      <i data-lucide="edit" class="w-5 h-5"></i>
+<div class="flex items-center justify-center mb-6 space-x-3">
+  <div class="flex items-center space-x-2">
+    <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-700"></i>
+    <h1 class="text-2xl font-bold text-indigo-700 whitespace-nowrap">Add Production</h1>
+  </div>
+  <button type="button" id="editTargetBtn" title="প্রোডাকশন টার্গেট ও বেতন সেট করুন" class="text-indigo-700 hover:text-indigo-900">
+    <i data-lucide="edit" class="w-5 h-5"></i>
   </button>
 </div>
 
 
 <form id="productionForm" class="space-y-4 hidden">
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-  <div class="grid grid-cols-2 gap-2 w-full">
-  
-  <div class="w-full">
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+        <label class="block text-gray-600 mb-1 text-center">তারিখ</label>
+        <input type="date" id="date" class="w-full border rounded p-2" required>
+    </div>
+    <div class="w-full">
     <label class="block text-gray-600 mb-1 text-center">ওয়ার্কার</label>
     <select id="worker" class="w-full border rounded p-2 text-center" required>
-      <option value="">ওয়ার্কার</option>
+    <option value="">ওয়ার্কার</option>
     </select>
+    </div>
   </div>
-  
-  <div>
-  <label class="block text-gray-600 mb-1 text-center">মিশিন</label>
-  <select id="machine" class="w-full border rounded p-2 text-center" required>
-  <option value="All">মিশিন</option>
-  <option value="M1">M1</option>
-  <option value="M2">M2</option>
-  <option value="M3">M3</option>
-  <option value="M4">M4</option>
-  </select>
-  </div>
-  </div>
-  
-  <div class="grid grid-cols-2 gap-2 w-full text-center">
-  <div>
-  <label class="block text-gray-600 mb-1 text-center">তারিখ</label>
-  <input type="date" id="date" class="w-full border rounded p-2" required>
-  </div>
-  <div>
-  <label class="block text-gray-600 mb-1 text-center">কাজের সময়</label>
-  <input type="text" id="workTime" class="w-full border rounded p-2" placeholder="08:30" required>
-  </div>
-  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="block text-gray-600 mb-1 text-center">মিশিন</label>
+      <select id="machine" class="w-full border rounded p-2 text-center" required>
+        <option value="All">মিশিন</option>
+        <option value="M1">M1</option>
+        <option value="M2">M2</option>
+        <option value="M3">M3</option>
+        <option value="M4">M4</option>
+      </select>
+    </div>
+    <div>
+    <label class="block text-gray-600 mb-1 text-center">বন্ধের সময়</label>
+    <input type="text" id="stopTime" class="w-full border rounded p-2 text-center" placeholder="HH:MM (যেমন: 02:00)" value="00:00" required>
+    </div>
   </div>
 
   <div class="text-gray-600 font-semibold mb-2 text-center">কাজের বিবরণ</div>
@@ -83,6 +82,10 @@
     সর্বমোট: <span id="grandTotal">0</span>
   </div>
 
+  <div>
+      <label for="notes" class="block text-gray-600 mb-1 text-center">নোট / মন্তব্য</label>
+      <textarea id="notes" class="w-full border rounded p-2" rows="2" placeholder="যেমন: লোডশেডিং এর জন্য ২ ঘন্টা বন্ধ ছিল।"></textarea>
+  </div>
   <div>
     <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 w-full">সংরক্ষণ করুন</button>
   </div>
@@ -96,24 +99,50 @@
     <h2 class="text-xl font-bold text-indigo-700 mb-4">টার্গেট ও বেতন আপডেট</h2>
     
     <div class="space-y-4">
-      <div>
-        <label for="targetWorkerSelect" class="block text-gray-600 mb-1">ওয়ার্কার নির্বাচন করুন</label>
-        <select id="targetWorkerSelect" class="w-full border rounded p-2 text-center">
-          <option value="">ওয়ার্কার</option>
-        </select>
-      </div>
-      
-      <div id="targetInputContainer" class="hidden space-y-4">
         <div>
-            <label for="productionTarget" class="block text-gray-600 mb-1">প্রোডাকশন টার্গেট (স্টিজ)</label>
-            <input type="number" id="productionTarget" class="w-full border rounded p-2" placeholder="যেমন: 5000" step="1">
+          <label for="targetWorkerSelect" class="block text-gray-600 mb-1">ওয়ার্কার নির্বাচন করুন</label>
+          <select id="targetWorkerSelect" class="w-full border rounded p-2 text-center">
+            <option value="">ওয়ার্কার</option>
+          </select>
         </div>
+        <div id="targetInputContainer" class="hidden space-y-4">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="targetMachineSelect" class="block text-gray-600 mb-1 text-sm">নির্ধারিত মেশিন</label>
+                    <select id="targetMachineSelect" class="w-full border rounded p-2 text-center text-sm">
+                        <option value="All">মিশিন</option>
+                        <option value="M1">M1</option>
+                        <option value="M2">M2</option>
+                        <option value="M3">M3</option>
+                        <option value="M4">M4</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="fixedProduction" class="block text-gray-600 mb-1 text-sm">নির্ধারিত প্রোডাকশন (বেস)</label>
+                    <input type="number" id="fixedProduction" class="w-full border rounded p-2 text-sm" placeholder="যেমন: 500" step="1">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="productionTarget" class="block text-gray-600 mb-1 text-sm">টার্গেট প্রোডাকশন</label>
+                    <input type="number" id="productionTarget" class="w-full border rounded p-2 text-sm" placeholder="যেমন: 5000" step="1">
+                </div>
 
-        <div>
-            <label for="fixedSalary" class="block text-gray-600 mb-1">নির্ধারিত বেতন (টাকা)</label>
-            <input type="number" id="fixedSalary" class="w-full border rounded p-2" placeholder="যেমন: 15000" step="100">
-        </div>
-      </div>
+                <div>
+                    <label for="fixedSalary" class="block text-gray-600 mb-1 text-sm">নির্ধারিত বেতন (টাকা)</label>
+                    <input type="number" id="fixedSalary" class="w-full border rounded p-2 text-sm" placeholder="যেমন: 15000" step="100">
+                </div>
+            </div>
+            
+            <div class="p-3 bg-indigo-50 border border-indigo-200 rounded text-center">
+                <label class="block text-gray-700 font-semibold mb-1">প্রাপ্য বেতন (অনুমান)</label>
+                <div id="achievedSalaryDisplay" class="text-xl font-bold text-indigo-700">৳ 0.00</div>
+                <div id="achievedPercentage" class="text-sm text-gray-500">০% টার্গেট পূরণ</div>
+            </div>
+            </div>
     </div>
     
     <div class="mt-6 flex justify-end space-x-3">
@@ -145,6 +174,7 @@ const WORKER_CATEGORY_KEY = "6TeDHhrINuMH5SxU6dAr";
 
 const productionForm = document.getElementById("productionForm");
 const workerSelect = document.getElementById("worker");
+const machineSelect = document.getElementById("machine"); 
 const stageContainer = document.getElementById("stageContainer");
 const grandTotalSpan = document.getElementById("grandTotal");
 const loader = document.getElementById("loader");
@@ -154,21 +184,55 @@ const targetModal = document.getElementById("targetModal");
 const editTargetBtn = document.getElementById("editTargetBtn");
 const closeModalBtn = document.getElementById("closeModalBtn");
 const targetWorkerSelect = document.getElementById("targetWorkerSelect");
+const targetMachineSelect = document.getElementById("targetMachineSelect");
+const fixedProductionInput = document.getElementById("fixedProduction");
 const productionTargetInput = document.getElementById("productionTarget");
-const fixedSalaryInput = document.getElementById("fixedSalary"); // নতুন
+const fixedSalaryInput = document.getElementById("fixedSalary");
 const targetInputContainer = document.getElementById("targetInputContainer");
 const saveTargetBtn = document.getElementById("saveTargetBtn");
 
+// নতুন ডিসপ্লে উপাদান
+const achievedSalaryDisplay = document.getElementById("achievedSalaryDisplay");
+const achievedPercentage = document.getElementById("achievedPercentage");
+
+// **********************************************
+// বন্ধের সময় (Stop Time) এবং নোট উপাদান
+// **********************************************
+const stopTimeInput = document.getElementById("stopTime"); // ID: stopTime
+const notesInput = document.getElementById("notes"); // নোট
+// **********************************************
+
 let authChecked = false;
+
+// Product/বিবরণ আইটেমগুলির লিস্ট (No Change)
+const PRODUCT_LIST = [
+    "বডি",
+    "পেনেল/ঘের",
+    "গলা/কলার",
+    "হাতা",
+    "ওড়না",
+    "সেলোয়ার",
+    "টাই/লেস",
+    "মনোগ্রাম/লোগো",
+    "অন্যান্য"
+];
 
 // Create Work Row (No Change)
 function createRow() {
   const row = document.createElement("div");
   row.className = "border rounded p-2 flex flex-col gap-2";
 
+  // ড্রপডাউন অপশন তৈরি করা
+  let productOptions = '<option value="">বিবরণ নির্বাচন করুন</option>';
+  PRODUCT_LIST.forEach(item => {
+      productOptions += `<option value="${item}">${item}</option>`;
+  });
+  
   row.innerHTML = `
     <div class="flex flex-wrap gap-2">
-      <input type="text" class="product border rounded p-2 flex-1 min-w-[45%]" placeholder="বিবরণ" required>
+      <select class="product border rounded p-2 flex-1 min-w-[45%]" required>
+          ${productOptions}
+      </select>
       <input type="number" class="stage border rounded p-2 flex-1 min-w-[45%]" placeholder="স্টিজ" step="1" required>
     </div>
     <div class="flex flex-wrap gap-2">
@@ -222,7 +286,7 @@ function calculateGrandTotal() {
 
 createRow();
 
-// Load Users for both main form and modal
+// Load Users for both main form and modal (No Change)
 async function loadUsers(targetSelectElement) {
   const peopleRef = collection(db, "people");
   const q = query(peopleRef, where("category_key", "==", WORKER_CATEGORY_KEY)); 
@@ -238,28 +302,107 @@ async function loadUsers(targetSelectElement) {
     opt.value = docSnap.id; 
     opt.textContent = user.name;
     
-    // টার্গেট এবং বেতন দুটিই ডেটা-অ্যাট্রিবিউট এ সেভ করা হচ্ছে
+    // ডেটা-অ্যাট্রিবিউট এ সেভ করা হচ্ছে
+    if (user.fixedProduction) {
+        opt.dataset.fixed = user.fixedProduction;
+    }
     if (user.productionTarget) {
         opt.dataset.target = user.productionTarget;
     }
-    if (user.fixedSalary) {
-        opt.dataset.salary = user.fixedSalary; 
+    // fixedSalary এর জন্য একটি নতুন ডাটা-এট্রিবিউট প্রয়োজন
+    if (user.fixedSalary) { 
+        opt.dataset.fixedsalary = user.fixedSalary; 
     }
+    if (user.achievedSalary) {
+        opt.dataset.salary = user.achievedSalary; 
+    }
+    if (user.achievedPercentage) {
+        opt.dataset.percentage = user.achievedPercentage; 
+    }
+    // --- অ্যাসাইন করা মেশিন সেভ করা ---
+    if (user.assignedMachine) {
+        opt.dataset.machine = user.assignedMachine;
+    }
+    // ----------------------------------------
     
     targetSelectElement.appendChild(opt);
   });
 }
 
 // =========================================================
-// টার্গেট ও বেতন আপডেট লজিক
+// প্রাপ্য বেতন গণনার ফাংশন (No Change)
+// =========================================================
+function calculateAchievedSalary(fixedProd, targetProd, fixedSal) {
+    const fixedProduction = parseFloat(fixedProd) || 0; // বেস বা স্ট্যান্ডার্ড
+    const productionTarget = parseFloat(targetProd) || 0; // ওয়ার্কারের পারফরম্যান্স
+    const fixedSalary = parseFloat(fixedSal) || 0; // নির্ধারিত বেতন
+
+    let achievedSalary = 0;
+    let actualPercentage = 0;
+
+    if (fixedProduction > 0) {
+        // ১. শতাংশ গণনা: (টার্গেট প্রোডাকশন / নির্ধারিত প্রোডাকশন) * 100
+        actualPercentage = (productionTarget / fixedProduction) * 100;
+        
+        // ২. প্রাপ্য বেতন গণনা: নির্ধারিত বেতনের তত শতাংশ
+        achievedSalary = fixedSalary * (actualPercentage / 100);
+    }
+    
+    // ডিসপ্লে আপডেট
+    achievedSalaryDisplay.textContent = `৳ ${achievedSalary.toFixed(2)}`;
+    achievedPercentage.textContent = `${actualPercentage.toFixed(0)}% টার্গেট পূরণ`;
+
+    // সেভ করার জন্য মানগুলো রিটার্ন করা
+    return {
+        achievedSalary: achievedSalary.toFixed(2), 
+        actualPercentage: actualPercentage.toFixed(2)
+    };
+}
+
+// ইনপুট পরিবর্তন হলে প্রাপ্য বেতন গণনা করা (No Change)
+fixedProductionInput.addEventListener('input', () => {
+    calculateAchievedSalary(fixedProductionInput.value, productionTargetInput.value, fixedSalaryInput.value);
+});
+productionTargetInput.addEventListener('input', () => {
+    calculateAchievedSalary(fixedProductionInput.value, productionTargetInput.value, fixedSalaryInput.value);
+});
+fixedSalaryInput.addEventListener('input', () => {
+    calculateAchievedSalary(fixedProductionInput.value, productionTargetInput.value, fixedSalaryInput.value);
+});
+
+// =========================================================
+// ১. প্রধান ফর্মে ওয়ার্কার পরিবর্তনের লজিক (মেশিন অটো-ফিল্টার) - No Change
+// =========================================================
+workerSelect.addEventListener('change', (e) => {
+    const workerId = e.target.value;
+
+    if (workerId) {
+        const selectedOption = workerSelect.options[workerSelect.selectedIndex];
+        const assignedMachine = selectedOption.dataset.machine || 'All'; 
+        
+        machineSelect.value = assignedMachine;
+    } else {
+        machineSelect.value = 'All';
+    }
+});
+
+// =========================================================
+// টার্গেট ও বেতন আপডেট লজিক (Modal-এর জন্য) - No Change
 // =========================================================
 
 // Modal ওপেন করা (No Change)
 editTargetBtn.addEventListener('click', () => {
     loadUsers(targetWorkerSelect);
     targetModal.style.display = 'flex';
+    // ইনপুট খালি করা ও ডিফল্ট সেট করা
+    targetMachineSelect.value = 'All'; 
+    fixedProductionInput.value = '';
     productionTargetInput.value = '';
-    fixedSalaryInput.value = ''; // নতুন
+    fixedSalaryInput.value = ''; 
+    
+    achievedSalaryDisplay.textContent = `৳ 0.00`;
+    achievedPercentage.textContent = `০% টার্গেট পূরণ`;
+
     targetInputContainer.classList.add("hidden");
     saveTargetBtn.disabled = true;
 });
@@ -269,7 +412,7 @@ closeModalBtn.addEventListener('click', () => {
     targetModal.style.display = 'none';
 });
 
-// ওয়ার্কার নির্বাচন করলে টার্গেট ও বেতন দেখানো
+// ওয়ার্কার নির্বাচন করলে টার্গেট, বেতন এবং মেশিন দেখানো (No Change)
 targetWorkerSelect.addEventListener('change', async (e) => {
     const workerId = e.target.value;
     
@@ -279,40 +422,59 @@ targetWorkerSelect.addEventListener('change', async (e) => {
         
         const selectedOption = targetWorkerSelect.options[targetWorkerSelect.selectedIndex];
         
-        // টার্গেট ও বেতন লোড করে ইনপুটে সেট করা
+        // --- ডেটা লোড করে ইনপুটে সেট করা ---
+        const currentFixed = selectedOption.dataset.fixed || '';
         const currentTarget = selectedOption.dataset.target || '';
-        const currentSalary = selectedOption.dataset.salary || ''; 
-        
+        const currentFixedSalary = selectedOption.dataset.fixedsalary || ''; 
+        const currentMachine = selectedOption.dataset.machine || 'All'; 
+
+        targetMachineSelect.value = currentMachine; // মেশিনের মান সেট করা
+        fixedProductionInput.value = currentFixed;
         productionTargetInput.value = currentTarget;
-        fixedSalaryInput.value = currentSalary; // নতুন
+        fixedSalaryInput.value = currentFixedSalary; // ফিক্সড স্যালারি ইনপুট ফিল্ডে লোড করা
+
+        // ডেটা লোড হওয়ার পর প্রাপ্য বেতন গণনা
+        calculateAchievedSalary(currentFixed, currentTarget, currentFixedSalary); 
+
     } else {
         targetInputContainer.classList.add("hidden");
         saveTargetBtn.disabled = true;
     }
 });
 
-// টার্গেট ও বেতন ফায়ারস্টোরে আপডেট করা
+// টার্গেট ও বেতন ফায়ারস্টোরে আপডেট করা (No Change)
 saveTargetBtn.addEventListener('click', async () => {
     const workerId = targetWorkerSelect.value;
+    const assignedMachine = targetMachineSelect.value; 
+    const fixedValue = parseFloat(fixedProductionInput.value) || 0;
     const targetValue = parseFloat(productionTargetInput.value) || 0;
-    const salaryValue = parseFloat(fixedSalaryInput.value) || 0; // নতুন
+    const salaryValue = parseFloat(fixedSalaryInput.value) || 0; // ফিক্সড স্যালারি ইনপুট থেকে নেওয়া হলো
 
-    if (!workerId || targetValue < 0 || salaryValue < 0) {
+    if (!workerId || fixedValue < 0 || targetValue < 0 || salaryValue < 0) {
         Swal.fire('ত্রুটি','বৈধ মান দিন।','error');
         return;
     }
 
+    // প্রাপ্য বেতনের চূড়ান্ত মান গণনা
+    const result = calculateAchievedSalary(fixedValue, targetValue, salaryValue);
+
+
     try {
         const workerDocRef = doc(db, "people", workerId);
+        
         await updateDoc(workerDocRef, {
+            assignedMachine: assignedMachine, 
+            fixedProduction: fixedValue,
             productionTarget: targetValue,
-            fixedSalary: salaryValue // নতুন ফিল্ড আপডেট
+            fixedSalary: salaryValue, // ফিক্সড স্যালারি ডাটাবেসে সেভ করা দরকার
+            achievedSalary: result.achievedSalary, // নতুন ফিল্ড: প্রাপ্য বেতন সেভ করা হচ্ছে
+            achievedPercentage: result.actualPercentage // নতুন ফিল্ড: শতাংশ সেভ করা হচ্ছে
         });
 
-        Swal.fire('সংরক্ষিত!','টার্গেট ও বেতন সফলভাবে আপডেট হয়েছে।','success');
+        Swal.fire('সংরক্ষিত!','টার্গেট, বেতন ও মেশিন সফলভাবে আপডেট হয়েছে।','success');
         
-        // Modal বন্ধ করার আগে উভয় ড্রপডাউন রিফ্রেশ করা
-        await loadUsers(workerSelect);
+        // উভয় ড্রপডাউন রিফ্রেশ করা
+        await loadUsers(workerSelect); 
         targetModal.style.display = 'none';
 
     } catch (err) {
@@ -321,13 +483,18 @@ saveTargetBtn.addEventListener('click', async () => {
     }
 });
 
-// Save Production (No Change)
+// =========================================================
+// Save Production (আপডেট: stopTime সেভ করা) - ID পরিবর্তন করা হয়েছে
+// =========================================================
 productionForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  
+  const submitButton = productionForm.querySelector('button[type="submit"]');
+  
   let incomplete = false;
   const works = [];
   document.querySelectorAll("#stageContainer > div").forEach(row => {
-    const product = row.querySelector(".product").value;
+    const product = row.querySelector(".product").value; 
     const stage = row.querySelector(".stage").value;
     const count = row.querySelector(".count").value;
     if (!product || !stage || !count) {
@@ -339,20 +506,35 @@ productionForm.addEventListener("submit", async (e) => {
       total: row.querySelector(".total").value
     });
   });
-  if (!workerSelect.value || !document.getElementById("machine").value || !document.getElementById("date").value || !document.getElementById("workTime").value) {
+  
+  // প্রয়োজনীয় ইনপুট ভ্যালু চেক করা
+  if (!workerSelect.value || !document.getElementById("machine").value || !document.getElementById("date").value || !stopTimeInput.value) {
     incomplete = true;
   }
+  
   if (incomplete) {
     Swal.fire('অসম্পূর্ণ!','অনুগ্রহ করে সমস্ত প্রয়োজনীয় ঘর পূরণ করুন।','warning');
     return;
   }
+
+  // ১. সাবমিট করার আগে বাটন ডিসেবল এবং লোডিং টেক্সট দেখানো
+  const originalButtonText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = 'সংরক্ষণ করা হচ্ছে...'; 
 
   const data = {
     workerId: workerSelect.value,
     workerName: workerSelect.options[workerSelect.selectedIndex].text,
     machine: document.getElementById("machine").value,
     date: document.getElementById("date").value,
-    workTime: document.getElementById("workTime").value,
+    
+    // **********************************************
+    // বন্ধের সময় (Stop Time) ডেটা
+    // **********************************************
+    stopTime: stopTimeInput.value, // ডেটাবেসে stopTime নামে সেভ হবে
+    notes: notesInput.value, // নোট
+    // **********************************************
+    
     works,
     grandTotal: grandTotalSpan.textContent,
     createdBy: auth.currentUser.email,
@@ -361,14 +543,21 @@ productionForm.addEventListener("submit", async (e) => {
 
   try {
     await addDoc(collection(db, "productions"), data);
+    
     Swal.fire('সংরক্ষিত!','উৎপাদন সফলভাবে সংরক্ষিত হয়েছে।','success');
     productionForm.reset();
+    stopTimeInput.value = '00:00'; // stopTime ফিল্ডটি রিসেট করা
     stageContainer.innerHTML = '';
     createRow();
     grandTotalSpan.textContent = '0';
+    
   } catch(err) {
     console.error(err);
     Swal.fire('ত্রুটি','উৎপাদন সংরক্ষণ করা যায়নি।','error');
+  } finally {
+    // ২. প্রক্রিয়া শেষ হওয়ার পরে বাটনটি আবার সক্রিয় করা এবং আগের টেক্সট ফিরিয়ে আনা
+    submitButton.disabled = false;
+    submitButton.textContent = originalButtonText;
   }
 });
 
@@ -380,7 +569,7 @@ onAuthStateChanged(auth, async user => {
   if (!user) {
     window.location.href = "/account";
     return;
-  }
+    }
   
   const usersRef = collection(db, "users");
   const q = query(usersRef, where("userId", "==", user.uid)); 
