@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>লেনদেন পেজ - Firestore</title>
+  <title>লেনদেন পেজ</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
@@ -23,6 +22,267 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    #confirm-modal-content {
+      background-color: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    #confirm-modal-content h3 {
+      font-weight: bold;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .smart-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      color: white;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+    .smart-button:hover {
+      opacity: 0.9;
+    }
+    .smart-button.teal { background-color: #14b8a6; }
+    .smart-button.red { background-color: #ef4444; }
+    .smart-button.blue { background-color: #3b82f6; }
+    .smart-button.gray { background-color: #6b7280; }
+
+    .icon-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        transition: background-color 0.2s;
+        color: #4b5563;
+    }
+    .icon-button:hover {
+        background-color: #e5e7eb;
+    }
+    
+    .card-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 0.75rem;
+        padding: 0.5rem;
+    }
+    
+    /* Center the cards */
+    .card-list-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .transaction-card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-body {
+        flex-grow: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    /* New: Added flex and gap for better alignment */
+    .balance-card h3, .balance-card p {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+
+    .amount-credit { color: #16a34a; font-weight: 700; }
+    .amount-debit { color: #dc2626; font-weight: 700; }
+
+    .balance-positive { color: #16a34a; font-weight: 700; }
+    .balance-negative { color: #dc2626; font-weight: 700; }
+    
+    .filter-icon {
+        font-size: 1.25rem;
+        margin-left: 0.5rem;
+    }
+
+    .profile-icon-container {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #e5e7eb;
+    }
+
+    .profile-icon-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-icon-svg {
+      width: 28px;
+      height: 28px;
+      color: #9ca3af;
+    }
+
+    .thin-border {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 4px;
+        width: 100%;
+        border-bottom-left-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+    .thin-border.credit { background-color: #14b8a6; }
+    .thin-border.debit { background-color: #f87171; }
+    
+    .filter-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .filter-item {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+    }
+
+    .filter-select {
+        border: none;
+        background: transparent;
+        padding: 0;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1f2937;
+        flex-grow: 1;
+    }
+    
+    .filter-select:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    
+    .search-input-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .search-input-container svg {
+        color: #4b5563;
+    }
+    
+    .search-input-container input {
+        flex-grow: 1;
+        border: none;
+        outline: none;
+        padding: 0;
+    }
+
+    /* New Card List for Person Modal */
+    .person-card-list {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .person-transaction-card {
+        background: #f9fafb;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        padding: 0.75rem;
+        border: 1px solid #e5e7eb;
+    }
+    
+    /* New: Edit Name Modal */
+    .edit-person-modal-content {
+      background-color: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    
+    /* New: For the person modal's transaction list */
+    .person-transaction-card .card-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .person-transaction-card .card-date-amount {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .person-transaction-card .card-row-info {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+    
+    @media (max-width: 640px) {
+        .person-transaction-card .card-row {
+            flex-direction: row;
+        }
+        .person-transaction-card .card-date-amount {
+            align-items: flex-start;
+        }
+    }
+
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 p-5">
@@ -34,81 +294,107 @@
 <div id="header-placeholder"></div>
 
 <div class="container mx-auto max-w-7xl bg-white p-8 rounded-xl shadow-lg mt-20 hidden" id="mainContent">
-  <h1 class="text-3xl font-bold text-center text-teal-600 mb-8">লেনদেন পেজ</h1>
 
-  <div class="flex flex-col gap-4 mb-8">
-    <div class="bg-blue-50 p-4 rounded-lg shadow-md flex justify-between">
-      <h3 class="text-lg font-semibold text-blue-800">মোট পেলাম</h3>
-      <p id="total-credit" class="text-2xl font-bold text-blue-600">৳ ০</p>
+  <div class="flex flex-wrap justify-between gap-2 mb-6">
+    <div class="flex-1 min-w-[100px] bg-blue-50 p-3 rounded-lg shadow-sm text-center balance-card">
+      <h3 class="text-sm font-semibold text-blue-800 truncate">মোট পেলাম</h3>
+      <p id="total-credit" class="text-lg font-bold text-blue-600 text-fit">৳ ০</p>
     </div>
-    <div class="bg-red-50 p-4 rounded-lg shadow-md flex justify-between">
-      <h3 class="text-lg font-semibold text-red-800">মোট দিলাম</h3>
-      <p id="total-debit" class="text-2xl font-bold text-red-600">৳ ০</p>
+  
+    <div class="flex-1 min-w-[100px] bg-red-50 p-3 rounded-lg shadow-sm text-center balance-card">
+      <h3 class="text-sm font-semibold text-red-800 truncate">মোট দিলাম</h3>
+      <p id="total-debit" class="text-lg font-bold text-red-600 text-fit">৳ ০</p>
     </div>
-    <div class="bg-green-50 p-4 rounded-lg shadow-md flex justify-between">
-      <h3 class="text-lg font-semibold text-green-800">মোট ব্যালেন্স</h3>
-      <p id="total-balance" class="text-2xl font-bold text-green-600">৳ ০</p>
+  
+    <div class="flex-1 min-w-[100px] bg-green-50 p-3 rounded-lg shadow-sm text-center balance-card">
+      <h3 class="text-sm font-semibold text-green-800 truncate">ক্যাশ ব্যালেন্স</h3>
+      <p id="total-cash" class="text-lg font-bold text-green-600 text-fit">৳ ০</p>
     </div>
+  
+  	<div class="flex-1 min-w-[100px] bg-gray-50 p-3 rounded-lg shadow-sm text-center balance-card">
+	  <h3 class="text-sm font-semibold text-green-800 truncate">মোট ব্যালেন্স</h3>
+  	  <p id="total-balance" class="text-lg font-bold text-green-600 text-fit">৳ ০</p>
+	</div>
   </div>
-
-  <div id="filter-section" class="bg-gray-50 p-6 rounded-lg shadow-inner mb-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="block text-sm font-medium mb-1">ক্যাটাগরি</label>
-        <select id="category" class="w-full p-2 border rounded-md" onchange="updateNameAndFilter()">
-          <option value="">সব</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium mb-1">নাম</label>
-        <select id="name" class="w-full p-2 border rounded-md" onchange="filterTransactions()">
-          <option value="">নাম নির্বাচন করুন</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium mb-1">শুরুর তারিখ</label>
-        <input type="date" id="start_date" class="w-full p-2 border rounded-md" onchange="filterTransactions()">
-      </div>
-      <div>
-        <label class="block text-sm font-medium mb-1">শেষ তারিখ</label>
-        <input type="date" id="end_date" class="w-full p-2 border rounded-md" onchange="filterTransactions()">
-      </div>
+ </div>
+  <div class="flex items-center justify-between w-full overflow-x-auto px-2 py-2 gap-2">
+    <button id="newEntryBtn" onclick="openEntryForm()" class="flex-shrink-0 text-teal-600 hover:text-teal-800 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+    </button>
+  
+    <div class="flex items-center flex-grow bg-white border border-gray-300 rounded-full px-2 h-10 min-w-0">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="name-search" placeholder="নাম দিয়ে খুঁজুন..." oninput="filterTransactions()" class="w-full px-1 text-sm outline-none bg-transparent">
     </div>
-    <div class="flex justify-end gap-4">
-      <button onclick="clearFilters()" id="clearFiltersBtn" class="px-6 py-2 bg-gray-500 text-white rounded-md flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-        ফিল্টার ক্লিয়ার
-      </button>
-      <button onclick="shareFilteredData()" id="shareBtn" class="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
-        শেয়ার করুন
-      </button>
-      <button id="newEntryBtn" onclick="openEntryForm()" class="px-6 py-2 bg-teal-500 text-white rounded-md hidden flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-        নতুন এন্ট্রি
-      </button>
-    </div>
+  
+    <button id="showFilterModalBtn" onclick="openFilterModal()" class="flex-shrink-0 text-gray-600 hover:text-gray-800 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+    </button>
   </div>
-
-  <div class="overflow-x-auto rounded-lg shadow-md">
-    <table class="w-full text-left table-auto">
-      <thead class="bg-gray-200">
-        <tr>
-          <th class="px-6 py-3">তারিখ</th>
-          <th class="px-6 py-3">নাম</th>
-          <th class="px-6 py-3">বিবরণ</th>
-          <th class="px-6 py-3">পেলাম</th>
-          <th class="px-6 py-3">দিলাম</th>
-          <th class="px-6 py-3">ব্যালেন্স</th>
-          <th class="px-6 py-3">অ্যাকশন</th>
-        </tr>
-      </thead>
-      <tbody id="transaction-list" class="bg-white divide-y divide-gray-200"></tbody>
-    </table>
+  
+  <div class="card-list-container">
+    <div id="transaction-card-list" class="card-list"></div>
   </div>
 </div>
 
-<div id="entry-modal" class="modal">
+<div id="filter-modal" class="modal z-[101]">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4 md:mx-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold">ফিল্টার</h2>
+            <div class="flex gap-2">
+                <button onclick="openEditCategoriesModal()" id="editCategoriesBtn" class="icon-button">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                </button>
+                <button onclick="shareFilteredData()" id="shareBtn" class="icon-button">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+                </button>
+                <button onclick="clearFilters()" id="clearFiltersBtn" class="icon-button">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                </button>
+                <button onclick="closeFilterModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="filter-grid">
+            <div class="filter-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+                <select id="category" class="filter-select" onchange="updateNameAndFilter()">
+                  <option value="">ক্যাটাগরি</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-2"><path d="M14 19a6 6 0 0 0-12 0"/><circle cx="8" cy="10" r="4"/><path d="M22 19a6 6 0 0 0-6-6 4 4 0 1 0 0-8"/></svg>
+                <select id="name" class="filter-select" onchange="filterTransactions()">
+                  <option value="">নাম</option>
+                </select>
+            </div>
+           	 <div class="filter-item">
+           		 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dollar-sign"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            		<select id="type-filter" class="filter-select" onchange="filterTransactions()">
+           			 <option value="all">সব</option>
+           			 <option value="credit">পেলাম</option>
+            		 <option value="debit">দিলাম</option>
+           			</select>
+            </div>
+            <div class="filter-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+                <input type="date" id="start_date" class="filter-select" onchange="filterTransactions()">
+            </div>
+            <div class="filter-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+                <input type="date" id="end_date" class="filter-select" onchange="filterTransactions()">
+            </div>
+            
+            <button onclick="closeFilterModal()" class="bg-gradient-to-r from-teal-500 to-green-500 text-white font-semibold px-4 py-2 rounded-full shadow-md hover:from-teal-600 hover:to-green-600 transition-all duration-300">
+            ফিলটার
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="entry-modal" class="modal z-[101]">
   <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
     <h2 id="modal-title" class="text-2xl font-bold mb-4 text-center">নতুন লেনদেন যোগ করুন</h2>
     <form id="entry-form">
@@ -130,382 +416,322 @@
           <input type="text" id="new-name-name" class="w-full p-2 border rounded-md" placeholder="নতুন নাম">
         </div>
       </div>
-      <div class="mb-4">
-        <label class="block text-sm mb-1">লেনদেনের ধরন</label>
-        <select id="entry-type" class="w-full p-2 border rounded-md" required>
-          <option value="credit">পেলাম</option>
-          <option value="debit">দিলাম</option>
-        </select>
+      <div class="mb-4 flex gap-4">
+      <div class="flex-1">
+      <label class="block text-sm mb-1">লেনদেনের ধরন</label>
+      <select id="entry-type" class="w-full p-2 border rounded-md" required>
+      <option value="credit">পেলাম</option>
+      <option value="debit">দিলাম</option>
+      </select>
       </div>
-      <div class="mb-4">
-        <label class="block text-sm mb-1">পরিমাণ (৳)</label>
-        <input type="number" id="entry-amount" class="w-full p-2 border rounded-md" required>
+      <div class="flex-1">
+      <label class="block text-sm mb-1">ক্যাশের ধরন</label>
+      <select id="cash-type" class="w-full p-2 border rounded-md" required>
+      <option value="cash">নগদ</option>
+      <option value="deu">বাকি</option>
+      </select>
+      </div>
+      </div>
+      <div class="mb-4 flex gap-4">
+      <div class="flex-1">
+      <label class="block text-sm mb-1">পরিমাণ (৳)</label>
+      <input type="number" id="entry-amount" class="w-full p-2 border rounded-md" required>
+      </div>
+      <div class="flex-1">
+      <label class="block text-sm mb-1">তারিখ</label>
+      <input type="date" id="entry-date" class="w-full p-2 border rounded-md" required>
+      </div>
       </div>
       <div class="mb-4">
         <label class="block text-sm mb-1">বিবরণ</label>
         <input type="text" id="entry-description" class="w-full p-2 border rounded-md">
       </div>
-      <div class="mb-4">
-        <label class="block text-sm mb-1">তারিখ</label>
-        <input type="date" id="entry-date" class="w-full p-2 border rounded-md" required>
-      </div>
-      <div class="flex justify-between gap-4">
-        <button type="button" onclick="closeEntryForm()" class="px-4 py-2 bg-gray-400 text-white rounded-md">বাতিল</button>
+      <div class="flex justify-center gap-4">
+        <button type="button" onclick="closeEntryForm()" class="smart-button gray"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="m15 9-6 6"/>
+        <path d="m9 9 6 6"/>
+        </svg>বাতিল</button>
         <div id="edit-buttons-container" class="flex gap-4">
-          <button type="submit" id="submitBtn" class="px-4 py-2 bg-teal-500 text-white rounded-md">যোগ করুন</button>
+          <button type="submit" id="submitBtn" class="smart-button teal">যোগ করুন</button>
         </div>
       </div>
     </form>
   </div>
 </div>
 
+<div id="confirm-modal" class="modal z-[102]">
+    <div id="confirm-modal-content">
+        <h3 class="text-xl font-bold mb-4">আপনি কি নিশ্চিত?</h3>
+        <p id="confirm-message" class="mb-6">এই লেনদেনটি স্থায়ীভাবে মুছে যাবে।</p>
+        <div class="flex justify-center gap-4">
+            <button onclick="closeConfirmModal()" class="smart-button gray">বাতিল</button>
+            <button id="confirm-delete-btn" class="smart-button red">মুছে ফেলুন</button>
+        </div>
+    </div>
+</div>
+
+<div id="edit-modal" class="modal z-[101]">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold" id="edit-modal-title">এডিট অপশন</h2>
+      <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    
+    <div id="edit-selection-section" class="flex flex-col gap-4">
+        <button onclick="showEditSection('category')" class="px-6 py-4 bg-gray-100 rounded-md shadow hover:bg-gray-200 transition-colors duration-200">
+            <h3 class="text-xl font-semibold">ক্যাটাগরি এডিট করুন</h3>
+            <p class="text-sm text-gray-500">ক্যাটাগরির নাম পরিবর্তন বা ডিলিট করুন</p>
+        </button>
+        <button onclick="showEditSection('name')" class="px-6 py-4 bg-gray-100 rounded-md shadow hover:bg-gray-200 transition-colors duration-200">
+            <h3 class="text-xl font-semibold">নাম এডিট করুন</h3>
+            <p class="text-sm text-gray-500">নাম, মোবাইল, নোট বা ক্যাটাগরি পরিবর্তন করুন</p>
+        </button>
+    </div>
+
+    <div id="edit-category-section" class="hidden">
+      <div class="mb-2">
+        <label class="block text-sm font-medium mb-1">ক্যাটাগরি</label>
+        <select id="edit-category-select" class="w-full p-2 border rounded-md" onchange="showCategoryForm()">
+          <option value="">ক্যাটাগরি নির্বাচন করুন</option>
+        </select>
+      </div>
+      <div id="category-form-container" class="hidden">
+        <label class="block text-sm font-medium mb-1">নতুন ক্যাটাগরি নাম</label>
+        <div class="flex items-center gap-2">
+            <input type="text" id="edit-category-name-input" class="w-full p-2 border rounded-md">
+        </div>
+      </div>
+    </div>
+
+    <div id="edit-name-section" class="hidden">
+      <div class="mb-2">
+        <label class="block text-sm font-medium mb-1">নাম</label>
+        <select id="edit-name-select" class="w-full p-2 border rounded-md" onchange="showNameForm()">
+          <option value="">নাম নির্বাচন করুন</option>
+        </select>
+      </div>
+      <div id="name-form-container" class="hidden">
+        <label class="block text-sm font-medium mb-1">নতুন নাম</label>
+        <input type="text" id="edit-name-name-input" class="w-full p-2 border rounded-md mb-2">
+        
+        <label class="block text-sm font-medium mb-1">মোবাইল নাম্বার</label>
+        <input type="tel" id="edit-name-mobile-input" class="w-full p-2 border rounded-md mb-2" placeholder="মোবাইল নাম্বার">
+        
+        <label class="block text-sm font-medium mb-1">নোট</label>
+        <textarea id="edit-name-note-input" rows="3" class="w-full p-2 border rounded-md mb-2" placeholder="নোট"></textarea>
+        
+        <label class="block text-sm font-medium mb-1">ক্যাটাগরি</label>
+        <select id="edit-name-category-select" class="w-full p-2 border rounded-md mb-2">
+            </select>
+      </div>
+    </div>
+    
+    <div id="dynamic-edit-buttons" class="flex justify-center whitespace-nowrap gap-2 mt-4 hidden">
+        <button id="deleteBtn" class="smart-button red">
+             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+            ডিলিট করুন
+        </button>
+        <button id="updateBtn" class="smart-button blue">আপডেট করুন</button>
+    </div>
+  </div>
+</div>
+
+<div id="person-profile-modal" class="modal z-[100]">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4">
+        <div class="flex justify-between items-start mb-4">
+            <div class="flex items-center gap-4">
+                <div id="person-profile-icon" class="profile-icon-container"></div>
+                <div class="flex flex-col">
+                    <h2 id="person-profile-title" class="text-2xl font-bold"></h2>
+                    <span id="person-mobile" class="text-sm text-gray-500"></span>
+                </div>
+            </div>
+            <div class="flex gap-2 items-center">
+              <button id="editPersonInfoBtn" onclick="openEditPersonModal()" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pen"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/><path d="m15 5 3 3"/></svg>
+              </button>
+              <button onclick="closePersonProfileModal()" class="text-gray-500 hover:text-gray-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+        </div>
+        <div id="person-details" class="mb-6 p-4 bg-gray-100 rounded-md">
+            <p id="person-category-info" class="mb-1"><span class="font-semibold text-gray-700">ক্যাটাগরি:</span> <span id="person-category"></span></p>
+            <p id="person-note-info" class="mb-1"><span class="font-semibold text-gray-700">নোট:</span> <span id="person-note"></span></p>
+        </div>
+        <div class="flex flex-wrap justify-between gap-2 mb-6">
+            <div class="flex-1 min-w-[100px] bg-green-50 p-3 rounded-lg shadow-sm text-center balance-card">
+                <h4 class="text-base font-semibold text-blue-800">পেলাম</h4>
+                <p id="person-total-credit" class="text-xl font-bold text-blue-600">৳ ০</p>
+            </div>
+            <div class="flex-1 min-w-[100px] bg-green-50 p-3 rounded-lg shadow-sm text-center balance-card">
+                <h4 class="text-base font-semibold text-red-800">দিলাম</h4>
+                <p id="person-total-debit" class="text-xl font-bold text-red-600">৳ ০</p>
+            </div>
+            <div class="flex-1 min-w-[100px] bg-green-50 p-3 rounded-lg shadow-sm text-center balance-card">
+                <h4 class="text-base font-semibold text-green-800">ব্যালেন্স</h4>
+                <p id="person-total-balance" class="text-xl font-bold text-green-600">৳ ০</p>
+            </div>
+        </div>
+        <div id="person-transactions-container" class="max-h-80 overflow-y-auto border rounded-md p-2">
+            <div id="person-transactions-list" class="person-card-list"></div>
+        </div>
+    </div>
+</div>
+
+<div id="edit-person-modal" class="modal z-[101]">
+    <div class="edit-person-modal-content">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold">নাম এডিট করুন</h2>
+            <button onclick="closeEditPersonModal()" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <form id="edit-person-form">
+            <div class="mb-4">
+                <label class="block text-sm mb-1">নাম</label>
+                <input type="text" id="edit-person-name" class="w-full p-2 border rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1">মোবাইল</label>
+                <input type="tel" id="edit-person-mobile" class="w-full p-2 border rounded-md">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1">নোট</label>
+                <textarea id="edit-person-note" class="w-full p-2 border rounded-md"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1">ক্যাটাগরি</label>
+                <select id="edit-person-category" class="w-full p-2 border rounded-md" required>
+                </select>
+            </div>
+            <div class="flex justify-center whitespace-nowrap gap-4">
+                <button type="button" onclick="closeEditPersonModal()" class="smart-button gray">বাতিল</button>
+                <button type="submit" class="smart-button blue">আপডেট করুন</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div id="notification-container"></div>
-
 <div id="footer-placeholder"></div>
-
 <script src="include-loader.js"></script>
 <script>
-  // ✅ Firebase Config
-  const firebaseConfig = {
+// --- গ্লোবাল ভেরিয়েবল এবং ফায়ারবেস ইনিশিয়ালাইজেশন ---
+const firebaseConfig = {
     apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
     authDomain: "asembroidery-5cd5e.firebaseapp.com",
     projectId: "asembroidery-5cd5e",
     storageBucket: "asembroidery-5cd5e.appspot.com",
     messagingSenderId: "592758047307",
     appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-  let transactionsData = [];
-  let categoriesData = {};
-  let peopleData = {};
-  let isAdmin = false;
+// --- কনফিগারেশন ---
+const PRODUCT_SUPPLIER_CATEGORY = 'YoPPrSg6VWCd3wAprive'; 
+const WORKER_CATEGORIES = []; 
+// --------------------
 
-  // ✅ Loader Logic
-  const loader = document.getElementById("loader");
-  const mainContent = document.getElementById("mainContent");
+let transactionsData = []; 
+let categoriesData = {};
+let peopleData = {}; 
+let isAdmin = false;
+let previousModalId = '';
+let currentFilterType = 'all'; 
+let personFilterType = 'all'; 
+let isDefaultView = true;
 
-  function showLoader() {
-    loader.style.display = "flex";
-    mainContent.classList.add("hidden");
-  }
+// --- LOADER AND NOTIFICATION LOGIC (অপরিবর্তিত) ---
+const loader = document.getElementById("loader");
+const mainContent = document.getElementById("mainContent");
 
-  function hideLoader() {
-    loader.style.display = "none";
-    mainContent.classList.remove("hidden");
-  }
+function showLoader() {
+    if (loader) loader.style.display = "flex";
+    if (mainContent) mainContent.classList.add("hidden");
+}
 
-  // ✅ Notification
-  function showNotification(message, type="info") {
+function hideLoader() {
+    if (loader) loader.style.display = "none";
+    if (mainContent) mainContent.classList.remove("hidden");
+}
+
+function showNotification(message, type = "info") {
     const container = document.getElementById("notification-container");
+    if (!container) return;
     const div = document.createElement("div");
     div.className = `notification ${type}`;
     div.textContent = message;
     container.appendChild(div);
     setTimeout(() => div.classList.add("show"), 100);
     setTimeout(() => {
-      div.classList.remove("show");
-      setTimeout(() => div.remove(), 400);
+        div.classList.remove("show");
+        setTimeout(() => div.remove(), 400);
     }, 3000);
-  }
+}
 
-  // ✅ Modal
-  function openEntryForm() { 
-    document.getElementById('entry-form').reset();
-    document.getElementById('entry-modal').dataset.docId = '';
-    document.getElementById('modal-title').textContent = 'নতুন লেনদেন যোগ করুন';
-    document.getElementById('submitBtn').textContent = 'যোগ করুন';
-    document.getElementById('entry-form').onsubmit = submitNewEntry;
-    
-    // Hide delete button and show only submit button
-    document.getElementById('edit-buttons-container').innerHTML = `<button type="submit" id="submitBtn" class="px-4 py-2 bg-teal-500 text-white rounded-md">যোগ করুন</button>`;
+function showProcessing(buttonId) {
+    const button = document.getElementById(buttonId);
+    if (button) {
+        if (!button.dataset.originalText) {
+            button.dataset.originalText = button.textContent;
+        }
 
-    document.getElementById('entry-category').value = '';
-    document.getElementById('new-category-input').classList.add('hidden');
-    document.getElementById('new-name-input').classList.add('hidden');
-    document.getElementById('entry-modal').style.display = 'flex'; 
-    updateCategoryOptions('entry-category');
-  }
-
-  function closeEntryForm() { 
-    document.getElementById('entry-modal').style.display = 'none'; 
-    document.getElementById('entry-form').reset(); 
-  }
-  
-  // New functions to toggle input fields
-  function toggleNewCategoryAndName() {
-    const categorySelect = document.getElementById('entry-category');
-    const newCategoryInput = document.getElementById('new-category-input');
-    
-    if (categorySelect.value === 'new-category') {
-        newCategoryInput.classList.remove('hidden');
-    } else {
-        newCategoryInput.classList.add('hidden');
+        button.disabled = true;
+        button.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> প্রসেস হচ্ছে...';
+        button.classList.add('flex', 'items-center', 'justify-center');
     }
-    updateNameOptions('entry-name', categorySelect.value);
-  }
+}
 
-  function toggleNewNameInput() {
-    const nameSelect = document.getElementById('entry-name');
-    const newNameInput = document.getElementById('new-name-input');
-    
-    if (nameSelect.value === 'new-name') {
-        newNameInput.classList.remove('hidden');
-    } else {
-        newNameInput.classList.add('hidden');
+function hideProcessing(buttonId) {
+    const button = document.getElementById(buttonId);
+    if (button) {
+        button.disabled = false;
+        button.textContent = button.dataset.originalText || 'যোগ করুন'; 
+        button.classList.remove('flex', 'items-center', 'justify-center');
     }
-  }
+}
+// ---------------------------------------------
 
-  // ✅ Format Date Function (DD/MM/YY)
-  function formatDate(dateString) {
+
+// --- HELPER FUNCTIONS (অপরিবর্তিত) ---
+function formatDate(dateString) {
+    if (!dateString) return 'অজানা তারিখ';
     const [year, month, day] = dateString.split('-');
     return `${day}/${parseInt(month, 10)}/${year.slice(-2)}`;
-  }
+}
 
-  // ✅ Render Transactions
-  function renderTransactions(transactions) {
-    const tbody = document.getElementById("transaction-list");
-    tbody.innerHTML = "";
-    let totalCredit = 0, totalDebit = 0;
-    const peopleBalances = {};
-    const urlParams = new URLSearchParams(window.location.search);
-    const isViewMode = urlParams.get('mode') === 'view';
-
-    // First pass to calculate balances for all transactions
-    transactions.forEach(tx => {
-      if (!peopleBalances[tx.name_key]) {
-        peopleBalances[tx.name_key] = 0;
-      }
-      if (tx.type === "credit") {
-        peopleBalances[tx.name_key] += tx.amount;
-      } else {
-        peopleBalances[tx.name_key] -= tx.amount;
-      }
-    });
-    
-    // Sort transactions by date descending
-    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    // Second pass to render and calculate totals
-    transactions.forEach(tx => {
-      if (tx.type === "credit") {
-        totalCredit += tx.amount;
-      } else {
-        totalDebit += tx.amount;
-      }
-
-      const row = document.createElement("tr");
-      row.className = "table-cell-nowrap";
-      const balanceAmount = peopleBalances[tx.name_key];
-      const balanceClass = balanceAmount >= 0 ? 'text-green-600' : 'text-red-600';
-      const balanceText = balanceAmount >= 0 ? `৳ ${balanceAmount}` : `৳ ${Math.abs(balanceAmount)}`;
-      
-      const actions = isViewMode ? `
-        <button onclick="viewPersonHistory('${tx.name_key}')" class="text-teal-600 hover:underline">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      ` : isAdmin ? `
-        <button onclick="openEditForm('${tx.id}')" class="text-blue-600 hover:underline mr-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pen"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/><path d="m15 5 3 3"/></svg>
-        </button>
-        <button onclick="viewPersonHistory('${tx.name_key}')" class="text-teal-600 hover:underline">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      ` : `
-        <button onclick="viewPersonHistory('${tx.name_key}')" class="text-teal-600 hover:underline">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      `;
-
-      row.innerHTML = `
-        <td class="px-6 py-2">${formatDate(tx.date)}</td>
-        <td class="px-6 py-2">${tx.name}</td>
-        <td class="px-6 py-2">${tx.description}</td>
-        <td class="px-6 py-2 ${tx.type==="credit"?"text-green-600":"text-gray-400"}">৳ ${tx.type==="credit" ? tx.amount : 0}</td>
-        <td class="px-6 py-2 ${tx.type==="debit"?"text-red-600":"text-gray-400"}">৳ ${tx.type==="debit" ? tx.amount : 0}</td>
-        <td class="px-6 py-2 ${balanceClass}">${balanceText}</td>
-        <td class="px-6 py-2">${actions}</td>
-      `;
-      tbody.appendChild(row);
-    });
-    document.getElementById("total-credit").textContent = `৳ ${totalCredit}`;
-    document.getElementById("total-debit").textContent = `৳ ${totalDebit}`;
-    document.getElementById("total-balance").textContent = `৳ ${totalCredit-totalDebit}`;
-    
-    // ✅ ভিউ মোড UI নিষ্ক্রিয় করা
-    if (isViewMode) {
-        disableViewModeUI();
+function findPersonData(personId) {
+    for (const catId in peopleData) {
+        if (peopleData[catId][personId]) {
+            return {
+                id: personId,
+                category_key: catId,
+                ...peopleData[catId][personId]
+            };
+        }
     }
-  }
+    return null;
+}
 
-  // ✅ New Filter & History Link
-  function viewPersonHistory(nameKey) {
-    const url = new URL(window.location);
-    if(nameKey) {
-        url.searchParams.set('name_key', nameKey);
-    } else {
-        url.searchParams.delete('name_key');
-    }
-    window.history.pushState({}, '', url);
-    document.getElementById('name').value = nameKey;
-    filterTransactions();
-  }
-
-  // ✅ Share Filtered Data
-  function shareFilteredData() {
-      const url = new URL(window.location);
-      const categoryKey = document.getElementById('category').value;
-      const nameKey = document.getElementById('name').value;
-      const startDate = document.getElementById('start_date').value;
-      const endDate = document.getElementById('end_date').value;
-
-      if (categoryKey) url.searchParams.set('category_key', categoryKey);
-      if (nameKey) url.searchParams.set('name_key', nameKey);
-      if (startDate) url.searchParams.set('start_date', startDate);
-      if (endDate) url.searchParams.set('end_date', endDate);
-
-      // ✅ নতুন 'mode' প্যারামিটার যোগ করা হলো
-      url.searchParams.set('mode', 'view');
-
-      navigator.clipboard.writeText(url.href).then(() => {
-          showNotification("✅ ফিল্টার করা লিংক কপি করা হয়েছে!", "success");
-      }).catch(err => {
-          showNotification("❌ লিংক কপি করতে সমস্যা হয়েছে: " + err, "error");
-      });
-  }
-
-  // ✅ Edit Form Functions
-  function openEditForm(docId) {
-    const transaction = transactionsData.find(tx => tx.id === docId);
-    if (!transaction) {
-      showNotification("❌ লেনদেন খুঁজে পাওয়া যায়নি।", "error");
-      return;
-    }
-
-    document.getElementById('modal-title').textContent = 'লেনদেন এডিট করুন';
-    document.getElementById('submitBtn').textContent = 'আপডেট করুন';
-    document.getElementById('entry-form').onsubmit = (e) => updateEntry(e, docId);
-
-    // Add delete button dynamically
-    document.getElementById('edit-buttons-container').innerHTML = `
-      <button type="button" onclick="deleteEntry('${docId}')" class="px-4 py-2 bg-red-500 text-white rounded-md">ডিলিট করুন</button>
-      <button type="submit" id="submitBtn" class="px-4 py-2 bg-teal-500 text-white rounded-md">আপডেট করুন</button>
-    `;
-
-    // Populate the form with data
-    document.getElementById('entry-category').value = transaction.category_key;
-    document.getElementById('entry-name').value = transaction.name_key;
-    document.getElementById('entry-type').value = transaction.type;
-    document.getElementById('entry-amount').value = transaction.amount;
-    document.getElementById('entry-description').value = transaction.description;
-    document.getElementById('entry-date').value = transaction.date;
-    
-    // Update name dropdown options for selected category
-    updateNameOptions('entry-name', transaction.category_key);
-
-    document.getElementById('new-category-input').classList.add('hidden');
-    document.getElementById('new-name-input').classList.add('hidden');
-    
-    document.getElementById('entry-modal').style.display = 'flex';
-  }
-
-  async function updateEntry(e, docId) {
-    e.preventDefault();
-    const updatedData = {
-      category_key: document.getElementById("entry-category").value,
-      category_name: categoriesData[document.getElementById("entry-category").value].name,
-      name_key: document.getElementById("entry-name").value,
-      name: peopleData[document.getElementById("entry-category").value][document.getElementById("entry-name").value].name,
-      type: document.getElementById("entry-type").value,
-      amount: parseFloat(document.getElementById("entry-amount").value),
-      description: document.getElementById("entry-description").value,
-      date: document.getElementById("entry-date").value,
-    };
-
-    try {
-      await db.collection("transactions").doc(docId).update(updatedData);
-      showNotification("✅ লেনদেন সফলভাবে আপডেট হয়েছে!", "success");
-      closeEntryForm();
-    } catch (err) {
-      showNotification("❌ Error: " + err.message, "error");
-    }
-  }
-
-  // ✅ Delete Function
-  async function deleteEntry(docId) {
-      if (confirm("আপনি কি নিশ্চিত এই লেনদেনটি মুছে ফেলতে চান? এটি স্থায়ীভাবে মুছে যাবে।")) {
-          try {
-              await db.collection("transactions").doc(docId).delete();
-              showNotification("✅ লেনদেন সফলভাবে মুছে ফেলা হয়েছে!", "success");
-              closeEntryForm();
-          } catch (err) {
-              showNotification("❌ লেনদেন মুছে ফেলতে সমস্যা হয়েছে: " + err.message, "error");
-          }
-      }
-  }
-
-  // Original submit function for new entries
-  async function submitNewEntry(e) {
-    e.preventDefault();
-    const user = auth.currentUser;
-    if (!user) {
-        showNotification("❌ আপনি লগইন করেননি।", "error");
-        return;
-    }
-    const entryCategory = document.getElementById("entry-category");
-    const entryName = document.getElementById("entry-name");
-    let categoryKey = entryCategory.value;
-    let categoryName = entryCategory.options[entryCategory.selectedIndex] ? entryCategory.options[entryCategory.selectedIndex].textContent : document.getElementById("new-category-name").value;
-    let nameKey = entryName.value;
-    let nameName = entryName.options[entryName.selectedIndex] ? entryName.options[entryName.selectedIndex].textContent : document.getElementById("new-name-name").value;
-
-    if (categoryKey === "new-category") {
-      categoryName = document.getElementById("new-category-name").value.trim();
-      if (!categoryName) { alert('নতুন ক্যাটাগরি নাম লিখুন।'); return; }
-      const newCatRef = await db.collection("categories").add({ name: categoryName });
-      categoryKey = newCatRef.id;
-    }
-    
-    if (nameKey === "new-name") {
-      nameName = document.getElementById("new-name-name").value.trim();
-      if (!nameName) { alert('নতুন নাম লিখুন।'); return; }
-      const newNameRef = await db.collection("people").add({ category_key: categoryKey, name: nameName });
-      nameKey = newNameRef.id;
-    }
-
-    const tx = {
-      category_key: categoryKey,
-      category_name: categoryName,
-      name_key: nameKey,
-      name: nameName,
-      type: document.getElementById("entry-type").value,
-      amount: parseFloat(document.getElementById("entry-amount").value),
-      description: document.getElementById("entry-description").value,
-      date: document.getElementById("entry-date").value,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    db.collection("transactions").add(tx).then(() => {
-      showNotification("✅ লেনদেন সফলভাবে যোগ হয়েছে!", "success");
-      closeEntryForm();
-    }).catch(err => {
-      showNotification("❌ Error: "+err.message, "error");
-    });
-  }
-
-  // ✅ Load Data and Populate Filters
-  function updateCategoryOptions(selectId) {
+// --- DROPDOWN POPULATION FUNCTIONS (অপরিবর্তিত) ---
+function updateCategoryOptions(selectId) {
     const select = document.getElementById(selectId);
-    let currentVal = select.value;
+    let currentVal = select?.value;
+    if (!select) return;
+    
     select.innerHTML = '';
-    const defaultOption = selectId === 'category' ? 'সব' : 'নির্বাচন করুন';
+    const defaultOption = selectId.includes('category') && !selectId.includes('edit-person') ? 'ক্যাটাগরি' : 'নির্বাচন করুন';
     const allOption = document.createElement('option');
     allOption.value = '';
     allOption.textContent = defaultOption;
     select.appendChild(allOption);
-    
+
     for (const key in categoriesData) {
         const option = document.createElement('option');
         option.value = key;
@@ -513,209 +739,1234 @@
         select.appendChild(option);
     }
     
-    const newCatOption = document.createElement('option');
-    newCatOption.value = 'new-category';
-    newCatOption.textContent = 'নতুন ক্যাটাগরি যোগ করুন';
-    if(selectId === 'entry-category') select.appendChild(newCatOption);
-    
-    select.value = currentVal;
-    if (select.value === 'new-category' && selectId === 'entry-category') {
-      document.getElementById('new-category-input').classList.remove('hidden');
-    } else {
-      document.getElementById('new-category-input').classList.add('hidden');
+    if (selectId === 'entry-category') {
+        const newCatOption = document.createElement('option');
+        newCatOption.value = 'new-category';
+        newCatOption.textContent = 'নতুন ক্যাটাগরি যোগ করুন';
+        select.appendChild(newCatOption);
     }
-  }
 
-  // ✅ Updated function to handle dynamic name list
-  function updateNameOptions(selectId, categoryId) {
+    select.value = currentVal;
+    
+    if (selectId === 'entry-category') {
+        const newCategoryInput = document.getElementById('new-category-input');
+        if (newCategoryInput) {
+             if (select.value === 'new-category') {
+                newCategoryInput.classList.remove('hidden');
+            } else {
+                newCategoryInput.classList.add('hidden');
+            }
+        }
+    }
+}
+
+function updateNameOptions(selectId, categoryId) {
     const select = document.getElementById(selectId);
-    let currentVal = select.value;
+    let currentVal = select?.value;
+    if (!select) return;
+
     select.innerHTML = '';
-    const defaultOption = selectId === 'name' ? 'নাম নির্বাচন করুন' : 'নির্বাচন করুন';
+    const defaultOption = selectId.includes('name') && !selectId.includes('edit-person') ? 'নাম' : 'নির্বাচন করুন';
     const allOption = document.createElement('option');
     allOption.value = '';
     allOption.textContent = defaultOption;
     select.appendChild(allOption);
     
+    const namesToShow = {};
     if (categoryId && peopleData[categoryId]) {
-        // Show names only for the selected category
-        for (const key in peopleData[categoryId]) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = peopleData[categoryId][key].name;
-            select.appendChild(option);
+        for (const personId in peopleData[categoryId]) {
+            namesToShow[personId] = peopleData[categoryId][personId].name;
         }
     } else if (!categoryId && selectId === 'name') {
-        // If "সব" is selected, show all names from all categories
-        const allNames = {};
         for (const catId in peopleData) {
-            for(const personId in peopleData[catId]){
-                if(!allNames[personId]){
-                    allNames[personId] = peopleData[catId][personId].name;
+            for (const personId in peopleData[catId]) {
+                if (!namesToShow[personId]) {
+                    namesToShow[personId] = peopleData[catId][personId].name;
                 }
             }
         }
-        for(const personId in allNames){
+    }
+
+    for (const personId in namesToShow) {
+        const option = document.createElement('option');
+        option.value = personId;
+        option.textContent = namesToShow[personId];
+        select.appendChild(option);
+    }
+
+    if (selectId === 'entry-name') {
+        const newNameOption = document.createElement('option');
+        newNameOption.value = 'new-name';
+        newNameOption.textContent = 'নতুন নাম যোগ করুন';
+        select.appendChild(newNameOption);
+    }
+    
+    select.value = currentVal;
+    
+    if (selectId === 'entry-name') {
+        const newNameInput = document.getElementById('new-name-input');
+        if (newNameInput) {
+            if (select.value === 'new-name') {
+                newNameInput.classList.remove('hidden');
+            } else {
+                newNameInput.classList.add('hidden');
+            }
+        }
+    }
+}
+
+function updateNameAndFilter() {
+    const categoryId = document.getElementById('category').value;
+    document.getElementById('name').value = '';
+    updateNameOptions('name', categoryId);
+    filterTransactions();
+}
+
+// --- MODAL HANDLERS ---
+function openFilterModal() {
+    const filterModal = document.getElementById('filter-modal');
+    if (filterModal) {
+        filterModal.style.display = 'flex';
+    } else {
+        console.warn("Filter modal not found!");
+    }
+}
+
+function closeFilterModal() {
+    const filterModal = document.getElementById('filter-modal');
+    if (filterModal) {
+        filterModal.style.display = 'none';
+    }
+    filterTransactions();
+}
+
+// ✅ আপডেট করা: এন্ট্রি মডাল ওপেনিং ফাংশন
+function openEntryForm(docId) {
+    const entryModal = document.getElementById('entry-modal');
+    const entryForm = document.getElementById('entry-form');
+    const modalTitle = document.getElementById('modal-title');
+    const buttonsContainer = document.getElementById('edit-buttons-container');
+    
+    if (!entryModal || !entryForm) {
+        showNotification("❌ লেনদেনের ফর্মটি খুঁজে পাওয়া যায়নি (entry-modal বা entry-form)।", "error");
+        console.error("Entry modal or form not found.");
+        return; 
+    }
+    
+    entryForm.reset();
+    entryModal.dataset.docId = '';
+    modalTitle.textContent = 'নতুন লেনদেন যোগ করুন';
+    
+    // Set default option for new inputs
+    document.getElementById('entry-type').value = 'credit';
+    document.getElementById('cash-type').value = 'cash';
+
+    // Set submit button and handler
+    buttonsContainer.innerHTML = `<button type="submit" id="submitBtn" class="smart-button teal">যোগ করুন</button>`;
+    entryForm.onsubmit = submitNewEntry;
+    
+    document.getElementById('entry-category').value = '';
+    document.getElementById('new-category-input').classList.add('hidden');
+    document.getElementById('new-name-input').classList.add('hidden');
+    
+    updateCategoryOptions('entry-category');
+    updateNameOptions('entry-name');
+    document.getElementById('entry-date').valueAsDate = new Date();
+
+    if (docId) {
+        openEditForm(docId);
+    } else {
+        // ✅ মূল ফিক্স: মডালটি দৃশ্যমান করা
+        entryModal.style.display = 'flex';
+    }
+}
+
+function closeEntryForm() {
+    const entryModal = document.getElementById('entry-modal');
+    if (entryModal) {
+        entryModal.style.display = 'none';
+        document.getElementById('entry-form').reset();
+        if (previousModalId && document.getElementById(previousModalId)) {
+            document.getElementById(previousModalId).style.display = 'flex';
+            previousModalId = '';
+        }
+    }
+}
+
+function toggleNewCategoryAndName() {
+    const categorySelect = document.getElementById('entry-category');
+    const newCategoryInput = document.getElementById('new-category-input');
+    if (newCategoryInput) {
+        if (categorySelect.value === 'new-category') {
+            newCategoryInput.classList.remove('hidden');
+        } else {
+            newCategoryInput.classList.add('hidden');
+        }
+    }
+    updateNameOptions('entry-name', categorySelect.value);
+}
+
+function toggleNewNameInput() {
+    const nameSelect = document.getElementById('entry-name');
+    const newNameInput = document.getElementById('new-name-input');
+    if (newNameInput) {
+        if (nameSelect.value === 'new-name') {
+            newNameInput.classList.remove('hidden');
+        } else {
+            newNameInput.classList.add('hidden');
+        }
+    }
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').style.display = 'none';
+}
+
+function closePersonProfileModal() {
+    document.getElementById('person-profile-modal').style.display = 'none';
+    previousModalId = '';
+    personFilterType = 'all'; 
+    if (document.getElementById('person-amount-header')) document.getElementById('person-amount-header').innerHTML = 'পরিমাণ';
+}
+
+function closeEditPersonModal() {
+    document.getElementById('edit-person-modal').style.display = 'none';
+    if(previousModalId && document.getElementById('edit-person-form')?.dataset.personId) {
+        openPersonProfileModal(document.getElementById('edit-person-form').dataset.personId);
+        previousModalId = '';
+    }
+}
+
+// --- CONFIRM MODAL (অপরিবর্তিত) ---
+function showConfirmModal(id, type) {
+    const currentModal = document.querySelector('.modal[style*="flex"]');
+    if (currentModal) {
+        previousModalId = currentModal.id;
+        currentModal.style.display = 'none';
+    }
+
+    document.getElementById('confirm-modal').style.display = 'flex';
+    document.getElementById('confirm-delete-btn').onclick = () => confirmDeleteAction(id, type);
+    
+    let message = 'এই এন্ট্রিটি স্থায়ীভাবে মুছে যাবে। আপনি নিশ্চিত?';
+    if (type === 'transaction') {
+      message = 'এই লেনদেনটি স্থায়ীভাবে মুছে যাবে।';
+    } else if (type === 'category') {
+        const categoryName = categoriesData[id]?.name;
+        message = `আপনি কি নিশ্চিত যে আপনি "${categoryName}" ক্যাটাগররিটি মুছে ফেলতে চান? এই ক্যাটাগরির অধীনে নাম থাকলে মোছা যাবে না।`;
+    } else if (type === 'name') {
+        const nameData = findPersonData(id);
+        const personName = nameData ? nameData.name : 'এই নাম';
+        message = `আপনি কি নিশ্চিত যে আপনি "${personName}" নামটি মুছে ফেলতে চান? এই নামের সাথে সম্পর্কিত লেনদেন থাকলে মোছা যাবে না।`;
+    }
+    document.getElementById('confirm-message').textContent = message;
+}
+
+function confirmDeleteAction(id, type) {
+    if (type === 'transaction') {
+        deleteEntry(id);
+    } else if (type === 'category') {
+        deleteCategory(id);
+    } else if (type === 'name') {
+        deleteName(id);
+    }
+    closeConfirmModal(true);
+}
+
+function closeConfirmModal(isActionSuccessful = false) {
+    document.getElementById('confirm-modal').style.display = 'none';
+    if (!isActionSuccessful) {
+        if (previousModalId && document.getElementById(previousModalId)) {
+            document.getElementById(previousModalId).style.display = 'flex';
+        }
+    }
+    previousModalId = '';
+}
+
+
+// --- লেনদেন CRUD ফাংশন (অপরিবর্তিত) ---
+async function submitNewEntry(e) {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) {
+        showNotification("❌ আপনি লগইন করেননি।", "error");
+        return;
+    }
+    
+    showProcessing('submitBtn');
+
+    const entryCategory = document.getElementById("entry-category");
+    const entryName = document.getElementById("entry-name");
+    
+    const entryType = document.getElementById("entry-type").value;
+    const cashType = document.getElementById("cash-type").value;
+
+    let categoryKey = entryCategory.value;
+    let categoryName = '';
+    let nameKey = entryName.value;
+    let nameName = '';
+    
+    // Category and Name Creation logic
+    if (categoryKey === "new-category") {
+        categoryName = document.getElementById("new-category-name").value.trim();
+        if (!categoryName) { hideProcessing('submitBtn'); showNotification('নতুন ক্যাটাগরি নাম লিখুন।', 'error'); return; }
+        try {
+            const newCatRef = await db.collection("categories").add({ name: categoryName });
+            categoryKey = newCatRef.id;
+        } catch (err) { hideProcessing('submitBtn'); showNotification("❌ ক্যাটাগরি তৈরি করতে সমস্যা হয়েছে: " + err.message, "error"); return; }
+    } else {
+        categoryName = categoriesData[categoryKey]?.name || 'অজানা ক্যাটাগরি';
+    }
+    
+    if (nameKey === "new-name") {
+        nameName = document.getElementById("new-name-name").value.trim();
+        if (!nameName) { hideProcessing('submitBtn'); showNotification('নতুন নাম লিখুন।', 'error'); return; }
+        if (!categoryKey) { hideProcessing('submitBtn'); showNotification('নতুন নাম যোগ করার আগে ক্যাটাগরি নির্বাচন করুন।', 'error'); return; }
+        try {
+            const newNameRef = await db.collection("people").add({
+                category_key: categoryKey,
+                name: nameName,
+                mobile: document.getElementById("entry-mobile")?.value || null,
+                note: document.getElementById("entry-note")?.value || null
+            });
+            nameKey = newNameRef.id;
+        } catch (err) { hideProcessing('submitBtn'); showNotification("❌ নাম তৈরি করতে সমস্যা হয়েছে: " + err.message, "error"); return; }
+    } else {
+        const personData = findPersonData(nameKey);
+        nameName = personData ? personData.name : 'অজানা নাম';
+    }
+
+    const isCashTransaction = (cashType.toLowerCase() === 'cash'); 
+    
+    const tx = {
+        category_key: categoryKey,
+        category_name: categoryName,
+        name_key: nameKey,
+        name: nameName,
+        type: entryType,
+        amount: parseFloat(document.getElementById("entry-amount").value),
+        description: document.getElementById("entry-description").value,
+        date: document.getElementById("entry-date").value,
+        is_cash: isCashTransaction, 
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    db.collection("transactions").add(tx).then(() => {
+        showNotification("✅ লেনদেন সফলভাবে যোগ হয়েছে!", "success");
+        hideProcessing('submitBtn');
+        closeEntryForm();
+    }).catch(err => {
+        showNotification("❌ Error: " + err.message, "error");
+        hideProcessing('submitBtn');
+    });
+}
+
+function openEditForm(docId) {
+    const transaction = transactionsData.find(tx => tx.id === docId);
+    if (!transaction) {
+        showNotification("❌ লেনদেন খুঁজে পাওয়া যায়নি।", "error");
+        return;
+    }
+
+    document.getElementById('person-profile-modal').style.display = 'none';
+    previousModalId = 'person-profile-modal';
+
+    document.getElementById('modal-title').textContent = 'লেনদেন এডিট করুন';
+    const buttonsContainer = document.getElementById('edit-buttons-container');
+    buttonsContainer.innerHTML = `
+      <button type="button" onclick="showConfirmModal('${docId}', 'transaction')" class="smart-button red flex justify-center whitespace-nowrap">ডিলিট</button>
+      <button type="submit" id="submitBtn" class="smart-button blue flex justify-center whitespace-nowrap">আপডেট</button>
+    `;
+    
+    updateCategoryOptions('entry-category');
+    updateNameOptions('entry-name', transaction.category_key); 
+
+    document.getElementById('entry-category').value = transaction.category_key;
+    document.getElementById('entry-name').value = transaction.name_key;
+    
+    document.getElementById('entry-type').value = transaction.type;
+    document.getElementById('cash-type').value = transaction.is_cash ? 'cash' : 'Deu'; 
+
+    document.getElementById('entry-amount').value = transaction.amount;
+    document.getElementById('entry-description').value = transaction.description;
+    document.getElementById('entry-date').value = transaction.date;
+
+    document.getElementById('new-category-input').classList.add('hidden');
+    document.getElementById('new-name-input').classList.add('hidden');
+    document.getElementById('entry-form').onsubmit = (e) => updateEntry(e, docId);
+    document.getElementById('entry-modal').style.display = 'flex';
+}
+
+async function updateEntry(e, docId) {
+    e.preventDefault();
+    
+    showProcessing('submitBtn');
+
+    const newCategoryKey = document.getElementById("entry-category").value;
+    const newNameKey = document.getElementById("entry-name").value;
+    const entryType = document.getElementById("entry-type").value;
+    const cashType = document.getElementById("cash-type").value;
+
+    if (newCategoryKey === 'new-category' || newNameKey === 'new-name') {
+        hideProcessing('submitBtn');
+        showNotification("❌ এডিট মোডে নতুন নাম বা ক্যাটাগরি তৈরি করা যাবে না।", "error");
+        return;
+    }
+    
+    const newCategoryName = categoriesData[newCategoryKey]?.name || 'অজানা ক্যাটাগরি';
+    const newPersonData = findPersonData(newNameKey);
+    const newNameName = newPersonData ? newPersonData.name : 'অজানা নাম';
+    
+    const isCashTransaction = (cashType.toLowerCase() === 'cash'); 
+    
+    const updatedData = {
+        category_key: newCategoryKey,
+        category_name: newCategoryName,
+        name_key: newNameKey,
+        name: newNameName,
+        type: entryType,
+        amount: parseFloat(document.getElementById("entry-amount").value),
+        description: document.getElementById("entry-description").value,
+        date: document.getElementById("entry-date").value,
+        is_cash: isCashTransaction, 
+    };
+    try {
+        await db.collection("transactions").doc(docId).update(updatedData);
+        showNotification("✅ লেনদেন সফলভাবে আপডেট হয়েছে!", "success");
+        hideProcessing('submitBtn');
+        closeEntryForm();
+    } catch (err) {
+        showNotification("❌ Error: " + err.message, "error");
+        hideProcessing('submitBtn');
+    }
+}
+
+async function deleteEntry(docId) {
+    try {
+        await db.collection("transactions").doc(docId).delete();
+        showNotification("✅ লেনদেন সফলভাবে মুছে ফেলা হয়েছে!", "success");
+        closeEntryForm();
+    } catch (err) {
+        showNotification("❌ লেনদেন মুছে ফেলতে সমস্যা হয়েছে: " + err.message, "error");
+    }
+}
+
+// --- CATEGORY/NAME EDIT AND DELETE FUNCTIONS (অপরিবর্তিত) ---
+function openEditCategoriesModal() {
+    if (!isAdmin) {
+        showNotification("❌ আপনার এডিটিং এর অনুমতি নেই।", "error");
+        return;
+    }
+    closeFilterModal();
+    document.getElementById('edit-modal').style.display = 'flex';
+    document.getElementById('edit-modal-title').textContent = 'এডিট অপশন';
+    document.getElementById('edit-selection-section').classList.remove('hidden');
+    document.getElementById('edit-category-section').classList.add('hidden');
+    document.getElementById('edit-name-section').classList.add('hidden');
+    document.getElementById('category-form-container').classList.add('hidden');
+    document.getElementById('name-form-container').classList.add('hidden');
+    document.getElementById('dynamic-edit-buttons').classList.add('hidden');
+    document.getElementById('edit-category-select').value = '';
+    document.getElementById('edit-name-select').value = '';
+    updateCategoryEditOptions();
+    updateNameEditOptions();
+    updateNameCategoryOptions();
+}
+
+function showEditSection(type) {
+    document.getElementById('edit-selection-section').classList.add('hidden');
+    document.getElementById('edit-category-section').classList.add('hidden');
+    document.getElementById('edit-name-section').classList.add('hidden');
+    document.getElementById('edit-modal-title').textContent = type === 'category' ? 'ক্যাটাগরি এডিট করুন' : 'নাম এডিট করুন';
+    document.getElementById('dynamic-edit-buttons').classList.add('hidden');
+    
+    if (type === 'category') {
+        document.getElementById('edit-category-section').classList.remove('hidden');
+        document.getElementById('edit-category-select').value = '';
+        document.getElementById('category-form-container').classList.add('hidden');
+    } else if (type === 'name') {
+        document.getElementById('edit-name-section').classList.remove('hidden');
+        document.getElementById('edit-name-select').value = '';
+        document.getElementById('name-form-container').classList.add('hidden');
+    }
+}
+
+function updateCategoryEditOptions() {
+    const select = document.getElementById('edit-category-select');
+    select.innerHTML = '<option value="">ক্যাটাগরি নির্বাচন করুন</option>';
+    for (const key in categoriesData) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = categoriesData[key].name;
+        select.appendChild(option);
+    }
+}
+
+function updateNameCategoryOptions() {
+    const select = document.getElementById('edit-name-category-select');
+    select.innerHTML = '<option value="">ক্যাটাগরি নির্বাচন করুন</option>';
+    for (const catId in categoriesData) {
+        const option = document.createElement('option');
+        option.value = catId;
+        option.textContent = categoriesData[catId].name;
+        select.appendChild(option);
+    }
+}
+
+function updateNameEditOptions() {
+    const select = document.getElementById('edit-name-select');
+    select.innerHTML = '<option value="">নাম নির্বাচন করুন</option>';
+    for (const catId in peopleData) {
+        for (const personId in peopleData[catId]) {
             const option = document.createElement('option');
             option.value = personId;
-            option.textContent = allNames[personId];
+            option.textContent = peopleData[catId][personId].name;
             select.appendChild(option);
         }
     }
-    
-    const newNameOption = document.createElement('option');
-    newNameOption.value = 'new-name';
-    newNameOption.textContent = 'নতুন নাম যোগ করুন';
-    if(selectId === 'entry-name') select.appendChild(newNameOption);
+}
 
-    select.value = currentVal;
-    if (select.value === 'new-name' && selectId === 'entry-name') {
-      document.getElementById('new-name-input').classList.remove('hidden');
+function showCategoryForm() {
+    const categoryId = document.getElementById('edit-category-select').value;
+    const formContainer = document.getElementById('category-form-container');
+    const updateBtn = document.getElementById('updateBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const dynamicButtons = document.getElementById('dynamic-edit-buttons');
+    if (categoryId) {
+        formContainer.classList.remove('hidden');
+        dynamicButtons.classList.remove('hidden');
+        document.getElementById('edit-category-name-input').value = categoriesData[categoryId].name;
+        updateBtn.onclick = () => updateCategory(categoryId);
+        deleteBtn.onclick = () => showConfirmModal(categoryId, 'category');
     } else {
-      document.getElementById('new-name-input').classList.add('hidden');
+        formContainer.classList.add('hidden');
+        dynamicButtons.classList.add('hidden');
     }
-  }
+}
 
-  // ✅ New function to handle both dropdown change and filtering
-  function updateNameAndFilter() {
-    const categoryId = document.getElementById('category').value;
-    document.getElementById('name').value = ''; 
-    updateNameOptions('name', categoryId);
-    filterTransactions();
-  }
-
-  // ✅ Load initial data and set up listeners
-  db.collection('categories').onSnapshot(snap => {
-    categoriesData = {};
-    snap.forEach(doc => {
-      categoriesData[doc.id] = doc.data();
-    });
-    updateCategoryOptions('category');
-    updateCategoryOptions('entry-category');
-  });
-
-  db.collection('people').onSnapshot(snap => {
-    peopleData = {};
-    snap.forEach(doc => {
-      const data = doc.data();
-      if (!peopleData[data.category_key]) {
-        peopleData[data.category_key] = {};
-      }
-      peopleData[data.category_key][doc.id] = data;
-    });
-    updateNameOptions('name', document.getElementById('category').value);
-  });
-
-  db.collection("transactions").orderBy("createdAt", "desc").onSnapshot(snap => {
-    transactionsData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-    filterTransactionsFromUrl(); // ✅ লিংকের প্যারামিটার থেকে ডেটা লোড করার জন্য নতুন কল
-  });
-  
-  // ✅ Role Check & URL Param Check
-  auth.onAuthStateChanged(async user => {
-    if (user) {
-      try {
-        const snap = await db.collection("users").where("uid", "==", user.uid).limit(1).get();
-        if (snap.empty) {
-          console.warn("⚠️ User document পাওয়া যায়নি। UID:", user.uid);
-          showNotification("⚠️ আপনার প্রোফাইল খুঁজে পাওয়া যায়নি।", "error");
-          return;
-        }
-        const userData = snap.docs[0].data();
-        if (userData.role && userData.role.toLowerCase() === "admin") {
-          isAdmin = true;
-          document.getElementById("newEntryBtn").classList.remove("hidden");
-          showNotification("✅ অ্যাডমিন হিসেবে লগইন সফল", "success");
-        } else {
-          isAdmin = false;
-          document.getElementById("newEntryBtn").classList.add("hidden");
-          showNotification("⚠️ আপনার কেবল ভিউ করার অনুমতি আছে।", "error");
-        }
-      } catch (err) {
-        console.error("User role check failed:", err);
-        showNotification("❌ ইউজার ডাটা লোডে সমস্যা: " + err.message, "error");
-      }
-      
-      // ✅ Hide loader after everything is loaded
-      lucide.createIcons();
-      hideLoader();
-      
+function showNameForm() {
+    const nameId = document.getElementById('edit-name-select').value;
+    const formContainer = document.getElementById('name-form-container');
+    const updateBtn = document.getElementById('updateBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const dynamicButtons = document.getElementById('dynamic-edit-buttons');
+    if (nameId) {
+        formContainer.classList.remove('hidden');
+        dynamicButtons.classList.remove('hidden');
+        let personData = findPersonData(nameId);
+        document.getElementById('edit-name-name-input').value = personData.name || '';
+        document.getElementById('edit-name-mobile-input').value = personData.mobile || '';
+        document.getElementById('edit-name-note-input').value = personData.note || '';
+        document.getElementById('edit-name-category-select').value = personData.category_key || '';
+        updateBtn.onclick = () => performCombinedNameUpdate(nameId);
+        deleteBtn.onclick = () => showConfirmModal(nameId, 'name');
     } else {
-      window.location.href = "login.html";
+        formContainer.classList.add('hidden');
+        dynamicButtons.classList.add('hidden');
     }
-  });
+}
 
-  function disableViewModeUI() {
-    // ✅ ফিল্টার সেকশন সম্পূর্ণ হাইড করার জন্য নতুন লজিক
-    document.getElementById('filter-section').classList.add('hidden');
+async function updateCategory(categoryId) {
+    const newName = document.getElementById('edit-category-name-input').value.trim();
+    if (!categoryId || !newName) {
+        showNotification("❌ ক্যাটাগরি বা নতুন নাম নির্বাচন করুন।", "error");
+        return;
+    }
+    const originalName = categoriesData[categoryId].name;
+    try {
+        await db.collection('categories').doc(categoryId).update({ name: newName });
+        showNotification(`✅ ক্যাটাগরি "${originalName}" সফলভাবে "${newName}" এ আপডেট করা হয়েছে!`, "success");
+        
+        const transactionsToUpdate = await db.collection('transactions').where('category_key', '==', categoryId).get();
+        const batch = db.batch();
+        transactionsToUpdate.docs.forEach(doc => { batch.update(doc.ref, { category_name: newName }); });
+        await batch.commit();
+        closeEditModal();
+    } catch (err) {
+        showNotification("❌ ক্যাটাগরি আপডেট করতে সমস্যা হয়েছে: " + err.message, "error");
+    }
+}
+
+async function performCombinedNameUpdate(nameId) {
+    const newName = document.getElementById('edit-name-name-input').value.trim();
+    const newMobile = document.getElementById('edit-name-mobile-input').value.trim();
+    const newNote = document.getElementById('edit-name-note-input').value.trim();
+    const newCategoryId = document.getElementById('edit-name-category-select').value;
     
-    // এডিট/ডিলিট বোতামগুলোও হাইড করতে হবে
-    const actionCells = document.querySelectorAll('#transaction-list td:last-child');
-    actionCells.forEach(cell => {
-        cell.classList.add('hidden');
+    if (!nameId || !newName || !newCategoryId) {
+        showNotification("❌ নাম, নতুন নাম এবং ক্যাটাগরি আবশ্যক।", "error");
+        return;
+    }
+    
+    let originalData = findPersonData(nameId);
+    const originalName = originalData.name;
+    const originalCategoryKey = originalData.category_key;
+    const newCategoryName = categoriesData[newCategoryId]?.name;
+    
+    const peopleUpdateData = {
+        name: newName,
+        mobile: newMobile || null,
+        note: newNote || null,
+        category_key: newCategoryId
+    };
+    
+    try {
+        const batch = db.batch();
+        const peopleRef = db.collection('people').doc(nameId);
+        batch.update(peopleRef, peopleUpdateData);
+        
+        const transactionsToUpdate = await db.collection('transactions').where('name_key', '==', nameId).get();
+        transactionsToUpdate.docs.forEach(doc => {
+            const transactionUpdateData = {};
+            if (originalName !== newName) { transactionUpdateData.name = newName; }
+            if (originalCategoryKey !== newCategoryId) {
+                transactionUpdateData.category_key = newCategoryId;
+                transactionUpdateData.category_name = newCategoryName;
+            }
+            if (Object.keys(transactionUpdateData).length > 0) {
+                batch.update(doc.ref, transactionUpdateData);
+            }
+        });
+        await batch.commit();
+        showNotification("✅ নাম এবং তথ্য সফলভাবে আপডেট করা হয়েছে!", "success");
+        closeEditModal();
+    } catch (err) {
+        showNotification("❌ আপডেট করতে সমস্যা হয়েছে: " + err.message, "error");
+    }
+}
+
+async function deleteCategory(categoryId) {
+    const categoryName = categoriesData[categoryId]?.name;
+    const relatedPeople = await db.collection('people').where('category_key', '==', categoryId).get();
+    if (!relatedPeople.empty) {
+        showNotification("❌ এই ক্যাটাগরির অধীনে নাম রয়েছে। আগে সেই নামগুলো মুছে ফেলুন।", "error");
+        return;
+    }
+    db.collection('categories').doc(categoryId).delete()
+        .then(() => {
+            showNotification(`✅ ক্যাটাগরি "${categoryName}" সফলভাবে মুছে ফেলা হয়েছে!`, "success");
+            closeEditModal();
+        })
+        .catch(err => {
+            showNotification("❌ ক্যাটাগরি মুছে ফেলতে সমস্যা হয়েছে: " + err.message, "error");
+        });
+}
+
+async function deleteName(nameId) {
+    let personData = findPersonData(nameId);
+    const personName = personData.name;
+    const relatedTransactions = await db.collection('transactions').where('name_key', '==', nameId).get();
+    if (!relatedTransactions.empty) {
+        showNotification("❌ এই নামের সাথে সম্পর্কিত লেনদেন রয়েছে। আগে সেই লেনদেনগুলো মুছে ফেলুন।", "error");
+        return;
+    }
+    db.collection('people').doc(nameId).delete()
+        .then(() => {
+            showNotification(`✅ নাম "${personName}" সফলভাবে মুছে ফেলা হয়েছে!`, "success");
+            closeEditModal();
+        })
+        .catch(err => {
+            showNotification("❌ নাম মুছে ফেলতে সমস্যা হয়েছে: " + err.message, "error");
+        });
+}
+
+
+// --- PERSON PROFILE AND EDIT FUNCTIONS (অপরিবর্তিত) ---
+async function openPersonProfileModal(nameId) {
+    const personData = findPersonData(nameId);
+    if (!personData) {
+        showNotification("❌ ব্যক্তির তথ্য খুঁজে পাওয়া যায়নি।", "error");
+        return;
+    }
+
+    if(document.getElementById('edit-person-form')) document.getElementById('edit-person-form').dataset.personId = nameId;
+    document.getElementById('person-profile-modal').dataset.personId = nameId;
+
+    const editBtn = document.getElementById('editPersonInfoBtn');
+    if (isAdmin) { editBtn.style.display = 'block'; } else { editBtn.style.display = 'none'; }
+
+    document.getElementById('person-profile-title').textContent = personData.name;
+    document.getElementById('person-mobile').textContent = personData.mobile || 'নেই';
+    document.getElementById('person-note').textContent = personData.note || 'নেই';
+    document.getElementById('person-category').textContent = categoriesData[personData.category_key]?.name || 'অজানা';
+
+    const profileIconContainer = document.getElementById('person-profile-icon');
+    const profilePicture = personData.profile_picture || '';
+    profileIconContainer.innerHTML = profilePicture ?
+        `<img src="${profilePicture}" alt="প্রোফাইল ছবি" class="w-full h-full object-cover rounded-full" />` :
+        `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="profile-icon-svg text-gray-500"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+    document.getElementById('person-category-info').classList.toggle('hidden', !categoriesData[personData.category_key]?.name);
+    document.getElementById('person-note-info').classList.toggle('hidden', !personData.note);
+
+    let relatedTransactions = transactionsData.filter(tx => tx.name_key === nameId);
+    
+    let totalCredit = 0;
+    let totalDebit = 0;
+    relatedTransactions.forEach(tx => {
+        if (tx.type === 'credit') { totalCredit += tx.amount; } else { totalDebit -= tx.amount; } 
+    });
+    
+    document.getElementById('person-total-credit').textContent = `৳ ${totalCredit.toFixed(2)}`;
+    document.getElementById('person-total-debit').textContent = `৳ ${Math.abs(totalDebit).toFixed(2)}`; 
+    
+    const personBalance = totalCredit + totalDebit; 
+    const balanceSign = personBalance >= 0 ? 'পাবে' : 'দিবে';
+    const balanceClass = personBalance >= 0 ? 'text-green-600' : 'text-red-600';
+    
+    document.getElementById('person-total-balance').textContent = `৳ ${Math.abs(personBalance).toFixed(2)}`;
+    document.getElementById('person-total-balance').className = `text-xl font-bold ${balanceClass}`;
+    document.getElementById('person-total-balance').previousElementSibling.textContent = balanceSign;
+    
+    const transactionsList = document.getElementById('person-transactions-list');
+    transactionsList.innerHTML = '';
+    
+    let filteredList = relatedTransactions;
+    if (personFilterType !== 'all') {
+        filteredList = relatedTransactions.filter(tx => tx.type === personFilterType);
+    }
+    
+    const sortedTransactions = filteredList.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    if (sortedTransactions.length === 0) {
+        transactionsList.innerHTML = '<p class="text-center text-gray-500 p-4">কোনো লেনদেন পাওয়া যায়নি।</p>';
+    }
+
+    sortedTransactions.forEach(tx => {
+        const card = document.createElement('div');
+        card.className = "person-transaction-card";
+        
+        const amountClass = tx.type === "credit" ? "amount-credit" : "amount-debit";
+        const amountText = `৳ ${tx.amount.toFixed(2)}`;
+        
+        const editButton = isAdmin ? `
+            <button onclick="event.stopPropagation(); openEditForm('${tx.id}')" class="text-blue-600 hover:text-blue-800 ml-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pen"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/><path d="m15 5 3 3"/></svg>
+            </button>
+        ` : '';
+
+        const descriptionDisplay = tx.description ? `<span class="text-sm text-gray-700 truncate">${tx.description}</span>` : '<span class="text-sm text-gray-400">নোট নেই</span>';
+
+        const isCash = (tx.is_cash === false) ? false : true; 
+        const cashLabel = isCash ? 'নগদ' : 'বাকি';
+        const cashIconClass = isCash ? 'text-green-500' : 'text-red-500';
+
+        card.innerHTML = `
+            <div class="card-row flex justify-between items-center w-full">
+                <div class="flex flex-col">
+                    <span class="text-xs text-gray-500">${formatDate(tx.date)}</span>
+                    ${descriptionDisplay}
+                </div>
+                <div class="flex items-center">
+                    <p class="text-base font-semibold ${amountClass} flex items-center gap-1">
+                        ${amountText}
+                        ${tx.type === 'credit' ? 
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>' : 
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="19" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>'
+                        }
+                    </p>
+                    <span title="${cashLabel}" class="ml-1 ${cashIconClass} text-xs">(${cashLabel})</span>
+                    ${editButton}
+                </div>
+            </div>
+        `;
+        transactionsList.appendChild(card);
     });
 
-    const actionHeader = document.querySelector('#transaction-list th:last-child');
-    if (actionHeader) {
-        actionHeader.classList.add('hidden');
+    document.getElementById('person-profile-modal').style.display = 'flex';
+}
+
+function openEditPersonModal() {
+    if (!isAdmin) { showNotification("❌ আপনার এডিটিং এর অনুমতি নেই।", "error"); return; }
+    closePersonProfileModal();
+    previousModalId = 'person-profile-modal';
+    const personId = document.getElementById('edit-person-form').dataset.personId;
+    const personData = findPersonData(personId);
+    if (!personData) { showNotification("❌ ব্যক্তির তথ্য খুঁজে পাওয়া যায়নি।", "error"); return; }
+    
+    const categorySelect = document.getElementById('edit-person-category');
+    categorySelect.innerHTML = '';
+    for(const catId in categoriesData) {
+        const option = document.createElement('option');
+        option.value = catId;
+        option.textContent = categoriesData[catId].name;
+        categorySelect.appendChild(option);
     }
-  }
+    
+    document.getElementById('edit-person-name').value = personData.name;
+    document.getElementById('edit-person-mobile').value = personData.mobile || '';
+    document.getElementById('edit-person-note').value = personData.note || '';
+    document.getElementById('edit-person-category').value = personData.category_key;
+    
+    document.getElementById('edit-person-modal').style.display = 'flex';
+}
 
-  // ✅ Filters
-  function clearFilters() { 
-    document.getElementById("category").value = ""; 
-    document.getElementById("name").value = ""; 
-    document.getElementById("start_date").value = ""; 
-    document.getElementById("end_date").value = ""; 
-    updateNameOptions('name', ''); // Reset names to show all
-    viewPersonHistory('');
-  }
+async function updatePersonInfo(e) {
+    e.preventDefault();
+    const personId = document.getElementById('edit-person-form').dataset.personId;
+    const newName = document.getElementById('edit-person-name').value.trim();
+    const newMobile = document.getElementById('edit-person-mobile').value.trim();
+    const newNote = document.getElementById('edit-person-note').value.trim();
+    const newCategoryId = document.getElementById('edit-person-category').value;
+    
+    if (!newName || !newCategoryId) { showNotification("❌ নাম এবং ক্যাটাগরি আবশ্যক।", "error"); return; }
 
-  function filterTransactions() {
-    const categoryKey = document.getElementById('category').value;
-    const nameKey = document.getElementById('name').value;
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
+    const newCategoryName = categoriesData[newCategoryId]?.name || '';
+    
+    try {
+        const batch = db.batch();
+        const peopleRef = db.collection('people').doc(personId);
+        batch.update(peopleRef, {
+            name: newName,
+            mobile: newMobile || null,
+            note: newNote || null,
+            category_key: newCategoryId
+        });
+
+        const transactionsToUpdate = await db.collection('transactions').where('name_key', '==', personId).get();
+        transactionsToUpdate.docs.forEach(doc => {
+            batch.update(doc.ref, { name: newName, category_key: newCategoryId, category_name: newCategoryName });
+        });
+
+        await batch.commit();
+        showNotification("✅ ব্যক্তির তথ্য সফলভাবে আপডেট হয়েছে!", "success");
+        closeEditPersonModal();
+    } catch(err) {
+        showNotification("❌ তথ্য আপডেট করতে সমস্যা হয়েছে: " + err.message, "error");
+    }
+}
+
+
+// --- FILTERING AND RENDERING LOGIC (অপরিবর্তিত) ---
+function filterTransactions() {
+    const categoryKey = document.getElementById('category')?.value;
+    const nameKey = document.getElementById('name')?.value;
+    const startDate = document.getElementById('start_date')?.value;
+    const endDate = document.getElementById('end_date')?.value;
+    const typeFilter = document.getElementById('type-filter')?.value;
+    const nameSearch = document.getElementById('name-search')?.value.toLowerCase();
+    
+    isDefaultView = !(categoryKey || nameKey || startDate || endDate || typeFilter !== 'all' || nameSearch);
     
     let filteredTransactions = transactionsData.filter(tx => {
         const txDate = new Date(tx.date);
         const isCategoryMatch = !categoryKey || tx.category_key === categoryKey;
         const isNameMatch = !nameKey || tx.name_key === nameKey;
-        const isStartDateMatch = !startDate || txDate >= new Date(startDate);
-        const isEndDateMatch = !endDate || txDate <= new Date(endDate);
-        return isCategoryMatch && isNameMatch && isStartDateMatch && isEndDateMatch;
+        const isStartDateMatch = !startDate || txDate >= new Date(startDate + 'T00:00:00');
+        const isEndDateMatch = !endDate || txDate <= new Date(endDate + 'T23:59:59');
+        const isTypeMatch = typeFilter === 'all' || tx.type === typeFilter;
+        const isNameSearchMatch = !nameSearch || tx.name.toLowerCase().includes(nameSearch);
+        
+        return isCategoryMatch && isNameMatch && isStartDateMatch && isEndDateMatch && isTypeMatch && isNameSearchMatch;
     });
+    
+    renderTransactions(filteredTransactions); 
+}
 
-    renderTransactions(filteredTransactions);
-  }
-
-  // ✅ New function to filter from URL parameters
-  function filterTransactionsFromUrl() {
+function filterTransactionsFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
     const categoryKey = urlParams.get('category_key');
     const nameKey = urlParams.get('name_key');
     const startDate = urlParams.get('start_date');
     const endDate = urlParams.get('end_date');
-    const isViewMode = urlParams.get('mode') === 'view';
-
-    // Populate the dropdowns and inputs based on URL params
-    if (categoryKey) document.getElementById('category').value = categoryKey;
-    if (nameKey) {
-        document.getElementById('name').value = nameKey;
-        updateNameOptions('name', categoryKey);
-    }
-    if (startDate) document.getElementById('start_date').value = startDate;
-    if (endDate) document.getElementById('end_date').value = endDate;
+    const typeFilter = urlParams.get('type');
     
-    // Call the main filter function
+    const hasFilters = categoryKey || nameKey || startDate || endDate || typeFilter;
+    
+    if (document.getElementById('category')) {
+        document.getElementById('category').disabled = hasFilters;
+        document.getElementById('name').disabled = hasFilters;
+        document.getElementById('start_date').disabled = hasFilters;
+        document.getElementById('end_date').disabled = hasFilters;
+        document.getElementById('type-filter').disabled = hasFilters;
+        document.getElementById('name-search').disabled = hasFilters;
+        
+        if (document.getElementById('newEntryBtn')) {
+            document.getElementById('newEntryBtn').style.display = hasFilters ? 'none' : 'block';
+        }
+        if (document.getElementById('showFilterModalBtn')) {
+            document.getElementById('showFilterModalBtn').style.display = hasFilters ? 'none' : 'block';
+        }
+        
+        if (hasFilters) {
+            showNotification("⚠️ এটি একটি ভিউ লিংক। ফিল্টার অপশনগুলো নিষ্ক্রিয়।", "info");
+        }
+        
+        if (categoryKey) document.getElementById('category').value = categoryKey;
+        if (nameKey) {
+            document.getElementById('name').value = nameKey;
+            updateNameOptions('name', categoryKey);
+        }
+        if (startDate) document.getElementById('start_date').value = startDate;
+        if (endDate) document.getElementById('end_date').value = endDate;
+        if (typeFilter) document.getElementById('type-filter').value = typeFilter;
+    }
+    
     filterTransactions();
-  }
+}
 
-  // ✅ Header/Footer Include
-  includeHTML("header.html", "header-placeholder", () => {
-    setupHeaderAndSidebar();
-  });
-  includeHTML("footer.html", "footer-placeholder");
+function renderTransactions(transactions) {
+    const cardContainer = document.getElementById("transaction-card-list");
+    if (!cardContainer) return;
+    cardContainer.innerHTML = "";
+    
+    // --- পাওনা/দেনা (People Balances) গণনার অংশ ---
+    const peopleBalances = {};
+    transactionsData.forEach(tx => {
+      if (!peopleBalances[tx.name_key]) { peopleBalances[tx.name_key] = 0; }
+      if (tx.type === "credit") { peopleBalances[tx.name_key] += tx.amount; } else { peopleBalances[tx.name_key] -= tx.amount; }
+    });
+    
+    // --- ফিল্টার করা লেনদেনের ক্যাশ ও মোট ব্যালেন্স গণনা ---
+    let cashTotalCredit = 0; 
+    let cashTotalDebit = 0;  
+
+    let overallTotalCredit = 0; 
+    let overallTotalDebit = 0;  
+    
+    transactions.forEach(tx => { 
+        const amount = tx.amount || 0;
+        const isCash = (tx.is_cash === false) ? false : true; 
+
+        if (tx.type === "credit") {
+            overallTotalCredit += amount; 
+            if (isCash) {
+                cashTotalCredit += amount; 
+            }
+        } else if (tx.type === "debit") {
+            overallTotalDebit += amount; 
+            if (isCash) {
+                cashTotalDebit += amount; 
+            }
+        }
+    });
+
+    // --- চূড়ান্ত ব্যালেন্স গণনা ---
+    const finalCashBalance = cashTotalCredit - cashTotalDebit;
+    const finalTotalBalance = overallTotalCredit - overallTotalDebit; 
+
+    // --- ড্যাশবোর্ড কার্ড আপডেট (ফিল্টার অনুযায়ী) ---
+    const balanceSignCash = finalCashBalance >= 0 ? '' : '-';
+    const balanceSignTotal = finalTotalBalance >= 0 ? '' : '-';
+
+    document.getElementById("total-credit").textContent = `৳ ${overallTotalCredit.toFixed(2)}`;
+    document.getElementById("total-debit").textContent = `৳ ${overallTotalDebit.toFixed(2)}`;
+    
+    const totalCashElement = document.getElementById("total-cash");
+    if (totalCashElement) {
+        totalCashElement.textContent = `৳ ${balanceSignCash}${Math.abs(finalCashBalance).toFixed(2)}`;
+        totalCashElement.className = `text-lg font-bold text-fit ${finalCashBalance >= 0 ? 'text-green-600' : 'text-red-600'}`;
+    }
+
+    const totalBalanceElement = document.getElementById("total-balance");
+    if (totalBalanceElement) {
+        totalBalanceElement.textContent = `৳ ${balanceSignTotal}${Math.abs(finalTotalBalance).toFixed(2)}`;
+        totalBalanceElement.className = `text-lg font-bold text-fit ${finalTotalBalance >= 0 ? 'text-green-600' : 'text-red-600'}`;
+    }
+    
+    // ... (লেনদেন কার্ড রেন্ডারিং লুপ)
+    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (transactions.length === 0) {
+        cardContainer.innerHTML = '<p class="text-center col-span-full text-gray-500">কোনো লেনদেন পাওয়া যায়নি।</p>';
+    }
+
+    transactions.forEach(tx => {
+      const card = document.createElement("div");
+      card.className = "transaction-card";
+      card.onclick = () => openPersonProfileModal(tx.name_key);
+      
+      const personData = findPersonData(tx.name_key);
+      const profilePicture = personData && personData.profile_picture ? personData.profile_picture : '';
+      
+      const profileIconHtml = profilePicture ? 
+        `<img src="${profilePicture}" alt="প্রোফাইল ছবি" class="w-full h-full object-cover rounded-full" />` : 
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="profile-icon-svg text-gray-500"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+      const amountClass = tx.type === "credit" ? "amount-credit" : "amount-debit";
+      const amountText = `৳ ${tx.amount.toFixed(2)}`;
+
+      const balanceAmount = peopleBalances[tx.name_key] || 0;
+      const balanceLabel = balanceAmount >= 0 ? 'পাবে' : 'দিবে';
+      const balanceAmountFormatted = `৳ ${Math.abs(balanceAmount).toFixed(2)}`;
+      const balanceClass = balanceAmount >= 0 ? 'text-green-600' : 'text-red-600';
+
+      const borderClass = tx.type === 'credit' ? 'credit' : 'debit';
+      
+      const isCash = (tx.is_cash === false) ? false : true; 
+      const cashLabel = isCash ? 'নগদ' : 'বাকি';
+      const cashIconClass = isCash ? 'text-green-500' : 'text-red-500';
+
+      card.innerHTML = `
+        <div class="card-header">
+            <div class="flex items-center gap-3">
+                <div class="profile-icon-container w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                    ${profileIconHtml}
+                </div>
+                <div class="flex flex-col">
+                    <h3 class="font-semibold text-base">${tx.name}</h3>
+                    <span class="text-xs text-gray-500">${formatDate(tx.date)} <span class="${cashIconClass}">| ${cashLabel}</span></span>
+                </div>
+            </div>
+            <div class="flex flex-col items-end">
+                <span class="${amountClass} text-sm font-semibold">${tx.type === 'credit' ? 'পেলাম' : 'দিলাম'}: ${amountText}</span>
+                <span class="text-xs ${balanceClass}">${balanceLabel}: ${balanceAmountFormatted}</span>
+            </div>
+        </div>
+        <div class="thin-border ${borderClass}"></div>
+      `;
+      cardContainer.appendChild(card);
+    });
+}
+
+
+// --- OTHER FUNCTIONS (অপরিবর্তিত) ---
+function clearFilters() {
+    if (!document.getElementById("category")) return;
+    document.getElementById("category").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("start_date").value = "";
+    document.getElementById("end_date").value = "";
+    document.getElementById('type-filter').value = 'all';
+    document.getElementById("name-search").value = "";
+    updateNameOptions('name', '');
+    showNotification('✅ ফিল্টার ক্লিয়ার করা হয়েছে!', 'info');
+    closeFilterModal();
+}
+
+function viewPersonHistory(nameKey) {
+    const url = new URL(window.location);
+    if (nameKey) { url.searchParams.set('name_key', nameKey); } else { url.searchParams.delete('name_key'); }
+    window.history.pushState({}, '', url);
+    if (document.getElementById('name')) document.getElementById('name').value = nameKey;
+    filterTransactions();
+}
+
+function toggleAmountFilter() {
+    const header = document.getElementById('amount-header');
+    if (!header) return;
+    if (currentFilterType === 'all') {
+        currentFilterType = 'credit';
+        header.innerHTML = 'পেলাম (▲)';
+    } else if (currentFilterType === 'credit') {
+        currentFilterType = 'debit';
+        header.innerHTML = 'দিলাম (▼)';
+    } else {
+        currentFilterType = 'all';
+        header.innerHTML = 'পরিমাণ';
+    }
+    filterTransactions();
+}
+
+function togglePersonAmountFilter() {
+    const personId = document.getElementById('person-profile-modal').dataset.personId;
+    if (!personId) return;
+
+    const header = document.getElementById('person-amount-header');
+    if (!header) return;
+    
+    if (personFilterType === 'all') {
+        personFilterType = 'credit';
+        header.innerHTML = 'পেলাম (▲)';
+    } else if (personFilterType === 'credit') {
+        personFilterType = 'debit';
+        header.innerHTML = 'দিলাম (▼)';
+    } else {
+        personFilterType = 'all';
+        header.innerHTML = 'পরিমাণ';
+    }
+    openPersonProfileModal(personId);
+}
+
+function shareFilteredData() {
+    const url = new URL(window.location.origin + window.location.pathname);
+    const categoryKey = document.getElementById('category')?.value;
+    const nameKey = document.getElementById('name')?.value;
+    const startDate = document.getElementById('start_date')?.value;
+    const endDate = document.getElementById('end_date')?.value;
+    const typeFilter = document.getElementById('type-filter')?.value;
+    if (categoryKey) url.searchParams.set('category_key', categoryKey);
+    if (nameKey) url.searchParams.set('name_key', nameKey);
+    if (startDate) url.searchParams.set('start_date', startDate);
+    if (endDate) url.searchParams.set('end_date', endDate);
+    if (typeFilter) url.searchParams.set('type', typeFilter);
+    navigator.clipboard.writeText(url.href).then(() => {
+        showNotification("✅ ফিল্টার করা লিংক কপি করা হয়েছে!", "success");
+    }).catch(err => {
+        showNotification("❌ লিংক কপি করতে সমস্যা হয়েছে: " + err, "error");
+    });
+}
+
+
+// --- ✅ আপডেট করা: UI COMPONENT LOADING লজিক ---
+async function includeHTML(file, elementId, callback) {
+    const elm = document.getElementById(elementId);
+    if (!elm) {
+        if (callback) callback();
+        return;
+    }
+    
+    try {
+        const response = await fetch(file);
+        if (response.ok) {
+            const text = await response.text();
+            elm.innerHTML = text;
+        } else {
+            const errorMessage = `Error loading ${file}: ${response.status} (${response.statusText})`;
+            console.error(errorMessage);
+            elm.innerHTML = `<p class="text-red-500 p-2 bg-red-100 rounded">❌ ${file} লোড করতে পারেনি। কোড/পাথ চেক করুন।</p>`;
+        }
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        elm.innerHTML = `<p class="text-red-500 p-2 bg-red-100 rounded">❌ ${file} ফেচ করতে ব্যর্থ। সার্ভার/ফাইল পাথ চেক করুন।</p>`;
+    }
+    
+    if (callback) callback();
+}
+
+// ✅ আপডেট করা: লিসেনার সেটআপ ফিক্সড
+function setupHeaderAndSidebar() {
+    const menuButton = document.getElementById("menuButton");
+    const sidebar = document.getElementById("sidebar");
+    const profileButton = document.getElementById("profileButton");
+    const profileMenu = document.getElementById("profileMenu");
+    const logoutButton = document.getElementById("logoutButton");
+    let sidebarOpen = false;
+    
+    // --- 1. সাইডবার টগল লজিক ---
+    if (menuButton && sidebar) {
+        menuButton.addEventListener("click", () => {
+            sidebarOpen = !sidebarOpen;
+            sidebar.classList.toggle("-translate-x-full", !sidebarOpen);
+        });
+    }
+    
+    // --- 2. প্রোফাইল মেনু টগল লজিক ---
+    if (profileButton && profileMenu) {
+        profileButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            profileMenu.classList.toggle("hidden");
+        });
+    }
+    
+    // --- 3. লগআউট বাটন লজিক ---
+    if (logoutButton) {
+        logoutButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+                await firebase.auth().signOut();
+                window.location.href = "login.html"; 
+            } catch (error) {
+                console.error("Logout failed:", error);
+                showNotification("❌ লগআউট ব্যর্থ: " + error.message, "error");
+            }
+        });
+    }
+    
+    // --- 4. বাইরে ক্লিক করলে মেনু বন্ধ করার লজিক ---
+    document.addEventListener("click", (e) => {
+        if (profileButton && profileMenu && !profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileMenu.classList.add("hidden");
+        }
+        if (sidebar && menuButton && !sidebar.contains(e.target) && !menuButton.contains(e.target)) {
+            sidebar.classList.add("-translate-x-full");
+            sidebarOpen = false;
+        }
+    });
+    
+    if (typeof lucide !== "undefined" && lucide.createIcons) { lucide.createIcons(); }
+}
+
+function updateHeaderTitle() {
+    const pageTitle = document.title;
+    const headerTitle = document.querySelector("#header-placeholder .page-header-title");
+    if (headerTitle) { headerTitle.textContent = pageTitle; }
+}
+
+
+// --- ফায়ারবেস অথেন্টিকেশন এবং ডাটা লোডিং ---
+auth.onAuthStateChanged(async user => {
+    if (user) {
+        showLoader(); // ডেটা লোড না হওয়া পর্যন্ত লোডার দেখানো
+        
+        // --- ✅ ইনক্লুডিং লজিক (নিশ্চিত করা হলো যে হেডার লোড হওয়ার পরই মেনু সেট হবে) ---
+        await includeHTML("header.html", "header-placeholder", () => {
+            updateHeaderTitle();
+            setupHeaderAndSidebar(); 
+            
+            // ✅ ইনলাইন 'onclick' ফাংশনটি যেহেতু মূল কোডে, তাই এখানে নিশ্চিত করার দরকার নেই।
+            //    তবে, যদি 'newEntryBtn' বাটনটি header.html-এর বাইরে থাকে, তবে এটি কাজ করবে।
+        });
+        
+        await includeHTML("footer.html", "footer-placeholder");
+        // -----------------------------------------------------
+
+        try {
+            const snap = await db.collection("users").where("uid", "==", user.uid).limit(1).get();
+            const userData = snap.docs[0]?.data();
+            const newEntryBtn = document.getElementById("newEntryBtn");
+            const editCategoriesBtn = document.getElementById("editCategoriesBtn");
+
+            if (userData?.role?.toLowerCase() === "admin") {
+                isAdmin = true;
+                if (newEntryBtn) newEntryBtn.classList.remove("hidden");
+                if (editCategoriesBtn) editCategoriesBtn.classList.remove("hidden");
+            } else {
+                isAdmin = false;
+                if (newEntryBtn) newEntryBtn.classList.add("hidden");
+                if (editCategoriesBtn) editCategoriesBtn.classList.add("hidden");
+            }
+        } catch (err) {
+            console.error("User role check failed:", err);
+        }
+
+        db.collection('categories').onSnapshot(snap => {
+            categoriesData = {};
+            snap.forEach(doc => { categoriesData[doc.id] = doc.data(); });
+            updateCategoryOptions('category');
+            updateCategoryOptions('entry-category');
+            updateCategoryEditOptions();
+            updateNameCategoryOptions();
+        });
+        
+        db.collection('people').onSnapshot(snap => {
+            peopleData = {};
+            snap.forEach(doc => {
+                const data = doc.data();
+                if (!peopleData[data.category_key]) { peopleData[data.category_key] = {}; }
+                peopleData[data.category_key][doc.id] = { id: doc.id, ...data };
+            });
+            updateNameOptions('name', document.getElementById('category')?.value);
+            updateNameOptions('entry-name', document.getElementById('entry-category')?.value);
+            updateNameEditOptions();
+        });
+        
+        db.collection("transactions").orderBy("createdAt", "desc").onSnapshot(snap => {
+            transactionsData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            filterTransactionsFromUrl();
+            hideLoader();
+        });
+        
+        // --- ইভেন্ট লিসেনার সেটআপ (অপরিবর্তিত) ---
+        if (document.getElementById('entry-form')) {
+            document.getElementById('entry-form').onsubmit = submitNewEntry;
+            document.getElementById('entry-category').onchange = toggleNewCategoryAndName;
+            document.getElementById('entry-name').onchange = toggleNewNameInput;
+        }
+        if (document.getElementById('edit-category-select')) { document.getElementById('edit-category-select').onchange = showCategoryForm; }
+        if (document.getElementById('edit-name-select')) { document.getElementById('edit-name-select').onchange = showNameForm; }
+        if (document.getElementById('edit-person-form')) { document.getElementById('edit-person-form').addEventListener('submit', updatePersonInfo); }
+        if (document.getElementById('category')) { document.getElementById('category').onchange = updateNameAndFilter; }
+        if (document.getElementById('name')) { document.getElementById('name').onchange = filterTransactions; }
+        if (document.getElementById('start_date')) { document.getElementById('start_date').onchange = filterTransactions; }
+        if (document.getElementById('end_date')) { document.getElementById('end_date').onchange = filterTransactions; }
+        if (document.getElementById('type-filter')) { document.getElementById('type-filter').onchange = filterTransactions; }
+        if (document.getElementById('name-search')) { document.getElementById('name-search').oninput = filterTransactions; }
+        
+    } else {
+        window.location.href = "login.html";
+    }
+});
 </script>
 </body>
 </html>
