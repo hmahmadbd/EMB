@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Product List – A S Embroidery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* লোডার ডিজাইন */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #e5e7eb;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-2 sm:p-4">
+
+  <div id="loader">
+    <div class="spinner"></div>
+    <p class="mt-4 text-blue-600 font-bold animate-pulse">ডাটা লোড হচ্ছে, অপেক্ষা করুন...</p>
+  </div>
+
+  <div class="max-w-6xl mx-auto bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
+    <div id="as-embroidery-system">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="flex items-center gap-4">
+    <button id="menuButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="menu"></i>
+    </button>
+    <h1 class="text-xl font-semibold">A S Embroidery</h1>
+    </div>
+    
+    <div class="relative">
+    <button id="profileButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="user"></i>
+    </button>
+    
+    <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded shadow-lg z-50 py-2">
+    <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="user-circle"></i> My Profile</a>
+    <a href="contact.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="contact"></i> Contact</a> 
+    <hr class="my-2 border-gray-200">
+    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
+    <i class="w-4 h-4" data-lucide="log-out"></i> Logout
+    </button>
+    </div>
+    </div>
+    </header>
+    
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden"></div>
+    
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-40 pt-16">
+    <div class="p-4 border-b font-bold text-lg text-blue-600 bg-gray-50 flex items-center gap-2">
+    <i data-lucide="layers" class="w-5 h-5"></i> Menu Navigation
+    </div>
+    <nav class="p-2 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
+    <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="layout-dashboard"></i> Dashboard</a> 
+    <a href="stitch_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="layers"></i> Stitch History</a>
+    <a href="target-settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="target"></i> Users Target</a>
+    <a href="hisab management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="receipt"></i> Transaction History</a>
+    
+    <div id="adminOnlyContent" class="hidden border-t mt-2 pt-2">
+    <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">Management</p>
+    <a href="product_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="package-plus"></i> Product In</a>
+    <a href="product_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="list"></i> Product List</a>
+    <a href="production_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="factory"></i> Production Add</a>
+    <a href="delivery_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="truck"></i> Delivery Add</a>
+    <a href="user_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="users"></i> All Users</a>
+    <a href="add-stitch.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="scissors"></i> Add Stitch</a> 
+    </div>
+    </nav>
+    </aside>
+    </div>
+    
+    <script>
+    (function() {
+    /** * ROLE CONFIGURATION 
+    * আপনার বাস্তব প্রজেক্টে এই ভ্যালু সেশন বা লোকাল স্টোরেজ থেকে আসবে।
+    * উদাহরণ: const userRole = localStorage.getItem('role');
+    */
+    const userRole = "admin"; // Options: 'admin', 'company', 'user'
+    
+    // Function to check role and update UI
+    function applyRolePermissions() {
+    const adminSection = document.getElementById("adminOnlyContent");
+    if (userRole === "admin" || userRole === "company") {
+    adminSection.classList.remove("hidden");
+    } else {
+    adminSection.remove(); // পুরোপুরি রিমুভ করে দেওয়া নিরাপদ
+    }
+    }
+    
+    // Initialize UI Logic
+    applyRolePermissions();
+    lucide.createIcons();
+    
+    const menuBtn = document.getElementById("menuButton");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const profileBtn = document.getElementById("profileButton");
+    const profileMenu = document.getElementById("profileMenu");
+    const logoutBtn = document.getElementById("logoutBtn");
+    
+    function notify(msg, type = "success") {
+    Toastify({
+    text: msg,
+    duration: 3000,
+    close: true,
+    gravity: "top",
+    position: "right",
+    style: { 
+    background: type === "success" ? "#2563eb" : "#ef4444",
+    borderRadius: "10px"
+    }
+    }).showToast();
+    }
+    
+    function toggleSidebar() {
+    const isOpen = !sidebar.classList.contains("-translate-x-full");
+    if (isOpen) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    } else {
+    sidebar.classList.remove("-translate-x-full");
+    overlay.classList.remove("hidden");
+    }
+    }
+    
+    menuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleSidebar();
+    });
+    
+    profileBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileMenu.classList.toggle("hidden");
+    });
+    
+    logoutBtn.addEventListener("click", () => {
+    notify("লগআউট হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।", "success");
+    setTimeout(() => {
+    // Clear session logic here
+    window.location.href = "login.html";
+    }, 2000);
+    });
+    
+    document.addEventListener("click", (e) => {
+    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+    profileMenu.classList.add("hidden");
+    }
+    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    }
+    });
+    
+    overlay.addEventListener("click", toggleSidebar);
+    })();
+    </script>
+    <div class="h-16"></div>
+    
+    <div class="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4 border-b pb-4">
+      <h1 class="text-2xl sm:text-3xl font-bold text-blue-800">📋 Product Management</h1>
+      <button id="addProductBtn" onclick="window.location.href='product_add.html'" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl shadow-md font-semibold transition-all">
+        + Add Product
+      </button>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+      <div class="bg-gray-50 p-4 rounded-xl border-b-4 border-gray-400 text-center shadow-sm">
+        <h2 class="text-[10px] font-bold text-gray-500 uppercase">Total</h2>
+        <p id="totalProducts" class="text-2xl font-black text-gray-800">0</p>
+      </div>
+      <div class="bg-blue-50 p-4 rounded-xl border-b-4 border-blue-500 text-center shadow-sm">
+        <h2 class="text-[10px] font-bold text-blue-600 uppercase">Stock</h2>
+        <p id="countStock" class="text-2xl font-black text-blue-700">0</p>
+      </div>
+      <div class="bg-yellow-50 p-4 rounded-xl border-b-4 border-yellow-500 text-center shadow-sm">
+        <h2 class="text-[10px] font-bold text-yellow-600 uppercase">Running</h2>
+        <p id="countRunning" class="text-2xl font-black text-yellow-700">0</p>
+      </div>
+      <div class="bg-orange-50 p-4 rounded-xl border-b-4 border-orange-500 text-center shadow-sm">
+        <h2 class="text-[10px] font-bold text-orange-600 uppercase">Checking</h2>
+        <p id="countChecking" class="text-2xl font-black text-orange-700">0</p>
+      </div>
+      <div class="bg-red-50 p-4 rounded-xl border-b-4 border-red-500 text-center shadow-sm">
+        <h2 class="text-[10px] font-bold text-red-600 uppercase">Pending</h2>
+        <p id="countPending" class="text-2xl font-black text-red-700">0</p>
+      </div>
+      <div class="bg-green-50 p-4 rounded-xl border-b-4 border-green-500 text-center shadow-sm">
+        <h2 class="text-[10px] font-bold text-green-600 uppercase">Complete</h2>
+        <p id="countComplete" class="text-2xl font-black text-green-700">0</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <input id="searchInput" type="text" placeholder="ID বা নাম দিয়ে খুঁজুন..." class="w-full border-2 border-gray-100 p-2.5 rounded-xl focus:border-blue-500 outline-none transition-all" />
+      <select id="clientFilter" class="w-full border-2 border-gray-100 p-2.5 rounded-xl focus:border-blue-500 outline-none bg-white">
+        <option value="">সকল ক্লায়েন্ট</option>
+      </select>
+      <div class="flex items-center justify-center bg-indigo-50 rounded-xl border-2 border-indigo-100 p-2 text-indigo-800 font-bold">
+        ক্লায়েন্ট সংখ্যা: <span id="totalClients" class="ml-2 text-xl">0</span>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+      <table class="min-w-full table-auto text-sm">
+        <thead class="bg-gray-100 text-gray-600 font-bold uppercase">
+          <tr>
+            <th class="px-4 py-4 border-b text-left">Product ID</th>
+            <th class="px-4 py-4 border-b text-left">Name</th>
+            <th class="px-4 py-4 border-b text-left">Fabric</th>
+            <th class="px-4 py-4 border-b text-left">Client</th>
+            <th class="px-4 py-4 border-b text-center">Status</th>
+            <th class="px-4 py-4 border-b text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody id="productTableBody" class="bg-white divide-y divide-gray-100">
+          </tbody>
+      </table>
+    </div>
+  </div>
+
+ <script type="module">
+ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+ import { getFirestore, collection, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+ 
+ const firebaseConfig = {
+    apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+    authDomain: "asembroidery-5cd5e.firebaseapp.com",
+    projectId: "asembroidery-5cd5e",
+    storageBucket: "asembroidery-5cd5e.appspot.com",
+    messagingSenderId: "592758047307",
+    appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+ };
+
+ const app = initializeApp(firebaseConfig);
+ const db = getFirestore(app);
+ const auth = getAuth(app);
+
+ let masterData = [];
+ let globalCompanyId = "";
+
+ // লোডার বন্ধ করার ফাংশন
+ function hideLoader() {
+   const loader = document.getElementById('loader');
+   if(loader) loader.style.display = 'none';
+ }
+
+ onAuthStateChanged(auth, async (user) => {
+   if (user) {
+     try {
+       const usersRef = collection(db, "users");
+       const q = query(usersRef, where("email", "==", user.email));
+       const querySnap = await getDocs(q);
+
+       if (!querySnap.empty) {
+         const userDoc = querySnap.docs[0];
+         globalCompanyId = userDoc.id; 
+         const role = userDoc.data().role;
+
+         if(role !== 'worker') document.getElementById("addProductBtn").classList.remove('hidden');
+
+         loadClients(globalCompanyId); 
+         initProductStream(role, globalCompanyId);
+       } else {
+         alert("ইউজার ডাটাবেজে আপনার প্রোফাইল পাওয়া যায়নি।");
+         hideLoader();
+       }
+     } catch (err) { 
+       console.error(err);
+       hideLoader();
+     }
+   } else { 
+     window.location.href = "login.html"; 
+   }
+ });
+
+ function loadClients(companyId) {
+   const usersRef = collection(db, "users");
+   onSnapshot(query(usersRef, where("role", "==", "client")), (snapshot) => {
+     const dropdown = document.getElementById("clientFilter");
+     dropdown.innerHTML = '<option value="">সকল ক্লায়েন্ট</option>';
+     let count = 0;
+     snapshot.forEach(doc => {
+       const data = doc.data();
+       if (data.companyId === companyId) {
+         const opt = document.createElement("option");
+         opt.value = data.name;
+         opt.textContent = data.name;
+         dropdown.appendChild(opt);
+         count++;
+       }
+     });
+     document.getElementById("totalClients").textContent = count;
+   });
+ }
+
+ function initProductStream(role, companyId) {
+   const productsRef = collection(db, "products");
+   onSnapshot(productsRef, (snapshot) => {
+     masterData = [];
+     snapshot.forEach(doc => {
+       const data = doc.data();
+       if (role === 'admin' || data.companyId === companyId) {
+         masterData.push({ id: doc.id, ...data });
+       }
+     });
+     applyFilters();
+     hideLoader(); // ডাটা প্রথমবার লোড হয়ে গেলে লোডার বন্ধ হবে
+   });
+ }
+
+ function applyFilters() {
+   const searchVal = document.getElementById("searchInput").value.toLowerCase();
+   const clientVal = document.getElementById("clientFilter").value;
+
+   const filtered = masterData.filter(p => {
+     const nameMatch = p.name?.toLowerCase().includes(searchVal) || p.id.toLowerCase().includes(searchVal);
+     const clientMatch = clientVal === "" || p.supplier === clientVal;
+     return nameMatch && clientMatch;
+   });
+
+   renderTable(filtered);
+   updateStats(filtered);
+ }
+
+ document.getElementById("searchInput").addEventListener("input", applyFilters);
+ document.getElementById("clientFilter").addEventListener("change", applyFilters);
+
+ function renderTable(data) {
+   const tbody = document.getElementById("productTableBody");
+   tbody.innerHTML = "";
+   
+   data.forEach(p => {
+     const tr = document.createElement("tr");
+     tr.className = "hover:bg-blue-50/30 transition-colors border-b border-gray-100";
+     tr.innerHTML = `
+       <td class="px-4 py-4 border-r border-gray-50 font-mono font-bold text-blue-600">${p.id}</td>
+       <td class="px-4 py-4 font-semibold text-gray-800">${p.name || 'N/A'}</td>
+       <td class="px-4 py-4 text-gray-500">${p.fabric || '-'}</td>
+       <td class="px-4 py-4 text-gray-500">${p.supplier || 'N/A'}</td>
+       <td class="px-4 py-4 text-center">
+         <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${getStatusColor(p.status)}">
+            ${p.status || 'Stock'}
+         </span>
+       </td>
+       <td class="px-4 py-4 text-center">
+         <button onclick="viewDetails('${p.id}')" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:shadow-lg transition-all">VIEW</button>
+       </td>
+     `;
+     tbody.appendChild(tr);
+   });
+ }
+
+ function getStatusColor(status) {
+    const s = status?.toLowerCase();
+    if(s === 'complete') return 'bg-green-100 text-green-700';
+    if(s === 'running') return 'bg-yellow-100 text-yellow-700';
+    if(s === 'checking') return 'bg-orange-100 text-orange-700';
+    if(s === 'pending') return 'bg-red-100 text-red-700';
+    return 'bg-blue-100 text-blue-700';
+ }
+
+ function updateStats(data) {
+    document.getElementById("totalProducts").textContent = data.length;
+    const count = (s) => data.filter(p => (p.status||'').toLowerCase() === s).length;
+    document.getElementById("countStock").textContent = count('stock');
+    document.getElementById("countRunning").textContent = count('running');
+    document.getElementById("countChecking").textContent = count('checking');
+    document.getElementById("countPending").textContent = count('pending');
+    document.getElementById("countComplete").textContent = count('complete');
+ }
+
+ // প্রোডাক্ট আইডি অনুযায়ী পরবর্তী পেজে পাঠানো
+ window.viewDetails = (productId) => {
+    // এটি product_details.html পেজে আইডিটি পাঠিয়ে দেবে
+    window.location.href = `product_details.html?id=${productId}`;
+ }; 
+ </script>
+</body>
+</html>
