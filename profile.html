@@ -1,220 +1,499 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>আমার প্রোফাইল - এ এস এমব্রয়ডারি</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>প্রোফাইল ম্যানেজমেন্ট - ASEmbroidery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f3f4f6; color: #1e293b; }
+        .glass-card { background: white; border-radius: 1.5rem; padding: 1.25rem; margin-bottom: 1rem; border: 1px solid #e5e7eb; }
+        .input-field { width: 100%; background: #f9fafb; border: 1px solid #d1d5db; padding: 10px 10px 10px 40px; border-radius: 12px; font-weight: 600; font-size: 14px; outline: none; transition: 0.3s; }
+        .input-field:focus { border-color: #4f46e5; background: white; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        .input-field:disabled { background: #e5e7eb; color: #64748b; border-style: dashed; cursor: not-allowed; }
+        .label-text { font-size: 11px; font-weight: 700; color: #4f46e5; margin-bottom: 5px; display: block; margin-left: 5px; }
+        
+        #loader { position: fixed; inset: 0; background: white; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); z-index: 9999; transition: 0.5s; width: 90%; max-width: 380px; }
+        #toast.show { top: 20px; }
+        .status-badge { font-size: 10px; padding: 2px 10px; border-radius: 50px; font-weight: 800; color: white; }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="pb-10">
 
-  <!-- Loader -->
-  <div id="loader" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50">
-    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600"></div>
-  </div>
-
-  <!-- Header -->
-  <div id="header-placeholder"></div>
-
-  <!-- Main Content -->
-  <main class="pl-4 pr-4 md:pl-72 pt-24 pb-16 max-w-4xl mx-auto hidden" id="mainContent">
-    <h2 class="text-3xl font-bold text-blue-700 mb-6 flex items-center gap-2">
-      <i data-lucide="user" class="w-7 h-7 text-blue-700 text-center"></i> আমার প্রোফাইল
-    </h2>
-
-    <div class="bg-white shadow rounded p-6 space-y-6">
-      <!-- Profile Header -->
-      <div class="flex items-center gap-6">
-        <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-          <i data-lucide="user" class="w-10 h-10 text-gray-500"></i>
-        </div>
-        <div>
-          <h3 id="userName" class="text-2xl font-semibold text-gray-800">...</h3>
-          <p id="userRole" class="text-gray-600">...</p>
-          <p id="userJoined" class="text-gray-500 text-sm">...</p>
-        </div>
-      </div>
-
-      <!-- Form Fields -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="text-sm text-gray-500">নাম</label>
-          <input id="nameInput" type="text" disabled class="w-full mt-1 px-3 py-2 border rounded text-gray-700" />
-        </div>
-        <div>
-          <label class="text-sm text-gray-500">ইমেইল</label>
-          <input id="emailInput" type="email" disabled class="w-full mt-1 px-3 py-2 border rounded text-gray-700" />
-        </div>
-        <div>
-          <label class="text-sm text-gray-500">ফোন</label>
-          <input id="phoneInput" type="text" disabled class="w-full mt-1 px-3 py-2 border rounded text-gray-700" />
-        </div>
-        <div>
-          <label class="text-sm text-gray-500">টার্গেট প্রোডাকশন</label>
-          <input id="targetInput" type="text" disabled class="w-full mt-1 px-3 py-2 border rounded text-gray-700" />
-        </div>
-      </div>
-
-      <!-- Edit Button -->
-      <div class="pt-6 text-center">
-        <button id="editSaveBtn" class="px-5 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 flex items-center gap-2 justify-center mx-auto">
-          <i data-lucide="edit-3"></i> এডিট
-        </button>
-      </div>
+    <div id="loader">
+        <div class="spinner"></div>
+        <p class="mt-4 text-sm font-bold text-slate-500">প্রোফাইল লোড হচ্ছে...</p>
     </div>
-  </main>
-  
-  <!-- Footer -->
-  <div id="footer-placeholder"></div>
 
-  <!-- Include Loader -->
-  <script src="include-loader.js"></script>
+    <div id="toast" class="flex items-center p-4 rounded-2xl shadow-2xl bg-white border-l-4">
+        <div id="toastMsg" class="text-sm font-bold"></div>
+    </div>
 
-  <!-- Firebase & Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { 
-      getFirestore, collection, query, where, getDocs, 
-      setDoc, updateDoc, doc 
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
-      authDomain: "asembroidery-5cd5e.firebaseapp.com",
-      projectId: "asembroidery-5cd5e",
-      storageBucket: "asembroidery-5cd5e.appspot.com",
-      messagingSenderId: "592758047307",
-      appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const nameInput = document.getElementById("nameInput");
-    const emailInput = document.getElementById("emailInput");
-    const phoneInput = document.getElementById("phoneInput");
-    const targetInput = document.getElementById("targetInput");
-
-    const userName = document.getElementById("userName");
-    const userRole = document.getElementById("userRole");
-    const userJoined = document.getElementById("userJoined");
-    const mainContent = document.getElementById("mainContent");
-    const loader = document.getElementById("loader");
-
-    const editSaveBtn = document.getElementById("editSaveBtn");
-    let isEditMode = false;
-    let currentUserDocRef = null;
-
-    function toggleEditMode(enable) {
-      nameInput.disabled = !enable;
-      emailInput.disabled = !enable;
-      phoneInput.disabled = !enable;
-      targetInput.disabled = !enable;
-
-      isEditMode = enable;
-      editSaveBtn.innerHTML = enable
-        ? `<i data-lucide="save"></i> সংরক্ষণ করুন`
-        : `<i data-lucide="edit-3"></i> এডিট`;
-
-      lucide.createIcons();
-    }
-
-    async function fetchUserProfile(user) {
-      try {
-        console.log("🔍 খোঁজা হচ্ছে UID:", user.uid);
-
-        // uid দিয়ে খুঁজবো
-        const q = query(collection(db, "users"), where("uid", "==", user.uid));
-        const querySnap = await getDocs(q);
-
-        if (!querySnap.empty) {
-          const docSnap = querySnap.docs[0];
-          currentUserDocRef = docSnap.ref;
-          const userData = docSnap.data();
-
-          console.log("✅ প্রোফাইল ডাটা:", userData);
-
-          nameInput.value = userData.name ?? "";
-          emailInput.value = userData.email ?? "";
-          phoneInput.value = userData.mobile ?? "";
-          targetInput.value = userData.productionTarget ?? "";
-
-          userName.textContent = userData.name ?? "অজানা ব্যবহারকারী";
-          userRole.textContent = userData.role ?? "পদবী নেই";
-          userJoined.textContent = userData.joinedDate
-            ? new Date(userData.joinedDate).toLocaleDateString("bn-BD", { year: "numeric", month: "long", day: "numeric" })
-            : "তারিখ নেই";
-
+    <main class="container mx-auto px-4 mt-6 max-w-md">
+        <div id="as-embroidery-system">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+        
+        <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
+        <div class="flex items-center gap-4">
+        <button id="menuButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+        <i data-lucide="menu"></i>
+        </button>
+        <h1 class="text-xl font-semibold">A S Embroidery</h1>
+        </div>
+        
+        <div class="relative">
+        <button id="profileButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+        <i data-lucide="user"></i>
+        </button>
+        
+        <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded shadow-lg z-50 py-2">
+        <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="user-circle"></i> My Profile</a>
+        <a href="contact.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="contact"></i> Contact</a> 
+        <hr class="my-2 border-gray-200">
+        <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
+        <i class="w-4 h-4" data-lucide="log-out"></i> Logout
+        </button>
+        </div>
+        </div>
+        </header>
+        
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden"></div>
+        
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-40 pt-16">
+        <div class="p-4 border-b font-bold text-lg text-blue-600 bg-gray-50 flex items-center gap-2">
+        <i data-lucide="layers" class="w-5 h-5"></i> Menu Navigation
+        </div>
+        <nav class="p-2 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
+        <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="layout-dashboard"></i> Dashboard</a> 
+        <a href="stitch_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="layers"></i> Stitch History</a>
+        <a href="target-settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="target"></i> Users Target</a>
+        <a href="hisab management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="receipt"></i> Transaction History</a>
+        <a href="attendance_entry.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="calendar-check"></i> Attendance </a>
+        <a href="attendance.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="list-checks"></i> Attendance </a>
+        
+        <div id="adminOnlyContent" class="hidden border-t mt-2 pt-2">
+        <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">Management</p>
+        <a href="product_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="package-plus"></i> Product In</a>
+        <a href="product_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="list"></i> Product List</a>
+        <a href="product_production.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="factory"></i> Production Add</a>
+        <a href="product_delivery.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="truck"></i> Delivery Add</a>
+        <a href="user_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="users"></i> All Users</a>
+        <a href="add-stitch.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="scissors"></i> Add Stitch</a> 
+        </div>
+        </nav>
+        </aside>
+        </div>
+        
+        <script>
+        (function() {
+        /** * ROLE CONFIGURATION 
+        * আপনার বাস্তব প্রজেক্টে এই ভ্যালু সেশন বা লোকাল স্টোরেজ থেকে আসবে।
+        * উদাহরণ: const userRole = localStorage.getItem('role');
+        */
+        const userRole = "admin"; // Options: 'admin', 'company', 'user'
+        
+        // Function to check role and update UI
+        function applyRolePermissions() {
+        const adminSection = document.getElementById("adminOnlyContent");
+        if (userRole === "admin" || userRole === "company") {
+        adminSection.classList.remove("hidden");
         } else {
-          console.warn("⚠️ কোনো প্রোফাইল পাওয়া যায়নি, নতুন তৈরি হচ্ছে...");
-          const newDocRef = doc(collection(db, "users"));
-          currentUserDocRef = newDocRef;
-          await setDoc(newDocRef, {
-            uid: user.uid,
-            name: "",
-            email: `${user.phoneNumber}@asembroidery.com`,
-            mobile: user.phoneNumber ?? "",
-            productionTarget: "",
-            role: "user",
-            joinedDate: Date.now(),
-          });
+        adminSection.remove(); // পুরোপুরি রিমুভ করে দেওয়া নিরাপদ
         }
-      } catch (error) {
-        console.error("❌ Error fetching profile:", error);
-      }
-    }
-
-    editSaveBtn.addEventListener("click", async () => {
-      if (!isEditMode) {
-        toggleEditMode(true);
-      } else {
-        const updatedData = {
-          name: nameInput.value.trim(),
-          email: emailInput.value.trim(),
-          mobile: phoneInput.value.trim(),
-          productionTarget: targetInput.value.trim()
-        };
-
-        try {
-          await updateDoc(currentUserDocRef, updatedData);
-          alert("✅ সফলভাবে সংরক্ষণ হয়েছে!");
-          userName.textContent = updatedData.name; // নামও আপডেট হবে উপরে
-          toggleEditMode(false);
-        } catch (error) {
-          console.error("Update error:", error);
-          alert("❌ সংরক্ষণে সমস্যা হয়েছে!");
         }
-      }
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Header & Footer load
-        await includeHTML("header.html", "header-placeholder");
-        await includeHTML("footer.html", "footer-placeholder");
-        setupHeaderAndSidebar();
         
-        // Load Profile
-        await fetchUserProfile(user);
-        
-        loader.style.display = "none";
-        mainContent.classList.remove("hidden");
+        // Initialize UI Logic
+        applyRolePermissions();
         lucide.createIcons();
-        toggleEditMode(false);
-      } else {
+        
+        const menuBtn = document.getElementById("menuButton");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebarOverlay");
+        const profileBtn = document.getElementById("profileButton");
+        const profileMenu = document.getElementById("profileMenu");
+        const logoutBtn = document.getElementById("logoutBtn");
+        
+        function notify(msg, type = "success") {
+        Toastify({
+        text: msg,
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        style: { 
+        background: type === "success" ? "#2563eb" : "#ef4444",
+        borderRadius: "10px"
+        }
+        }).showToast();
+        }
+        
+        function toggleSidebar() {
+        const isOpen = !sidebar.classList.contains("-translate-x-full");
+        if (isOpen) {
+        sidebar.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+        } else {
+        sidebar.classList.remove("-translate-x-full");
+        overlay.classList.remove("hidden");
+        }
+        }
+        
+        menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+        });
+        
+        profileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        profileMenu.classList.toggle("hidden");
+        });
+        
+        logoutBtn.addEventListener("click", () => {
+        notify("লগআউট হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।", "success");
+        setTimeout(() => {
+        // Clear session logic here
         window.location.href = "login.html";
-      }
-    });
+        }, 2000);
+        });
+        
+        document.addEventListener("click", (e) => {
+        if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+        profileMenu.classList.add("hidden");
+        }
+        if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+        sidebar.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+        }
+        });
+        
+        overlay.addEventListener("click", toggleSidebar);
+        })();
+        </script>
+        <div class="h-16"></div>
+        
+        <!--মেইন কন্টেন্ট-->
+        <div class="rounded-3xl p-6 mb-4 text-white shadow-xl bg-slate-900 relative">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <img id="pImg" src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" class="w-20 h-20 rounded-2xl border-2 border-white/20 bg-white/10 object-cover">
+                    <input type="file" id="pUpload" class="hidden" accept="image/*" onchange="handleCloudinaryUpload(this, 'profilePic', 'pImg')">
+                    <label for="pUpload" id="camLabel" class="absolute -bottom-2 -right-2 bg-indigo-500 p-1.5 rounded-full cursor-pointer shadow-lg">
+                        <i data-lucide="camera" class="w-3 h-3 text-white"></i>
+                    </label>
+                </div>
+                <div>
+                    <h2 id="cardName" class="text-xl font-bold leading-tight">লোড হচ্ছে...</h2>
+                    <p id="cardInfo" class="text-[10px] opacity-60 font-mono mt-1"></p>
+                    <div id="statusTag" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
 
-    // Loader fallback
-    setTimeout(() => {
-      if (loader.style.display !== "none") {
-        loader.innerHTML = "<p class='text-gray-600 text-lg'>লোড হচ্ছে... একটু ধৈর্য ধরুন</p>";
-      }
-    }, 5000);
-  </script>
+        <div id="workerCompanySection" class="glass-card">
+            <span class="label-text">🏢 কোম্পানির তথ্য</span>
+            <div class="space-y-3 mt-3">
+                <div class="relative flex gap-2">
+                    <div class="relative flex-1">
+                        <i data-lucide="building" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
+                        <input type="text" id="companyID" class="input-field" placeholder="কোম্পানি আইডি">
+                    </div>
+                    <button onclick="searchCompany()" id="searchBtn" class="bg-indigo-600 text-white px-4 rounded-xl text-xs font-bold active:scale-95 transition-all">খুঁজুন</button>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="machineSelect" class="input-field" onchange="fetchMachineConfig(this.value)" style="padding-left:15px">
+                        <option value="">মেশিন নির্বাচন</option>
+                    </select>
+                    <input type="text" id="designation" class="input-field" readonly placeholder="পদবী">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[9px] font-bold text-slate-400 ml-1">টার্গেট</label>
+                        <input type="text" id="avgTarget" class="input-field" disabled>
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-bold text-slate-400 ml-1">স্যালারি</label>
+                        <input type="text" id="salary" class="input-field" disabled>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="companyOwnSection" class="glass-card hidden">
+            <span class="label-text">🏢 কোম্পানির প্রোফাইল তথ্য</span>
+            <div class="space-y-3 mt-3">
+                <div class="relative">
+                    <i data-lucide="briefcase" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="companyNameInput" class="input-field" placeholder="কোম্পানির নাম">
+                </div>
+                <div class="relative">
+                    <i data-lucide="map" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="companyAddressInput" class="input-field" placeholder="কোম্পানি ঠিকানা">
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <span class="label-text">👤 ব্যক্তিগত ও এনআইডি তথ্য</span>
+            <div class="space-y-3 mt-3">
+                <div class="relative"><i data-lucide="user" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i><input type="text" id="userName" class="input-field" placeholder="পূর্ণ নাম / মালিকের নাম"></div>
+                <div class="relative"><i data-lucide="credit-card" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i><input type="text" id="nidNumber" class="input-field" placeholder="এনআইডি নম্বর"></div>
+                <div class="relative"><i data-lucide="mail" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i><input type="email" id="userEmail" class="input-field" placeholder="ইমেইল"></div>
+                <div class="relative"><i data-lucide="phone" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i><input type="tel" id="userPhone" class="input-field" placeholder="ফোন নম্বর"></div>
+                <div class="relative"><i data-lucide="map-pin" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i><input type="text" id="userAddress" class="input-field" placeholder="স্থায়ী ঠিকানা"></div>
+                <div class="relative"><i data-lucide="calendar" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i><input type="date" id="birthDate" class="input-field"></div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="text-center p-3 border-2 border-dashed border-slate-200 rounded-xl relative">
+                        <input type="file" id="idFront" class="hidden" accept="image/*" onchange="handleCloudinaryUpload(this, 'idFrontUrl', 'fPrev')">
+                        <label for="idFront" class="cursor-pointer text-[10px] font-bold text-slate-500 block">NID ফ্রন্ট</label>
+                        <img id="fPrev" class="hidden mt-2 h-14 mx-auto rounded shadow-sm object-cover">
+                    </div>
+                    <div class="text-center p-3 border-2 border-dashed border-slate-200 rounded-xl relative">
+                        <input type="file" id="idBack" class="hidden" accept="image/*" onchange="handleCloudinaryUpload(this, 'idBackUrl', 'bPrev')">
+                        <label for="idBack" class="cursor-pointer text-[10px] font-bold text-slate-500 block">NID ব্যাক</label>
+                        <img id="bPrev" class="hidden mt-2 h-14 mx-auto rounded shadow-sm object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="handleMainAction()" id="actionBtn" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg mb-10 transition-all active:scale-95">
+            <i data-lucide="save" id="btnIcon" class="w-5 h-5"></i> <span id="btnText">আপডেট করুন</span>
+        </button>
+
+    </main>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+            authDomain: "asembroidery-5cd5e.firebaseapp.com",
+            projectId: "asembroidery-5cd5e",
+            storageBucket: "asembroidery-5cd5e.appspot.com",
+            messagingSenderId: "592758047307",
+            appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Cloudinary Config
+        const CLOUD_NAME = "dviugos0u"; 
+        const UPLOAD_PRESET = "shebaa"; 
+
+        let currentTargetDocId = ""; 
+        let userFullData = {}; 
+        let loggedInUserRole = ""; 
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = "login.html"; return; }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryId = urlParams.get('id');
+
+            // Get logged-in user role
+            const myAuthSnap = await db.collection("users").where("uid", "==", user.uid).get();
+            if(!myAuthSnap.empty) loggedInUserRole = myAuthSnap.docs[0].data().role;
+
+            let targetSnap;
+            if (queryId) {
+                targetSnap = await db.collection("users").where("userId", "==", queryId).get();
+            } else {
+                targetSnap = myAuthSnap;
+            }
+
+            if(!targetSnap.empty) {
+                loadProfileData(targetSnap.docs[0]);
+            } else {
+                showToast("ব্যবহারকারী পাওয়া যায়নি", "error");
+                document.getElementById('loader').style.display = 'none';
+            }
+        });
+
+        function loadProfileData(doc) {
+            const d = doc.data();
+            currentTargetDocId = doc.id;
+            userFullData = d;
+
+            // UI Adjustments based on role
+            if(d.role === 'company') {
+                document.getElementById('workerCompanySection').classList.add('hidden');
+                document.getElementById('companyOwnSection').classList.remove('hidden');
+                document.getElementById('companyNameInput').value = d.companyName || "";
+                document.getElementById('companyAddressInput').value = d.companyAddress || "";
+            }
+
+            document.getElementById('cardName').innerText = d.name || d.companyName || "ব্যবহারকারী";
+            document.getElementById('cardInfo').innerText = `${(d.role || 'user').toUpperCase()} | ID: ${d.userId || 'N/A'}`;
+            document.getElementById('userName').value = d.name || "";
+            document.getElementById('nidNumber').value = d.nidNumber || "";
+            document.getElementById('userEmail').value = d.email || "";
+            document.getElementById('userPhone').value = d.mobile || "";
+            document.getElementById('userAddress').value = d.address || "";
+            document.getElementById('birthDate').value = d.birthDate || "";
+            
+            document.getElementById('companyID').value = d.companyId || "";
+            document.getElementById('designation').value = d.rank || "নতুন";
+            document.getElementById('salary').value = d.rankSalary || 0;
+            document.getElementById('avgTarget').value = d.target || 0;
+            
+            if(d.profilePic) document.getElementById('pImg').src = d.profilePic;
+            if(d.idFrontUrl) showPreview('fPrev', d.idFrontUrl);
+            if(d.idBackUrl) showPreview('bPrev', d.idBackUrl);
+
+            const status = d.status || "Pending";
+            const colors = { Pending: 'bg-amber-500', Request: 'bg-blue-500', Active: 'bg-emerald-500', Deactive: 'bg-rose-500' };
+            document.getElementById('statusTag').innerHTML = `<span class="status-badge ${colors[status] || 'bg-slate-400'}">${status}</span>`;
+
+            // Field access control
+            if (status === 'Active' && loggedInUserRole !== 'admin' && loggedInUserRole !== 'company') {
+                document.querySelectorAll('.input-field').forEach(el => el.disabled = true);
+                document.getElementById('actionBtn').classList.add('hidden');
+                document.getElementById('camLabel').classList.add('hidden');
+            }
+
+            if(d.companyId) searchCompany(d.companyId, d.machineNo);
+            
+            document.getElementById('loader').style.display = 'none';
+            lucide.createIcons();
+        }
+
+        async function handleCloudinaryUpload(input, fieldName, previewId) {
+            const file = input.files[0];
+            if (!file) return;
+
+            showToast("⏳ আপলোড হচ্ছে...", "info");
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", UPLOAD_PRESET);
+
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
+                const data = await res.json();
+                if (data.secure_url) {
+                    userFullData[fieldName] = data.secure_url;
+                    showPreview(previewId, data.secure_url);
+                    showToast("✅ সফলভাবে আপলোড হয়েছে!", "success");
+                } else { 
+                    showToast(`❌ এরর: ${data.error.message}`, "error"); 
+                }
+            } catch (err) { 
+                showToast("❌ নেটওয়ার্ক এরর!", "error"); 
+            }
+        }
+
+        async function handleMainAction() {
+            const btn = document.getElementById('actionBtn');
+            const btnText = document.getElementById('btnText');
+            
+            btn.disabled = true;
+            btnText.innerText = "প্রসেসিং...";
+
+            const updateObj = {
+                name: document.getElementById('userName').value,
+                nidNumber: document.getElementById('nidNumber').value,
+                mobile: document.getElementById('userPhone').value,
+                email: document.getElementById('userEmail').value,
+                address: document.getElementById('userAddress').value,
+                birthDate: document.getElementById('birthDate').value,
+                profilePic: userFullData.profilePic || "",
+                idFrontUrl: userFullData.idFrontUrl || "",
+                idBackUrl: userFullData.idBackUrl || "",
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if(userFullData.role === 'company') {
+                updateObj.companyName = document.getElementById('companyNameInput').value;
+                updateObj.companyAddress = document.getElementById('companyAddressInput').value;
+            } else {
+                updateObj.companyId = document.getElementById('companyID').value;
+                updateObj.machineNo = document.getElementById('machineSelect').value;
+                updateObj.target = document.getElementById('avgTarget').value;
+                updateObj.rankSalary = document.getElementById('salary').value;
+            }
+
+            try {
+                await db.collection("users").doc(currentTargetDocId).update(updateObj);
+                showToast("✅ প্রোফাইল আপডেট সফল!", "success");
+                setTimeout(() => location.reload(), 1500);
+            } catch (e) { 
+                showToast("❌ আপডেট ব্যর্থ হয়েছে!", "error"); 
+                btn.disabled = false;
+                btnText.innerText = "আপডেট করুন";
+            }
+        }
+
+        async function searchCompany(cId = null, mNo = null) {
+            const compId = cId || document.getElementById('companyID').value.trim();
+            if(!compId) { showToast("কোম্পানি আইডি দিন", "error"); return; }
+            
+            try {
+                const compDoc = await db.collection("companies").doc(compId).get();
+                if(compDoc.exists) {
+                    const machines = compDoc.data().machines || [];
+                    const select = document.getElementById('machineSelect');
+                    select.innerHTML = '<option value="">মেশিন নির্বাচন</option>' + 
+                        machines.map(m => `<option value="${m}" ${m == mNo ? 'selected' : ''}>Machine ${m}</option>`).join('');
+                    
+                    if(mNo) fetchMachineConfig(mNo);
+                } else {
+                    showToast("কোম্পানি পাওয়া যায়নি", "error");
+                }
+            } catch (error) {
+                console.error("Error searching company:", error);
+            }
+        }
+
+        async function fetchMachineConfig(mNo) {
+            if(!mNo) return;
+            const compId = document.getElementById('companyID').value;
+            const rank = userFullData.rank || "নতুন";
+            
+            try {
+                const configDoc = await db.collection("machineConfigs").doc(`${compId}_${mNo}`).get();
+                if(configDoc.exists) {
+                    const data = configDoc.data();
+                    //Assuming data is stored as rank keys or an array
+                    const match = data[rank] || Object.values(data).find(c => c.name === rank);
+                    if(match) {
+                        document.getElementById('avgTarget').value = match.target || 0;
+                        document.getElementById('salary').value = match.salary || 0;
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching config:", error);
+            }
+        }
+
+        function showPreview(id, url) { 
+            const el = document.getElementById(id); 
+            el.src = url; 
+            el.classList.remove('hidden'); 
+        }
+
+        function showToast(m, t) { 
+            const toast = document.getElementById('toast'); 
+            const msg = document.getElementById('toastMsg');
+            toast.className = `flex items-center p-4 rounded-2xl shadow-2xl bg-white border-l-4 ${t=='success'?'border-emerald-500':'border-rose-500'} show`; 
+            msg.innerText = m; 
+            setTimeout(() => toast.classList.remove('show'), 3000); 
+        }
+
+        lucide.createIcons();
+    </script>
 </body>
 </html>
