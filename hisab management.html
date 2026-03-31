@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AS Embroidery - Ultimate Business Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+    body { font-family: 'Hind Siliguri', sans-serif; background-color: #f8fafc; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+    #mainLoader { position: fixed; inset: 0; background: #f8fafc; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.active { display: flex; }
+    .custom-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 12px; cursor: pointer; border-left-width: 6px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .active-tab { background: #2563eb !important; color: white !important; box-shadow: 0 8px 15px -3px rgba(37, 99, 235, 0.4); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .status-badge { font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
+    .status-pending { background: #fee2e2; color: #dc2626; }
+    .status-paid { background: #dcfce7; color: #16a34a; }
+    .status-cash { background: #dbeafe; color: #2563eb; }
+    .invest-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+    .invest-table th { font-size: 8px; text-transform: uppercase; color: #94a3b8; padding: 10px 5px; text-align: center; }
+    .invest-table td { background: #f8fafc; padding: 12px 5px; font-size: 10px; font-weight: 700; text-align: center; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+    .invest-table td:first-child { border-left: 1px solid #f1f5f9; border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    .invest-table td:last-child { border-right: 1px solid #f1f5f9; border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+  </style>
+</head>
+<body class="p-4 pb-28">
+
+<div id="mainLoader">
+    <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+    <p class="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Syncing Business Data...</p>
+</div>
+
+<div id="appContent" class="max-w-md mx-auto hidden">
+    <div id="as-embroidery-system">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="flex items-center gap-4">
+    <button id="menuButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="menu"></i>
+    </button>
+    <h1 class="text-xl font-semibold">A S Embroidery</h1>
+    </div>
+    
+    <div class="relative">
+    <button id="profileButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="user"></i>
+    </button>
+    
+    <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded shadow-lg z-50 py-2">
+    <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="user-circle"></i> My Profile</a>
+    <a href="contact.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="contact"></i> Contact</a> 
+    <hr class="my-2 border-gray-200">
+    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
+    <i class="w-4 h-4" data-lucide="log-out"></i> Logout
+    </button>
+    </div>
+    </div>
+    </header>
+    
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden"></div>
+    
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-40 pt-16">
+    <div class="p-4 border-b font-bold text-lg text-blue-600 bg-gray-50 flex items-center gap-2">
+    <i data-lucide="layers" class="w-5 h-5"></i> Menu Navigation
+    </div>
+    <nav class="p-2 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
+    <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="layout-dashboard"></i> Dashboard</a> 
+    <a href="stitch_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="layers"></i> Stitch History</a>
+    <a href="target-settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="target"></i> Users Target</a>
+    <a href="hisab management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="receipt"></i> Transaction History</a>
+    <a href="attendance_entry.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="calendar-check"></i> Attendance </a>
+    <a href="attendance.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="list-checks"></i> Attendance </a>
+    
+    <div id="adminOnlyContent" class="hidden border-t mt-2 pt-2">
+    <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">Management</p>
+    <a href="product_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="package-plus"></i> Product In</a>
+    <a href="product_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="list"></i> Product List</a>
+    <a href="product_production.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="factory"></i> Production Add</a>
+    <a href="product_delivery.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="truck"></i> Delivery Add</a>
+    <a href="user_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="users"></i> All Users</a>
+    <a href="add-stitch.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="scissors"></i> Add Stitch</a> 
+    </div>
+    </nav>
+    </aside>
+    </div>
+    
+    <script>
+    (function() {
+    /** * ROLE CONFIGURATION 
+    * আপনার বাস্তব প্রজেক্টে এই ভ্যালু সেশন বা লোকাল স্টোরেজ থেকে আসবে।
+    * উদাহরণ: const userRole = localStorage.getItem('role');
+    */
+    const userRole = "admin"; // Options: 'admin', 'company', 'user'
+    
+    // Function to check role and update UI
+    function applyRolePermissions() {
+    const adminSection = document.getElementById("adminOnlyContent");
+    if (userRole === "admin" || userRole === "company") {
+    adminSection.classList.remove("hidden");
+    } else {
+    adminSection.remove(); // পুরোপুরি রিমুভ করে দেওয়া নিরাপদ
+    }
+    }
+    
+    // Initialize UI Logic
+    applyRolePermissions();
+    lucide.createIcons();
+    
+    const menuBtn = document.getElementById("menuButton");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const profileBtn = document.getElementById("profileButton");
+    const profileMenu = document.getElementById("profileMenu");
+    const logoutBtn = document.getElementById("logoutBtn");
+    
+    function notify(msg, type = "success") {
+    Toastify({
+    text: msg,
+    duration: 3000,
+    close: true,
+    gravity: "top",
+    position: "right",
+    style: { 
+    background: type === "success" ? "#2563eb" : "#ef4444",
+    borderRadius: "10px"
+    }
+    }).showToast();
+    }
+    
+    function toggleSidebar() {
+    const isOpen = !sidebar.classList.contains("-translate-x-full");
+    if (isOpen) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    } else {
+    sidebar.classList.remove("-translate-x-full");
+    overlay.classList.remove("hidden");
+    }
+    }
+    
+    menuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleSidebar();
+    });
+    
+    profileBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileMenu.classList.toggle("hidden");
+    });
+    
+    logoutBtn.addEventListener("click", () => {
+    notify("লগআউট হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।", "success");
+    setTimeout(() => {
+    // Clear session logic here
+    window.location.href = "login.html";
+    }, 2000);
+    });
+    
+    document.addEventListener("click", (e) => {
+    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+    profileMenu.classList.add("hidden");
+    }
+    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    }
+    });
+    
+    overlay.addEventListener("click", toggleSidebar);
+    })();
+    </script>
+    <div class="h-16"></div>
+    
+    <!--মেইন কন্টেন্ট-->
+    <div id="worthCard" class="bg-slate-900 rounded-[2.5rem] p-6 mb-6 text-white shadow-2xl relative border-b-8 border-slate-700">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <p class="text-[10px] font-bold uppercase text-slate-500 tracking-widest leading-none mb-1">Company Net Worth</p>
+                <h2 id="netWorth" class="text-3xl font-black">০ ৳</h2>
+            </div>
+            <span id="profitStatus" class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase shadow-lg bg-blue-600">LIVE</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3 border-t border-white/10 pt-5">
+            <div class="text-center"><p class="text-[8px] text-slate-400 uppercase font-bold">নগদ ক্যাশ</p><p id="cashBalance" class="text-[11px] font-bold text-emerald-400">০ ৳</p></div>
+            <div class="text-center"><p class="text-[8px] text-slate-400 uppercase font-bold">পাওনা</p><p id="marketDue" class="text-[11px] font-bold text-blue-400">০ ৳</p></div>
+            <div class="text-center"><p class="text-[8px] text-slate-400 uppercase font-bold">দেনা</p><p id="totalPayable" class="text-[11px] font-bold text-red-400">০ ৳</p></div>
+        </div>
+    </div>
+
+    <div id="investDashboard" class="hidden mb-6 space-y-4">
+        <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 overflow-hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Partner Equity Ledger</h4>
+                <button onclick="openPartnerModal()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[8px] font-black uppercase shadow-lg">
+                    <i class="fas fa-plus mr-1"></i> Add Partner
+                </button>
+            </div>
+            <div class="overflow-x-auto no-scrollbar">
+                <table class="invest-table">
+                    <thead>
+                        <tr>
+                            <th>Partner</th>
+                            <th>Invested</th>
+                            <th>Live P/L</th>
+                            <th>Cash Out</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="partnerTableBody"></tbody>
+                </table>
+            </div>
+            <div class="mt-4 pt-4 border-t border-dashed border-slate-100 grid grid-cols-2 gap-2">
+                <div>
+                    <p class="text-[7px] font-bold text-slate-400 uppercase">Fixed Asset Value</p>
+                    <p id="totalAssetLabel" class="text-[10px] font-black text-slate-700 italic">৳০</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[7px] font-bold text-red-400 uppercase">Depreciation (Loss)</p>
+                    <p id="totalDepLabel" class="text-[10px] font-black text-red-600 italic">৳০</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6 py-1">
+        <button onclick="switchMode('worker')" id="btn-worker" class="active-tab shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-white border border-slate-100">কর্মী</button>
+        <button onclick="switchMode('supplier')" id="btn-supplier" class="shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-white border border-slate-100">সাপ্লায়ার</button>
+        <button onclick="switchMode('client')" id="btn-client" class="shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-white border border-slate-100">ক্লায়েন্ট</button>
+        <button onclick="switchMode('office')" id="btn-office" class="shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-white border border-slate-100">অফিস</button>
+        <button onclick="switchMode('invest')" id="btn-invest" class="shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-white border border-slate-100">ইনভেস্ট</button>
+    </div>
+
+    <div id="filterArea" class="bg-white rounded-[2rem] p-6 shadow-sm mb-6 border border-slate-100">
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <select id="nameFilter" onchange="render()" class="bg-slate-50 rounded-xl p-3 text-[10px] font-bold border-none outline-none"></select>
+            <select id="typeFilter" onchange="render()" class="bg-slate-50 rounded-xl p-3 text-[10px] font-bold border-none outline-none"></select>
+        </div>
+        <div class="flex gap-3 mb-5">
+            <input type="date" id="startDate" onchange="render()" class="flex-1 bg-slate-50 rounded-xl p-3 text-[10px] font-bold border-none">
+            <input type="date" id="endDate" onchange="render()" class="flex-1 bg-slate-50 rounded-xl p-3 text-[10px] font-bold border-none">
+        </div>
+        <div class="grid grid-cols-3 gap-2 border-t pt-4">
+            <div class="text-center"><p class="text-[7px] font-bold text-slate-400 uppercase">Paid Total</p><p id="f_paid" class="text-[10px] font-black text-emerald-600">০</p></div>
+            <div class="text-center"><p class="text-[7px] font-bold text-slate-400 uppercase">Due Total</p><p id="f_due" class="text-[10px] font-black text-red-600">০</p></div>
+            <div class="text-center border-l border-slate-100"><p class="text-[7px] font-bold text-blue-500 uppercase">Grand Total</p><p id="f_total" class="text-[10px] font-black text-blue-700">০</p></div>
+        </div>
+    </div>
+
+    <div id="cardGrid" class="space-y-1"></div>
+</div>
+
+<div id="entryModal" class="modal-overlay">
+    <div class="modal-content bg-white rounded-[3rem] overflow-hidden shadow-2xl max-w-sm w-full mx-4">
+        <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
+            <h3 class="font-black text-[10px] uppercase italic tracking-widest">Entry Panel</h3>
+            <button onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-8 space-y-4">
+            <input type="hidden" id="edit_id">
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="text-[9px] font-bold text-slate-400 uppercase ml-1">তারিখ</label>
+                <input type="date" id="m_date" class="w-full bg-slate-50 border p-4 rounded-2xl text-xs font-bold outline-none"></div>
+                <div id="nameSelectDiv">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">অ্যাকাউন্ট</label>
+                    <select id="m_name" onchange="updateLiveBalanceInModal()" class="w-full bg-slate-50 border p-4 rounded-2xl text-xs font-bold outline-none"></select>
+                </div>
+                <div id="nameInputDiv" class="hidden">
+                    <label class="text-[9px] font-bold text-blue-500 uppercase ml-1">বিবরণ</label>
+                    <input type="text" id="m_name_input" class="w-full bg-blue-50 border border-blue-100 p-4 rounded-2xl text-xs font-bold outline-none" placeholder="...">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="text-[9px] font-bold text-slate-400 uppercase ml-1">পরিমাণ</label>
+                <input type="number" id="m_amount" class="w-full bg-slate-50 border p-4 rounded-2xl text-xs font-black outline-none" placeholder="0"></div>
+                <div><label class="text-[9px] font-bold text-slate-400 uppercase ml-1">লাইভ ব্যালেন্স</label>
+                <input type="text" id="m_live_bal" class="w-full bg-blue-50 border-blue-100 border p-4 rounded-2xl text-xs font-black outline-none text-blue-700" placeholder="৳ ০" readonly></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="text-[9px] font-bold text-slate-400 uppercase ml-1">স্ট্যাটাস</label>
+                <select id="m_status" onchange="toggleCashBox()" class="w-full bg-slate-50 border p-4 rounded-2xl text-xs font-bold outline-none">
+                    <option value="Paid">Paid</option><option value="Pending">Pending</option>
+                </select></div>
+                <div><label class="text-[9px] font-bold text-slate-400 uppercase ml-1">টাইপ</label>
+                <select id="m_type" onchange="handleTypeChange(this.value)" class="w-full bg-slate-50 border p-4 rounded-2xl text-xs font-bold outline-none text-blue-600"></select></div>
+            </div>
+            <div id="cashOptionDiv" class="flex items-center gap-4 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                <input type="checkbox" id="m_is_cash" class="w-6 h-6 accent-blue-600">
+                <p class="text-[10px] font-black text-blue-700 uppercase leading-none">Direct Cash Transaction</p>
+            </div>
+            <button onclick="processEntry()" class="w-full bg-blue-600 text-white h-[56px] rounded-2xl font-bold shadow-xl uppercase text-[10px] tracking-widest">Save Record</button>
+            <button id="deleteBtn" onclick="confirmDelete()" class="hidden w-full text-red-400 font-bold text-[10px] uppercase pt-3 text-center">Delete Permanent</button>
+        </div>
+    </div>
+</div>
+
+<div id="partnerModal" class="modal-overlay">
+    <div class="modal-content bg-white rounded-[2.5rem] overflow-hidden shadow-2xl max-w-sm w-full mx-4">
+        <div class="p-6 bg-blue-700 text-white flex justify-between items-center">
+            <h3 class="font-black text-[10px] uppercase tracking-widest">Partner Settings</h3>
+            <button onclick="closePartnerModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-8 space-y-4">
+            <input type="hidden" id="p_edit_id">
+            <div><label class="text-[9px] font-bold text-slate-400 uppercase ml-1">পার্টনারের নাম</label>
+            <input type="text" id="p_name" class="w-full bg-slate-50 border p-4 rounded-2xl text-xs font-bold outline-none" placeholder="নাম"></div>
+            <div><label class="text-[9px] font-bold text-slate-400 uppercase ml-1">শেয়ার % (০ = অটো)</label>
+            <input type="number" id="p_share" class="w-full bg-slate-50 border p-4 rounded-2xl text-xs font-black outline-none" placeholder="0"></div>
+            <button onclick="savePartner()" class="w-full bg-blue-700 text-white py-5 rounded-2xl font-bold shadow-xl mt-2 uppercase text-xs">Save Partner</button>
+            <button id="p_delete_btn" onclick="deletePartner()" class="hidden w-full text-red-400 font-bold text-[10px] uppercase pt-3 text-center">Remove Partner</button>
+        </div>
+    </div>
+</div>
+
+<button onclick="openAddModal()" class="fixed bottom-10 right-10 bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-2xl z-50 border-4 border-white active:scale-90 transition">
+    <i class="fas fa-plus text-xl"></i>
+</button>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, query, where, onSnapshot, getDocs, doc, getDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+        authDomain: "asembroidery-5cd5e.firebaseapp.com",
+        projectId: "asembroidery-5cd5e",
+        storageBucket: "asembroidery-5cd5e.appspot.com",
+        messagingSenderId: "592758047307",
+        appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let userCompanyId = "";
+    let currentMode = 'worker';
+    let cachedBalances = {}; 
+
+    const types = {
+        worker: ['Salary', 'Withdraw', 'Bonus', 'Fine'],
+        supplier: ['Purchase', 'Payment', 'Return'],
+        client: ['Sale', 'Receive', 'Discount'],
+        office: ['Cash In', 'Materials', 'Maintenance', 'Asset Purchase', 'Labor', 'Rent', 'Utility', 'Transport', 'Packaging', 'Marketing', 'Depreciation', 'Others'],
+        invest: ['Capital', 'Withdrawal']
+    };
+
+    const isOutType = (t) => ['Withdraw','Fine','Payment','Return','Others','Materials','Maintenance','Asset Purchase','Labor','Rent','Utility','Transport','Packaging','Marketing','Withdrawal', 'Discount', 'Depreciation'].includes(t);
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const q = query(collection(db, "users"), where("email", "==", user.email));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                userCompanyId = snap.docs[0].data().companyId;
+                setDates(); 
+                await switchMode('worker'); 
+                calculateExecutiveSummary();
+                document.getElementById('mainLoader').style.display = 'none';
+                document.getElementById('appContent').classList.remove('hidden');
+            }
+        } else { window.location.href = "login.html"; }
+    });
+
+    const setDates = () => {
+        const d = new Date();
+        document.getElementById('startDate').value = new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0];
+        document.getElementById('endDate').value = d.toISOString().split('T')[0];
+    };
+
+    async function getNextSerialId(collectionName, prefix) {
+        const q = query(collection(db, collectionName), where("companyId", "==", userCompanyId));
+        const snap = await getDocs(q);
+        return `${prefix}-${(snap.size + 1).toString().padStart(3, '0')}`;
+    }
+
+    // --- User Balance Syncing Logic ---
+    async function syncUserBalance(userName, role) {
+        if (role === 'office' || role === 'invest' || !userName) return;
+
+        const q = query(collection(db, "transactions"), where("companyId", "==", userCompanyId), where("name", "==", userName));
+        const snap = await getDocs(q);
+        let total = 0;
+        snap.forEach(d => {
+            const t = d.data();
+            if (!t.isCash && t.type !== 'Depreciation') {
+                total += isOutType(t.type) ? -t.amount : t.amount;
+            }
+        });
+
+        const userQ = query(collection(db, "users"), where("companyId", "==", userCompanyId), where("name", "==", userName));
+        const userSnap = await getDocs(userQ);
+        if (!userSnap.empty) {
+            await updateDoc(doc(db, "users", userSnap.docs[0].id), { balance: total });
+        }
+    }
+
+    window.toggleCashBox = () => {
+        const status = document.getElementById('m_status').value;
+        const box = document.getElementById('cashOptionDiv');
+        if(status === 'Paid') box.classList.remove('hidden'); 
+        else { box.classList.add('hidden'); document.getElementById('m_is_cash').checked = false; }
+    };
+
+    window.handleTypeChange = (val) => {
+        const statusBox = document.getElementById('m_status');
+        const cashBox = document.getElementById('m_is_cash');
+        if (val === 'Cash In') { statusBox.value = 'Paid'; statusBox.disabled = true; cashBox.checked = true; }
+        else if (val === 'Depreciation') { statusBox.value = 'Paid'; statusBox.disabled = true; cashBox.checked = false; }
+        else if (currentMode !== 'office' && currentMode !== 'invest') {
+            statusBox.disabled = true;
+            if (['Salary','Bonus','Purchase','Sale'].includes(val)) statusBox.value = 'Pending'; else statusBox.value = 'Paid';
+        } else { statusBox.disabled = false; }
+        toggleCashBox();
+    };
+
+    window.updateLiveBalanceInModal = () => {
+        const name = document.getElementById('m_name').value;
+        const bal = cachedBalances[name] || 0;
+        document.getElementById('m_live_bal').value = `৳ ${bal.toLocaleString()}`;
+    };
+
+    window.render = () => {
+        const sDate = document.getElementById('startDate').value;
+        const eDate = document.getElementById('endDate').value;
+        const filterName = document.getElementById('nameFilter').value;
+        const filterType = document.getElementById('typeFilter').value;
+
+        onSnapshot(query(collection(db, "transactions"), where("companyId", "==", userCompanyId)), (snap) => {
+            let html = ""; let tp = 0, td = 0; 
+            const globalBalances = {}; 
+            let docs = []; snap.forEach(d => docs.push({id: d.id, ...d.data()}));
+            docs.sort((a,b) => a.timestamp - b.timestamp);
+
+            docs.forEach(t => {
+                const out = isOutType(t.type);
+                if(!globalBalances[t.name]) globalBalances[t.name] = 0;
+                if(!t.isCash && t.type !== 'Depreciation') globalBalances[t.name] += out ? -t.amount : t.amount;
+                
+                const currentEntryBalance = globalBalances[t.name];
+                cachedBalances[t.name] = currentEntryBalance;
+
+                if (t.role === currentMode && t.date >= sDate && t.date <= eDate && (filterName === 'All' || t.name === filterName) && (filterType === 'All' || t.type === filterType)) {
+                    if(t.status === 'Paid') tp += t.amount; else td += t.amount;
+                    html = `<div class="custom-card ${t.status === 'Paid' ? 'border-emerald-500' : 'border-red-500'}" onclick="openEditModal('${t.id}')">
+                        <div class="flex justify-between items-center">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-slate-800 text-[11px] uppercase mb-1">${t.name}</h3>
+                                <div class="flex gap-2 items-center">
+                                    <span class="text-[8px] font-bold text-slate-400">${t.date}</span>
+                                    <span class="status-badge ${t.isCash ? 'status-cash' : (t.status==='Paid' ? 'status-paid' : 'status-pending')}">${t.isCash ? 'Cash' : t.status}</span>
+                                </div>
+                            </div>
+                            <div class="text-right flex flex-col items-end">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-[7px] font-black bg-slate-100 px-1.5 py-0.5 rounded text-slate-400 uppercase">${t.type}</span>
+                                    <p class="text-[13px] font-black ${out ? 'text-red-500' : 'text-emerald-600'}">৳${t.amount.toLocaleString()}</p>
+                                </div>
+                                <p class="text-[8px] font-bold text-blue-500 italic">Bal: ৳${currentEntryBalance.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>` + html;
+                }
+            });
+            document.getElementById('cardGrid').innerHTML = html || "<p class='text-center py-10 opacity-30 text-[9px] uppercase font-black italic'>No Data Found</p>";
+            document.getElementById('f_paid').innerText = tp.toLocaleString();
+            document.getElementById('f_due').innerText = td.toLocaleString();
+            document.getElementById('f_total').innerText = (tp + td).toLocaleString();
+        });
+    };
+
+    function calculateExecutiveSummary() {
+        onSnapshot(query(collection(db, "transactions"), where("companyId", "==", userCompanyId)), (snap) => {
+            let cashIn = 0, cashOut = 0, rolesDues = { worker: 0, supplier: 0, client: 0, office: 0 }, totalAsset = 0, totalDep = 0;
+            let investDueFromPartner = 0, investPayableToPartner = 0;
+            const pBals = { invested: {}, out: {} };
+            const globalBalances = {}; 
+
+            let allTxns = []; snap.forEach(d => allTxns.push(d.data()));
+            allTxns.sort((a,b) => a.timestamp - b.timestamp);
+
+            allTxns.forEach(t => {
+                const out = isOutType(t.type);
+                if(!globalBalances[t.name]) globalBalances[t.name] = 0;
+                if(!t.isCash && t.type !== 'Depreciation') globalBalances[t.name] += out ? -t.amount : t.amount;
+
+                if ((t.status === 'Paid' || t.isCash) && t.type !== 'Depreciation') {
+                    if (t.role === 'client') { if (['Receive','Sale'].includes(t.type)) cashIn += t.amount; else if (out) cashOut += t.amount; }
+                    else { if (out) cashOut += t.amount; else cashIn += t.amount; }
+                }
+
+                if (t.role === 'office') {
+                    if (t.type === 'Asset Purchase') totalAsset += t.amount;
+                    if (t.type === 'Depreciation') totalDep += t.amount;
+                }
+
+                if (t.role === 'invest') {
+                    if (t.type === 'Capital') {
+                        pBals.invested[t.name] = (pBals.invested[t.name] || 0) + t.amount;
+                        if (t.status === 'Pending') investDueFromPartner += t.amount; 
+                    } else if (t.type === 'Withdrawal') {
+                        pBals.out[t.name] = (pBals.out[t.name] || 0) + t.amount;
+                        if (t.status === 'Pending') investPayableToPartner += t.amount;
+                    }
+                }
+
+                if (!t.isCash && t.type !== 'Depreciation') {
+                    if (t.role === 'client') rolesDues.client += (out ? -t.amount : t.amount);
+                    else if (t.status === 'Pending') rolesDues[t.role] += t.amount;
+                }
+            });
+
+            // Advance (Negative Balance) Logic
+            let extraReceivable = 0;
+            for (let name in globalBalances) {
+                const sample = allTxns.find(x => x.name === name);
+                if (globalBalances[name] < 0 && sample && sample.role !== 'client') {
+                    extraReceivable += Math.abs(globalBalances[name]);
+                }
+            }
+
+            const finalCash = cashIn - cashOut;
+            const totalMarketDue = rolesDues.client + investDueFromPartner + extraReceivable;
+            const grandTotalPayable = rolesDues.worker + rolesDues.supplier + rolesDues.office + investPayableToPartner;
+            const currentNetAsset = totalAsset - totalDep;
+            const totalInv = Object.values(pBals.invested).reduce((a, b) => a + b, 0);
+            
+            const netWorth = (finalCash + totalMarketDue + currentNetAsset) - grandTotalPayable;
+            
+            document.getElementById('cashBalance').innerText = `${finalCash.toLocaleString()} ৳`;
+            document.getElementById('marketDue').innerText = `${totalMarketDue.toLocaleString()} ৳`;
+            document.getElementById('totalPayable').innerText = `${grandTotalPayable.toLocaleString()} ৳`;
+            document.getElementById('netWorth').innerText = `${netWorth.toLocaleString()} ৳`;
+            document.getElementById('totalAssetLabel').innerText = `৳${totalAsset.toLocaleString()}`;
+            document.getElementById('totalDepLabel').innerText = `৳${totalDep.toLocaleString()}`;
+            
+            const profit = netWorth >= totalInv; const sBox = document.getElementById('profitStatus');
+            sBox.innerText = profit ? "PROFIT" : "LOSS"; sBox.className = `px-4 py-1.5 rounded-xl text-[10px] font-black uppercase shadow-lg ${profit ? 'bg-emerald-500' : 'bg-red-500'}`;
+            
+            if (currentMode === 'invest') renderInvestTable(pBals, totalInv, netWorth, totalAsset, totalDep);
+        });
+    }
+
+    async function renderInvestTable(pBals, totalInv, netWorth, totalAsset, totalDep) {
+        onSnapshot(query(collection(db, "partners"), where("companyId", "==", userCompanyId)), (snap) => {
+            let html = ""; const netProfitLoss = netWorth - totalInv;
+            snap.forEach(d => {
+                const p = d.data(); 
+                const inv = pBals.invested[p.name] || 0;
+                const out = pBals.out[p.name] || 0;
+                const share = p.sharePercent > 0 ? p.sharePercent : (totalInv > 0 ? ((inv / totalInv) * 100).toFixed(1) : 0);
+                const pl = ((share / 100) * netProfitLoss);
+                const bal = (inv + pl) - out;
+                html += `<tr onclick="openPartnerModal('${d.id}', '${p.name}', '${p.sharePercent}')">
+                    <td class="text-blue-600">${p.name}</td>
+                    <td>${inv.toLocaleString()}</td>
+                    <td class="${pl >= 0 ? 'text-emerald-600' : 'text-red-500'}">${pl >= 0 ? '+' : ''}${Math.round(pl).toLocaleString()}</td>
+                    <td class="text-orange-500">${out.toLocaleString()}</td>
+                    <td class="bg-slate-100 font-black">${Math.round(bal).toLocaleString()}</td>
+                </tr>`;
+            });
+            document.getElementById('partnerTableBody').innerHTML = html || '<tr><td colspan="5" class="py-6 opacity-30 text-[8px]">No Partners</td></tr>';
+        });
+    }
+
+    window.switchMode = async (mode) => {
+        currentMode = mode; 
+        document.getElementById('investDashboard').classList.toggle('hidden', mode !== 'invest');
+        ['worker','supplier','client','office','invest'].forEach(m => {
+            const btn = document.getElementById(`btn-${m}`);
+            if(btn) btn.classList.toggle('active-tab', m === mode);
+        });
+        document.getElementById('typeFilter').innerHTML = '<option value="All">All Types</option>' + types[mode].map(x => `<option value="${x}">${x}</option>`).join('');
+        await loadModalNames();
+        const nf = document.getElementById('nameFilter'); nf.innerHTML = '<option value="All">All Accounts</option>';
+        if(currentMode !== 'office') {
+            const opts = document.getElementById('m_name').options;
+            for(let i=1; i<opts.length; i++) nf.innerHTML += `<option value="${opts[i].value}">${opts[i].value}</option>`;
+        }
+        render(); 
+        calculateExecutiveSummary();
+    };
+
+    async function loadModalNames() {
+        const ns = document.getElementById('m_name');
+        document.getElementById('m_type').innerHTML = types[currentMode].map(x => `<option value="${x}">${x}</option>`).join('');
+        if(currentMode === 'office') { 
+            document.getElementById('nameSelectDiv').classList.add('hidden'); 
+            document.getElementById('nameInputDiv').classList.remove('hidden'); 
+        } else {
+            document.getElementById('nameSelectDiv').classList.remove('hidden'); 
+            document.getElementById('nameInputDiv').classList.add('hidden');
+            ns.innerHTML = '<option value="">নির্বাচন করুন</option>';
+            const col = currentMode === 'invest' ? 'partners' : 'users';
+            const q = currentMode === 'invest' ? query(collection(db, col), where("companyId", "==", userCompanyId)) : query(collection(db, col), where("companyId", "==", userCompanyId), where("role", "==", currentMode));
+            const snap = await getDocs(q); 
+            snap.forEach(d => ns.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`);
+        }
+    }
+
+    window.processEntry = async () => {
+        const editId = document.getElementById('edit_id').value;
+        const name = (currentMode === 'office') ? document.getElementById('m_name_input').value : document.getElementById('m_name').value;
+        const amt = Number(document.getElementById('m_amount').value);
+        if(!name || !amt) return alert("সঠিক তথ্য দিন");
+        
+        const data = { 
+            companyId: userCompanyId, 
+            date: document.getElementById('m_date').value, 
+            name, amount: amt, 
+            type: document.getElementById('m_type').value, 
+            status: document.getElementById('m_status').value, 
+            isCash: document.getElementById('m_is_cash').checked, 
+            role: currentMode, 
+            timestamp: editId ? (await getDoc(doc(db, "transactions", editId))).data().timestamp : new Date().getTime()
+        };
+        
+        if(editId) await updateDoc(doc(db, "transactions", editId), data);
+        else {
+            const cId = await getNextSerialId("transactions", `TXN-${userCompanyId.substring(0,3)}`);
+            await setDoc(doc(db, "transactions", cId), data);
+        }
+        
+        await syncUserBalance(name, currentMode);
+        closeModal();
+    };
+
+    window.openEditModal = async (id) => {
+        const snap = await getDoc(doc(db, "transactions", id));
+        if(snap.exists()){
+            const t = snap.data(); document.getElementById('edit_id').value = id; await loadModalNames();
+            document.getElementById('m_date').value = t.date; 
+            if(currentMode === 'office') document.getElementById('m_name_input').value = t.name; else document.getElementById('m_name').value = t.name;
+            document.getElementById('m_amount').value = t.amount; 
+            document.getElementById('m_type').value = t.type; 
+            document.getElementById('m_status').value = t.status;
+            document.getElementById('m_is_cash').checked = t.isCash || false; 
+            handleTypeChange(t.type);
+            updateLiveBalanceInModal();
+            document.getElementById('deleteBtn').classList.remove('hidden'); 
+            document.getElementById('entryModal').classList.add('active');
+        }
+    };
+
+    window.confirmDelete = async () => { 
+        if(confirm("ডিলিট করবেন?")){ 
+            const id = document.getElementById('edit_id').value;
+            const snap = await getDoc(doc(db, "transactions", id));
+            const { name, role } = snap.data();
+            await deleteDoc(doc(db, "transactions", id)); 
+            await syncUserBalance(name, role);
+            closeModal(); 
+        } 
+    };
+
+    window.closeModal = () => document.getElementById('entryModal').classList.remove('active');
+    window.openPartnerModal = (id='', name='', share='') => {
+        document.getElementById('p_edit_id').value = id; document.getElementById('p_name').value = name;
+        document.getElementById('p_share').value = share; document.getElementById('p_delete_btn').classList.toggle('hidden', !id);
+        document.getElementById('partnerModal').classList.add('active');
+    };
+    window.closePartnerModal = () => document.getElementById('partnerModal').classList.remove('active');
+    window.savePartner = async () => {
+        const name = document.getElementById('p_name').value;
+        if(!name) return alert("নাম দিন");
+        const editId = document.getElementById('p_edit_id').value;
+        const data = { companyId: userCompanyId, name, sharePercent: Number(document.getElementById('p_share').value) };
+        if(editId) await updateDoc(doc(db, "partners", editId), data);
+        else await setDoc(doc(db, "partners", await getNextSerialId("partners", "PART")), data);
+        closePartnerModal(); loadModalNames();
+    };
+    window.openAddModal = async () => {
+        document.getElementById('edit_id').value = ''; await loadModalNames();
+        document.getElementById('m_date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('m_amount').value = ''; document.getElementById('m_is_cash').checked = false;
+        document.getElementById('m_live_bal').value = '৳ ০'; document.getElementById('deleteBtn').classList.add('hidden'); 
+        document.getElementById('entryModal').classList.add('active'); handleTypeChange(document.getElementById('m_type').value);
+    };
+</script>
+</body>
+</html>
