@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>এ এস এমব্রয়ডারি - স্মার্ট প্রোডাকশন</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f8fafc; }
+        .p-card { cursor: pointer; transition: 0.3s; border-left: 4px solid #6366f1; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .p-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .m-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; outline: none; font-size: 14px; }
+        .work-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr 40px; gap: 8px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+<div id="loader" class="fixed inset-0 bg-white/90 flex flex-col items-center justify-center z-[100]">
+    <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+    <p class="mt-4 text-indigo-700 font-bold uppercase tracking-widest text-[10px]">সিস্টেম লোড হচ্ছে...</p>
+</div>
+
+<div class="max-w-6xl mx-auto px-4 py-8 hidden" id="mainContent">
+    
+    <!--মেনু এবং সাইট বার-->
+    <div id="as-embroidery-system">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="flex items-center gap-4">
+    <button id="menuButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="menu"></i>
+    </button>
+    <h1 class="text-xl font-semibold">A S Embroidery</h1>
+    </div>
+    
+    <div class="relative">
+    <button id="profileButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="user"></i>
+    </button>
+    
+    <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded shadow-lg z-50 py-2">
+    <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="user-circle"></i> My Profile</a>
+    <a href="contact.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="contact"></i> Contact</a> 
+    <hr class="my-2 border-gray-200">
+    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
+    <i class="w-4 h-4" data-lucide="log-out"></i> Logout
+    </button>
+    </div>
+    </div>
+    </header>
+    
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden"></div>
+    
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-40 pt-16">
+    <div class="p-4 border-b font-bold text-lg text-blue-600 bg-gray-50 flex items-center gap-2">
+    <i data-lucide="layers" class="w-5 h-5"></i> Menu Navigation
+    </div>
+    <nav class="p-2 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
+    <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="layout-dashboard"></i> Dashboard</a> 
+    <a href="stitch_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="layers"></i> Stitch History</a>
+    <a href="target-settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="target"></i> Users Target</a>
+    <a href="hisab management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="receipt"></i> Transaction History</a>
+    <a href="attendance_entry.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="calendar-check"></i> Attendance </a>
+    <a href="attendance.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="list-checks"></i> Attendance </a>
+    
+    <div id="adminOnlyContent" class="hidden border-t mt-2 pt-2">
+    <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">Management</p>
+    <a href="product_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="package-plus"></i> Product In</a>
+    <a href="product_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="list"></i> Product List</a>
+    <a href="product_production.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="factory"></i> Production Add</a>
+    <a href="product_delivery.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="truck"></i> Delivery Add</a>
+    <a href="user_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="users"></i> All Users</a>
+    <a href="add-stitch.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="scissors"></i> Add Stitch</a> 
+    </div>
+    </nav>
+    </aside>
+    </div>
+    
+    <script>
+    (function() {
+    /** * ROLE CONFIGURATION 
+    * আপনার বাস্তব প্রজেক্টে এই ভ্যালু সেশন বা লোকাল স্টোরেজ থেকে আসবে।
+    * উদাহরণ: const userRole = localStorage.getItem('role');
+    */
+    const userRole = "admin"; // Options: 'admin', 'company', 'user'
+    
+    // Function to check role and update UI
+    function applyRolePermissions() {
+    const adminSection = document.getElementById("adminOnlyContent");
+    if (userRole === "admin" || userRole === "company") {
+    adminSection.classList.remove("hidden");
+    } else {
+    adminSection.remove(); // পুরোপুরি রিমুভ করে দেওয়া নিরাপদ
+    }
+    }
+    
+    // Initialize UI Logic
+    applyRolePermissions();
+    lucide.createIcons();
+    
+    const menuBtn = document.getElementById("menuButton");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const profileBtn = document.getElementById("profileButton");
+    const profileMenu = document.getElementById("profileMenu");
+    const logoutBtn = document.getElementById("logoutBtn");
+    
+    function notify(msg, type = "success") {
+    Toastify({
+    text: msg,
+    duration: 3000,
+    close: true,
+    gravity: "top",
+    position: "right",
+    style: { 
+    background: type === "success" ? "#2563eb" : "#ef4444",
+    borderRadius: "10px"
+    }
+    }).showToast();
+    }
+    
+    function toggleSidebar() {
+    const isOpen = !sidebar.classList.contains("-translate-x-full");
+    if (isOpen) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    } else {
+    sidebar.classList.remove("-translate-x-full");
+    overlay.classList.remove("hidden");
+    }
+    }
+    
+    menuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleSidebar();
+    });
+    
+    profileBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileMenu.classList.toggle("hidden");
+    });
+    
+    logoutBtn.addEventListener("click", () => {
+    notify("লগআউট হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।", "success");
+    setTimeout(() => {
+    // Clear session logic here
+    window.location.href = "login.html";
+    }, 2000);
+    });
+    
+    document.addEventListener("click", (e) => {
+    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+    profileMenu.classList.add("hidden");
+    }
+    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    }
+    });
+    
+    overlay.addEventListener("click", toggleSidebar);
+    })();
+    </script>
+    <div class="h-16"></div>
+    
+    <!--মেইন কন্টেন্ট-->
+    <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <h1 class="text-2xl font-black text-slate-800 tracking-tight">প্রোডাকশন <span class="text-indigo-600">ড্যাশবোর্ড</span></h1>
+        <div class="flex gap-2 w-full md:w-auto">
+            <a href="add-stitch.html" id="addBtn" class="hidden w-full md:w-auto">
+                <button class="w-full bg-indigo-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100">+ নতুন এন্ট্রি</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm mb-6 border border-slate-100 grid grid-cols-2 md:grid-cols-5 gap-3">
+        <select id="filterWorker" class="m-input"><option value="">সব কর্মী</option></select>
+        <select id="filterMachine" class="m-input"><option value="">সব মেশিন</option></select>
+        <select id="filterMonth" class="m-input"></select>
+        <select id="filterYear" class="m-input"></select>
+        <button id="clearFilter" class="bg-slate-100 text-slate-600 font-bold rounded-lg hover:bg-slate-200">রিসেট</button>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-indigo-500 text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">মোট স্টিচ</p><h3 id="totalProd" class="text-lg font-black text-slate-800">0</h3></div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-emerald-500 text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">গড় স্টিচ</p><h3 id="avgProd" class="text-lg font-black text-slate-800">0</h3></div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-orange-500 text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">কাজের দিন</p><h3 id="workDays" class="text-lg font-black text-slate-800">0</h3></div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-cyan-500 text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">টার্গেট</p><h3 id="targetProd" class="text-lg font-black text-slate-800">0</h3></div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-blue-500 text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">বেসিক বেতন</p><h3 id="fixedSalary" class="text-lg font-black text-slate-800">0</h3></div>
+        <div class="bg-indigo-600 p-4 rounded-xl shadow-md border-t-4 border-indigo-900 text-center"><p class="text-[10px] font-bold text-indigo-100 uppercase">প্রাপ্য বিল</p><h3 id="earnedSalary" class="text-lg font-black text-white">0</h3></div>
+    </div>
+
+    <div id="productionList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+</div>
+
+<div id="modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in duration-150">
+        <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+            <h3 class="font-black text-slate-800">এন্ট্রি ডিটেইলস</h3>
+            <button onclick="closeModal()"><i data-lucide="x" class="text-slate-400"></i></button>
+        </div>
+        <form id="prodForm" class="p-6 space-y-4">
+            <input type="hidden" id="modalId">
+            <div class="grid grid-cols-2 gap-3">
+                <input type="date" id="mDate" class="m-input" disabled>
+                <select id="mWorker" class="m-input" disabled></select>
+                <select id="mMachine" class="m-input" disabled></select>
+                <input type="text" id="mTotal" class="m-input bg-indigo-50 font-black text-indigo-700" readonly>
+            </div>
+            <div id="worksContainer" class="mt-4 max-h-56 overflow-y-auto pr-2"></div>
+            <div class="flex justify-end gap-3 pt-6 border-t mt-4">
+                <div id="adminActions" class="hidden flex gap-2">
+                    <button type="button" id="editBtnModal" onclick="enableEdit()" class="bg-slate-800 text-white px-6 py-2 rounded-xl font-bold">এডিট</button>
+                    <button type="submit" id="saveBtnModal" class="bg-emerald-600 text-white px-6 py-2 rounded-xl font-bold hidden">আপডেট</button>
+                    <button type="button" id="delBtnModal" onclick="deleteEntry()" class="bg-rose-100 text-rose-600 p-2 rounded-xl hidden"><i data-lucide="trash-2"></i></button>
+                </div>
+                <button type="button" onclick="closeModal()" class="bg-slate-100 text-slate-600 px-6 py-2 rounded-xl font-bold">বন্ধ</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, getDocs, query, where, orderBy, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = { apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94", authDomain: "asembroidery-5cd5e.firebaseapp.com", projectId: "asembroidery-5cd5e", storageBucket: "asembroidery-5cd5e.appspot.com", messagingSenderId: "592758047307", appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const companyId = "U013";
+const monthNames = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+
+let allProds = [], allWorkers = [], machines = [], role = "", currentEntry = null;
+
+// ১. ইউজার কালেকশনে র‍্যাঙ্ক ও স্যালারি আপডেট করার ফাংশন
+async function syncWorkerRankAndSalary(workerId, newRank, newSalary) {
+    try {
+        const workerRef = doc(db, "users", workerId);
+        const snap = await getDoc(workerRef);
+        if (snap.exists()) {
+            const data = snap.data();
+            // যদি বর্তমান ডেটার সাথে নতুন ডেটার পার্থক্য থাকে তবেই আপডেট হবে
+            if (data.rank !== newRank || data.rankSalary !== newSalary) {
+                await updateDoc(workerRef, {
+                    rank: newRank,
+                    rankSalary: Number(newSalary) || 0
+                });
+                console.log(`Updated worker ${workerId}: ${newRank} - ${newSalary}`);
+            }
+        }
+    } catch (err) { console.error("Sync Error:", err); }
+}
+
+async function loadInitialData() {
+    const wSnap = await getDocs(query(collection(db, "users"), where("companyId", "==", companyId), where("role", "==", "worker")));
+    allWorkers = wSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const cSnap = await getDoc(doc(db, "companies", companyId));
+    if (cSnap.exists()) machines = cSnap.data().machines || [];
+    populateFilters();
+}
+
+function populateFilters() {
+    document.getElementById("filterWorker").innerHTML = `<option value="">সব কর্মী</option>` + allWorkers.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
+    document.getElementById("filterMachine").innerHTML = `<option value="">সব মেশিন</option>` + machines.map(m => `<option value="${m}">${m}</option>`).join('');
+    const now = new Date();
+    document.getElementById("filterMonth").innerHTML = monthNames.map((n, i) => `<option value="${i}" ${i==now.getMonth()?'selected':''}>${n}</option>`).join('');
+    document.getElementById("filterYear").innerHTML = [0,1,2].map(i => `<option value="${now.getFullYear()-i}">${now.getFullYear()-i}</option>`).join('');
+}
+
+async function render() {
+    const list = document.getElementById("productionList");
+    list.innerHTML = `<div class="col-span-full text-center py-10 opacity-50">প্রোসেসিং র‍্যাঙ্ক...</div>`;
+    
+    const m = document.getElementById("filterMonth").value, y = document.getElementById("filterYear").value;
+    const wId = document.getElementById("filterWorker").value, mac = document.getElementById("filterMachine").value;
+
+    const filtered = allProds.filter(p => {
+        const d = new Date(p.date);
+        return (m==="" || d.getMonth()==m) && (y==="" || d.getFullYear()==y) && (wId==="" || p.workerId==wId) && (mac==="" || p.machine==mac);
+    });
+
+    const configCache = {};
+    const machineList = [...new Set(filtered.map(p => p.machine))];
+    for (let mName of machineList) {
+        const cSnap = await getDoc(doc(db, "machineConfigs", `${companyId}_${mName}`));
+        configCache[mName] = cSnap.exists() ? cSnap.data() : { ranks: [], calculationDays: 0 };
+    }
+
+    list.innerHTML = "";
+    let totalS = 0, target = 0, fixedS = 0;
+    if (wId) {
+        const worker = allWorkers.find(x => x.id === wId);
+        target = parseFloat(worker?.target) || 0;
+        fixedS = parseFloat(worker?.salary) || 0;
+    }
+
+    // প্রতিবার রেন্ডারে আপডেট ট্র্যাকিং করার জন্য ম্যাপ
+    const workerUpdateMap = new Map();
+
+    filtered.forEach(p => {
+        const stitchValue = Number(p.grandStitch || p.grandTotal || 0);
+        totalS += stitchValue;
+        const worker = allWorkers.find(x => x.id === p.workerId);
+        
+        // র‍্যাঙ্ক ক্যালকুলেশন লজিক (ক্যালকুলেশন ডে অনুযায়ী)
+        const config = configCache[p.machine];
+        const calcDays = Number(config.calculationDays) || 0;
+        const startDate = new Date();
+        startDate.setDate(new Date().getDate() - calcDays);
+        const startStr = startDate.toISOString().split('T')[0];
+
+        const totalForRank = allProds
+            .filter(x => x.workerId === p.workerId && x.machine.trim() === p.machine.trim() && x.date >= startStr)
+            .reduce((sum, x) => sum + Number(x.grandStitch || x.grandTotal || 0), 0);
+
+        const sortedRanks = [...(config.ranks || [])].sort((a, b) => Number(a.target) - Number(b.target));
+        let liveRank = "সাধারণ", liveSalary = 0;
+
+        if (sortedRanks.length > 0) {
+            liveRank = sortedRanks[0].name;
+            liveSalary = sortedRanks[0].salary;
+            for (let i = 0; i < sortedRanks.length; i++) {
+                if (totalForRank >= Number(sortedRanks[i].target)) {
+                    if (sortedRanks[i+1]) {
+                        liveRank = sortedRanks[i+1].name;
+                        liveSalary = sortedRanks[i+1].salary;
+                    } else {
+                        liveRank = sortedRanks[i].name;
+                        liveSalary = sortedRanks[i].salary;
+                    }
+                }
+            }
+        }
+
+        // ডাটাবেজ আপডেট কল (যদি এই রেন্ডারে এই কর্মীকে এখনো আপডেট না করা হয়)
+        if (!workerUpdateMap.has(p.workerId)) {
+            workerUpdateMap.set(p.workerId, true);
+            syncWorkerRankAndSalary(p.workerId, liveRank, liveSalary);
+        }
+
+        list.innerHTML += `
+            <div class="p-card" onclick="viewEntry('${p.id}')">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">${p.date}</span>
+                    <span class="bg-indigo-600 text-white px-2 py-0.5 rounded text-[10px] font-black shadow-sm">${liveRank}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <h4 class="font-bold text-slate-700">${worker?.name || 'অজানা'}</h4>
+                    <span class="font-black text-indigo-600 text-lg">${stitchValue.toLocaleString()}</span>
+                </div>
+                <p class="text-[9px] text-slate-400 mt-2 uppercase font-bold tracking-widest">${p.machine}</p>
+            </div>`;
+    });
+
+    const workDays = filtered.length;
+    const avg = workDays > 0 ? totalS / workDays : 0;
+    const daysInMonth = new Date(y, parseInt(m) + 1, 0).getDate();
+    const earned = (fixedS / daysInMonth * workDays) * (target > 0 ? (avg / (target / 30)) : 1);
+
+    document.getElementById("totalProd").textContent = totalS.toLocaleString();
+    document.getElementById("avgProd").textContent = Math.round(avg).toLocaleString();
+    document.getElementById("workDays").textContent = workDays;
+    document.getElementById("targetProd").textContent = Math.round(target).toLocaleString();
+    document.getElementById("fixedSalary").textContent = fixedS.toLocaleString();
+    document.getElementById("earnedSalary").textContent = Math.round(earned).toLocaleString();
+    lucide.createIcons();
+}
+
+// --- ক্যালকুলেশন ও এডিট ফাংশন ---
+window.calc = function() {
+    let g = 0;
+    document.querySelectorAll(".work-row").forEach(row => {
+        const s = parseFloat(row.querySelector('[data-f="s"]').value) || 0;
+        const c = parseFloat(row.querySelector('[data-f="c"]').value) || 0;
+        const t = s * c;
+        row.querySelector('[data-f="t"]').value = t;
+        g += t;
+    });
+    document.getElementById("mTotal").value = g;
+}
+
+window.viewEntry = function(id) {
+    const p = allProds.find(x => x.id === id);
+    currentEntry = JSON.parse(JSON.stringify(p));
+    document.getElementById("modalId").value = id;
+    document.getElementById("mDate").value = p.date;
+    document.getElementById("mTotal").value = Number(p.grandStitch || p.grandTotal || 0);
+    document.getElementById("mWorker").innerHTML = `<option value="${p.workerId}">${allWorkers.find(w => w.id === p.workerId)?.name}</option>`;
+    document.getElementById("mMachine").innerHTML = `<option value="${p.machine}">${p.machine}</option>`;
+    renderWorks(p.works || [], false);
+    resetModal();
+    if (["admin", "company"].includes(role)) document.getElementById("adminActions").classList.remove("hidden");
+    document.getElementById("modal").classList.replace("hidden", "flex");
+}
+
+function renderWorks(works, isEdit) {
+    const container = document.getElementById("worksContainer");
+    container.innerHTML = works.map(w => {
+        const calculatedTotal = Number(w.total || (Number(w.stage) * Number(w.count)) || 0);
+        return `<div class="work-row">
+            <input type="text" data-f="p" value="${w.product || ''}" class="m-input text-xs" ${isEdit?'':'disabled'}>
+            <input type="number" data-f="s" value="${w.stage || 0}" class="m-input text-xs text-center" oninput="calc()" ${isEdit?'':'disabled'}>
+            <input type="number" data-f="c" value="${w.count || 0}" class="m-input text-xs text-center" oninput="calc()" ${isEdit?'':'disabled'}>
+            <input type="text" data-f="t" value="${calculatedTotal}" class="m-input text-xs font-bold bg-white" disabled>
+            ${isEdit ? `<button type="button" onclick="this.parentElement.remove();calc()" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+        </div>`;
+    }).join('');
+    if (isEdit) container.innerHTML += `<button type="button" onclick="addW()" class="w-full py-2 border-2 border-dashed border-slate-200 text-slate-400 text-xs font-bold rounded-xl mt-2">+ রো যোগ করুন</button>`;
+    lucide.createIcons();
+}
+
+window.addW = function() {
+    const div = document.createElement('div');
+    div.className = "work-row";
+    div.innerHTML = `<input type="text" data-f="p" class="m-input text-xs"><input type="number" data-f="s" class="m-input text-xs text-center" oninput="calc()"><input type="number" data-f="c" class="m-input text-xs text-center" oninput="calc()"><input type="text" data-f="t" class="m-input text-xs font-bold bg-white" disabled><button type="button" onclick="this.parentElement.remove();calc()" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+    document.getElementById("worksContainer").appendChild(div);
+    lucide.createIcons();
+}
+
+window.enableEdit = function() {
+    ["mDate", "mWorker", "mMachine"].forEach(id => document.getElementById(id).disabled = false);
+    document.getElementById("mWorker").innerHTML = allWorkers.map(w => `<option value="${w.id}" ${currentEntry.workerId==w.id?'selected':''}>${w.name}</option>`).join('');
+    document.getElementById("mMachine").innerHTML = machines.map(m => `<option value="${m}" ${currentEntry.machine==m?'selected':''}>${m}</option>`).join('');
+    renderWorks(currentEntry.works || [], true);
+    document.getElementById("editBtnModal").classList.add("hidden");
+    document.getElementById("saveBtnModal").classList.remove("hidden");
+    document.getElementById("delBtnModal").classList.remove("hidden");
+}
+
+document.getElementById("prodForm").onsubmit = async (e) => {
+    e.preventDefault();
+    document.getElementById("loader").style.display = "flex";
+    const works = [];
+    document.querySelectorAll(".work-row").forEach(r => {
+        const pVal = r.querySelector('[data-f="p"]').value;
+        const sVal = Number(r.querySelector('[data-f="s"]').value) || 0;
+        const cVal = Number(r.querySelector('[data-f="c"]').value) || 0;
+        if(pVal) works.push({ product: pVal, stage: sVal, count: cVal, total: sVal * cVal });
+    });
+    try {
+        await updateDoc(doc(db, "productions", currentEntry.id), { 
+            date: document.getElementById("mDate").value, 
+            workerId: document.getElementById("mWorker").value, 
+            machine: document.getElementById("mMachine").value, 
+            grandStitch: Number(document.getElementById("mTotal").value),
+            grandTotal: Number(document.getElementById("mTotal").value), 
+            works 
+        });
+        location.reload();
+    } catch (e) { alert("Error!"); }
+}
+
+window.deleteEntry = async function() {
+    if(!confirm("মুছে ফেলবেন?")) return;
+    document.getElementById("loader").style.display = "flex";
+    try { await deleteDoc(doc(db, "productions", currentEntry.id)); location.reload(); } catch (e) { alert("Error!"); }
+}
+
+window.closeModal = () => document.getElementById("modal").classList.replace("flex", "hidden");
+function resetModal() {
+    ["mDate", "mWorker", "mMachine"].forEach(id => document.getElementById(id).disabled = true);
+    document.getElementById("editBtnModal").classList.remove("hidden");
+    document.getElementById("saveBtnModal").classList.add("hidden");
+    document.getElementById("delBtnModal").classList.add("hidden");
+}
+
+onAuthStateChanged(auth, async user => {
+    if (user) {
+        const uSnap = await getDocs(query(collection(db, "users"), where("email", "==", user.email)));
+        if (!uSnap.empty) {
+            role = uSnap.docs[0].data().role;
+            if (["admin", "company"].includes(role)) document.getElementById("addBtn").classList.remove("hidden");
+        }
+        await loadInitialData();
+        const pSnap = await getDocs(query(collection(db, "productions"), orderBy("date", "desc")));
+        allProds = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        render();
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("mainContent").classList.remove("hidden");
+    } else { window.location.href = "login.html"; }
+});
+
+["filterWorker", "filterMachine", "filterMonth", "filterYear"].forEach(id => document.getElementById(id).onchange = render);
+document.getElementById("clearFilter").onclick = () => location.reload();
+</script>
+</body>
+</html>
