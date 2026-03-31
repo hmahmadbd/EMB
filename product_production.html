@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Production Control - A S Embroidery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .active-tab { @apply bg-blue-700 text-white border-blue-700 shadow-lg scale-105 z-10; }
+    .worker-tag { @apply bg-blue-100 text-blue-700 px-2 py-1 rounded-md flex items-center gap-1 text-[10px] font-bold border border-blue-200; }
+    #tabContainer::-webkit-scrollbar { height: 6px; }
+    #tabContainer::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .data-label { @apply font-black text-gray-900 mr-1; }
+    .data-value { @apply font-medium text-gray-700; }
+  </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+
+  <div id="loader" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
+    <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-600 mb-4"></div>
+    <p class="text-xs font-bold text-blue-800 uppercase">Loading Data...</p>
+  </div>
+
+  <div id="mainContent" class="max-w-xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden hidden">
+    <div id="as-embroidery-system">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="flex items-center gap-4">
+    <button id="menuButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="menu"></i>
+    </button>
+    <h1 class="text-xl font-semibold">A S Embroidery</h1>
+    </div>
+    
+    <div class="relative">
+    <button id="profileButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="user"></i>
+    </button>
+    
+    <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded shadow-lg z-50 py-2">
+    <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="user-circle"></i> My Profile</a>
+    <a href="contact.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="contact"></i> Contact</a> 
+    <hr class="my-2 border-gray-200">
+    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
+    <i class="w-4 h-4" data-lucide="log-out"></i> Logout
+    </button>
+    </div>
+    </div>
+    </header>
+    
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden"></div>
+    
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-40 pt-16">
+    <div class="p-4 border-b font-bold text-lg text-blue-600 bg-gray-50 flex items-center gap-2">
+    <i data-lucide="layers" class="w-5 h-5"></i> Menu Navigation
+    </div>
+    <nav class="p-2 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
+    <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="layout-dashboard"></i> Dashboard</a> 
+    <a href="stitch_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="layers"></i> Stitch History</a>
+    <a href="target-settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="target"></i> Users Target</a>
+    <a href="hisab management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="receipt"></i> Transaction History</a>
+    
+    <div id="adminOnlyContent" class="hidden border-t mt-2 pt-2">
+    <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">Management</p>
+    <a href="product_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="package-plus"></i> Product In</a>
+    <a href="product_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="list"></i> Product List</a>
+    <a href="product_production.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="factory"></i> Production Add</a>
+    <a href="product_delivery.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="truck"></i> Delivery Add</a>
+    <a href="user_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="users"></i> All Users</a>
+    <a href="add-stitch.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="scissors"></i> Add Stitch</a> 
+    </div>
+    </nav>
+    </aside>
+    </div>
+    
+    <script>
+    (function() {
+    /** * ROLE CONFIGURATION 
+    * আপনার বাস্তব প্রজেক্টে এই ভ্যালু সেশন বা লোকাল স্টোরেজ থেকে আসবে।
+    * উদাহরণ: const userRole = localStorage.getItem('role');
+    */
+    const userRole = "admin"; // Options: 'admin', 'company', 'user'
+    
+    // Function to check role and update UI
+    function applyRolePermissions() {
+    const adminSection = document.getElementById("adminOnlyContent");
+    if (userRole === "admin" || userRole === "company") {
+    adminSection.classList.remove("hidden");
+    } else {
+    adminSection.remove(); // পুরোপুরি রিমুভ করে দেওয়া নিরাপদ
+    }
+    }
+    
+    // Initialize UI Logic
+    applyRolePermissions();
+    lucide.createIcons();
+    
+    const menuBtn = document.getElementById("menuButton");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const profileBtn = document.getElementById("profileButton");
+    const profileMenu = document.getElementById("profileMenu");
+    const logoutBtn = document.getElementById("logoutBtn");
+    
+    function notify(msg, type = "success") {
+    Toastify({
+    text: msg,
+    duration: 3000,
+    close: true,
+    gravity: "top",
+    position: "right",
+    style: { 
+    background: type === "success" ? "#2563eb" : "#ef4444",
+    borderRadius: "10px"
+    }
+    }).showToast();
+    }
+    
+    function toggleSidebar() {
+    const isOpen = !sidebar.classList.contains("-translate-x-full");
+    if (isOpen) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    } else {
+    sidebar.classList.remove("-translate-x-full");
+    overlay.classList.remove("hidden");
+    }
+    }
+    
+    menuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleSidebar();
+    });
+    
+    profileBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileMenu.classList.toggle("hidden");
+    });
+    
+    logoutBtn.addEventListener("click", () => {
+    notify("লগআউট হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।", "success");
+    setTimeout(() => {
+    // Clear session logic here
+    window.location.href = "login.html";
+    }, 2000);
+    });
+    
+    document.addEventListener("click", (e) => {
+    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+    profileMenu.classList.add("hidden");
+    }
+    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    }
+    });
+    
+    overlay.addEventListener("click", toggleSidebar);
+    })();
+    </script>
+    <div class="h-16"></div>
+    
+    <!--মেইন কন্টেন্ট-->
+    <div class="p-5 bg-white border-b">
+        <select id="codeSelector" class="w-full border-2 border-blue-100 p-3 rounded-xl font-bold text-gray-800 bg-blue-50 outline-none focus:border-blue-500 transition-all">
+            <option value="">-- Select Product Code --</option>
+        </select>
+    </div>
+
+    <div id="dataSection" class="hidden animate-in fade-in duration-500">
+      
+      <div class="p-6 space-y-2">
+        <div class="flex justify-between items-center mb-2">
+            <h2 class="text-blue-600 font-black text-lg">Product Information</h2>
+            <button id="toggleInfoEdit" class="text-[10px] font-bold bg-gray-100 px-3 py-1 rounded-md hover:bg-blue-600 hover:text-white transition-all">EDIT</button>
+        </div>
+        
+        <div class="space-y-1.5 text-[15px]">
+            <p><span class="data-label">Product Name:</span> <span id="v_name" class="view-mode data-value">-</span> <input type="text" id="edit_name" class="edit-mode hidden border rounded px-1 w-full"/></p>
+            <p><span class="data-label">Fabric Type:</span> <span id="v_fabric" class="view-mode data-value">-</span> <input type="text" id="edit_fabric" class="edit-mode hidden border rounded px-1 w-full"/></p>
+            <p><span class="data-label">Color:</span> <span id="v_color" class="view-mode data-value">-</span> <input type="text" id="edit_color" class="edit-mode hidden border rounded px-1 w-full"/></p>
+            
+            <p><span class="data-label">Quantity:</span> 
+                <span id="v_qty_calc" class="view-mode data-value font-black text-blue-800">- / -</span>
+                <span id="v_unit" class="view-mode text-[10px] font-bold text-gray-400 uppercase"></span>
+                <div class="edit-mode hidden flex gap-1 mt-1"><input type="number" id="edit_qtyVal" class="w-1/2 border rounded px-1"/><select id="edit_qtyUnit" class="w-1/2 border rounded"><option value="গজ">গজ</option><option value="পিস">পিস</option></select></div>
+            </p>
+            
+            <p><span class="data-label">Supplied By:</span> <span id="v_supplier" class="view-mode data-value">-</span> <select id="edit_supplier" class="edit-mode hidden border rounded w-full"></select></p>
+            <p><span class="data-label">In Date:</span> <span id="v_inDate" class="view-mode data-value">-</span> <input type="date" id="edit_inDate" class="edit-mode hidden border rounded w-full"/></p>
+        </div>
+      </div>
+
+      <hr class="border-gray-100">
+
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-blue-600 font-black text-lg">Production Information</h2>
+            <button id="addNewDesignBtn" class="bg-blue-600 text-white p-1.5 rounded-lg shadow-lg hover:bg-blue-700"><i data-lucide="plus" class="w-4 h-4"></i></button>
+        </div>
+
+        <div id="tabContainer" class="flex gap-2 overflow-x-auto pb-3 mb-4 scroll-smooth"></div>
+
+        <form id="productionForm" class="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <input type="hidden" id="currentProdId" value="new">
+            
+            <div class="grid grid-cols-1 gap-3 text-sm">
+                <p><span class="data-label">Design Name:</span><input type="text" id="p_designName" class="w-full p-2 border rounded mt-1" required/></p>
+                <p><span class="data-label">Design Code:</span><input type="text" id="p_designCode" class="w-full p-2 border rounded mt-1 font-mono" required/></p>
+                <p><span class="data-label">Fabric Used:</span><input type="number" id="p_fabricUsed" class="w-full p-2 border rounded mt-1" required/></p>
+                <p id="stockError" class="text-red-500 text-[10px] font-bold hidden">⚠️ Input exceeds available stock!</p>
+                
+                <p><span class="data-label">Threads Used:</span><input type="text" id="p_threads" class="w-full p-2 border rounded mt-1"/></p>
+                
+                <div>
+                    <span class="data-label">Worker:</span>
+                    <div id="selectedWorkers" class="flex flex-wrap gap-1 my-1"></div>
+                    <select id="workerSelector" class="w-full p-2 border rounded text-xs bg-white"><option value="">-- Add Worker --</option></select>
+                </div>
+
+                <p><span class="data-label">Machine ID:</span><select id="machineSelector" class="w-full p-2 border rounded mt-1 bg-white"></select></p>
+                
+                <p><span class="data-label">Start Date:</span><input type="date" id="p_start" class="w-full p-2 border rounded mt-1"/></p>
+                <p><span class="data-label">End Date:</span><input type="date" id="p_end" class="w-full p-2 border rounded mt-1"/></p>
+            </div>
+
+            <div class="pt-2">
+                <label class="data-label text-xs uppercase block mb-1">Update Status:</label>
+                <select id="p_status" class="w-full p-3 rounded-xl border-2 border-blue-200 font-bold text-sm bg-white outline-none focus:border-blue-600">
+                    <option value="Stocks">📦 Stocks</option>
+                    <option value="Running">⚙️ Running</option>
+                    <option value="Checking">🔍 Checking</option>
+                    <option value="Pending">⏳ Pending</option>
+                    <option value="Complete">✅ Complete</option>
+                </select>
+            </div>
+
+            <button type="submit" id="saveBtn" class="w-full bg-blue-700 text-white py-4 rounded-xl font-black shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2 mt-4">
+                <i data-lucide="save" class="w-5 h-5"></i> <span id="btnText">SAVE PRODUCTION</span>
+            </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+      authDomain: "asembroidery-5cd5e.firebaseapp.com",
+      projectId: "asembroidery-5cd5e",
+      storageBucket: "asembroidery-5cd5e.appspot.com",
+      messagingSenderId: "592758047307",
+      appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    lucide.createIcons();
+
+    let allProducts = {}; 
+    let allProductionHistory = [];
+    let currentHistoryForBundle = [];
+    let selectedDocId = "";
+    let selectedWorkersList = [];
+    let isInfoEditing = false;
+    let availableStockForCurrent = 0;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      try {
+        const [pSnap, uSnap, hSnap] = await Promise.all([
+          getDocs(collection(db, "products")),
+          getDocs(collection(db, "users")),
+          getDocs(collection(db, "production_history"))
+        ]);
+        const pSel = document.getElementById("codeSelector");
+        pSnap.forEach(d => { allProducts[d.id] = { id: d.id, ...d.data() }; pSel.innerHTML += `<option value="${d.id}">${d.data().code || d.id}</option>`; });
+        hSnap.forEach(d => { allProductionHistory.push({ id: d.id, ...d.data() }); });
+        
+        const wSel = document.getElementById("workerSelector");
+        const sSel = document.getElementById("edit_supplier");
+        uSnap.forEach(d => {
+          if(d.data().role === 'worker') wSel.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`;
+          if(d.data().role === 'client') sSel.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`;
+        });
+        document.getElementById("loader").classList.add("hidden");
+        document.getElementById("mainContent").classList.remove("hidden");
+      } catch (err) { console.error(err); }
+    });
+
+    document.getElementById("codeSelector").addEventListener("change", async (e) => {
+      selectedDocId = e.target.value;
+      if(!selectedDocId) { document.getElementById("dataSection").classList.add("hidden"); return; }
+      const p = allProducts[selectedDocId];
+      
+      document.getElementById("v_name").innerText = p.name || '-';
+      document.getElementById("v_fabric").innerText = p.fabric || '-';
+      document.getElementById("v_color").innerText = p.color || '-';
+      document.getElementById("v_unit").innerText = p.quantityUnit || '';
+      document.getElementById("v_supplier").innerText = p.supplier || '-';
+      document.getElementById("v_inDate").innerText = p.inDate || '-';
+
+      document.getElementById("edit_name").value = p.name || "";
+      document.getElementById("edit_fabric").value = p.fabric || "";
+      document.getElementById("edit_color").value = p.color || "";
+      document.getElementById("edit_qtyVal").value = p.quantityValue || "";
+      document.getElementById("edit_qtyUnit").value = p.quantityUnit || "পিস";
+      document.getElementById("edit_supplier").value = p.supplier || "";
+      document.getElementById("edit_inDate").value = p.inDate || "";
+
+      const mSel = document.getElementById("machineSelector");
+      mSel.innerHTML = '<option value="">-- Machine --</option>';
+      const compSnap = await getDoc(doc(db, "companies", selectedDocId.split('-')[0]));
+      if(compSnap.exists() && compSnap.data().machines) compSnap.data().machines.forEach(m => mSel.innerHTML += `<option value="${m}">${m}</option>`);
+
+      renderTabsForBundle(selectedDocId);
+      document.getElementById("dataSection").classList.remove("hidden");
+    });
+
+    function renderTabsForBundle(bundleId) {
+      const container = document.getElementById("tabContainer");
+      container.innerHTML = "";
+      currentHistoryForBundle = allProductionHistory.filter(h => h.parentProductId === bundleId);
+      
+      const totalUsed = currentHistoryForBundle.reduce((sum, item) => sum + Number(item.fabricUsed || 0), 0);
+      const totalOriginal = Number(allProducts[bundleId].quantityValue || 0);
+      availableStockForCurrent = totalOriginal - totalUsed;
+
+      // স্টক ক্যালকুলেশন ৫০ / ৫০ ফরম্যাটে শো করা
+      document.getElementById("v_qty_calc").innerText = `${totalOriginal} / ${availableStockForCurrent}`;
+
+      let i = 1;
+      currentHistoryForBundle.forEach(item => {
+        const btn = document.createElement("button");
+        btn.innerText = `Design ${i++}`;
+        btn.id = `tab-${item.id}`;
+        btn.className = "px-5 py-2 border-2 border-gray-100 rounded-full text-[10px] font-black uppercase bg-white text-gray-400 whitespace-nowrap";
+        btn.onclick = () => switchDesign(item.id);
+        container.appendChild(btn);
+      });
+      if(currentHistoryForBundle.length > 0) switchDesign(currentHistoryForBundle[0].id);
+      else addNewTab();
+    }
+
+    // স্টক ভ্যালিডেশন
+    document.getElementById("p_fabricUsed").addEventListener("input", (e) => {
+        const inputVal = Number(e.target.value);
+        const currentId = document.getElementById("currentProdId").value;
+        let existingEntryFabric = 0;
+        if(currentId !== "new") {
+            const entry = currentHistoryForBundle.find(h => h.id === currentId);
+            existingEntryFabric = Number(entry.fabricUsed || 0);
+        }
+
+        if(inputVal > (availableStockForCurrent + existingEntryFabric)) {
+            document.getElementById("stockError").classList.remove("hidden");
+            document.getElementById("saveBtn").disabled = true;
+            document.getElementById("saveBtn").classList.add("bg-red-400");
+        } else {
+            document.getElementById("stockError").classList.add("hidden");
+            document.getElementById("saveBtn").disabled = false;
+            document.getElementById("saveBtn").classList.remove("bg-red-400");
+        }
+    });
+
+    function switchDesign(id) {
+      document.querySelectorAll("#tabContainer button").forEach(b => b.classList.remove("active-tab"));
+      const target = document.getElementById(`tab-${id}`);
+      if(target) target.classList.add("active-tab");
+      document.getElementById("currentProdId").value = id;
+
+      if(id === "new") {
+        document.getElementById("productionForm").reset();
+        selectedWorkersList = [];
+        document.getElementById("btnText").innerText = "SAVE PRODUCTION";
+      } else {
+        const d = currentHistoryForBundle.find(p => p.id === id);
+        if(d) {
+          document.getElementById("p_designName").value = d.designName || "";
+          document.getElementById("p_designCode").value = d.designCode || "";
+          document.getElementById("p_fabricUsed").value = d.fabricUsed || "";
+          document.getElementById("p_threads").value = d.threadsUsed || "";
+          document.getElementById("p_start").value = d.startDate || "";
+          document.getElementById("p_end").value = d.endDate || "";
+          document.getElementById("machineSelector").value = d.machineId || "";
+          document.getElementById("p_status").value = d.status || "Stocks";
+          selectedWorkersList = d.workers || [];
+          document.getElementById("btnText").innerText = "UPDATE PRODUCTION";
+        }
+      }
+      renderWorkerTags();
+    }
+
+    function addNewTab() {
+      if(!document.getElementById("tab-new")) {
+        const btn = document.createElement("button");
+        btn.innerText = "New +"; btn.id = "tab-new";
+        btn.className = "px-5 py-2 border-2 border-dashed border-blue-300 rounded-full text-[10px] font-black uppercase bg-white text-blue-500 whitespace-nowrap";
+        btn.onclick = () => switchDesign("new");
+        document.getElementById("tabContainer").appendChild(btn);
+      }
+      switchDesign("new");
+    }
+
+    document.getElementById("addNewDesignBtn").addEventListener("click", addNewTab);
+    document.getElementById("toggleInfoEdit").addEventListener("click", () => {
+        isInfoEditing = !isInfoEditing;
+        document.querySelectorAll(".view-mode").forEach(el => el.classList.toggle("hidden", isInfoEditing));
+        document.querySelectorAll(".edit-mode").forEach(el => el.classList.toggle("hidden", !isInfoEditing));
+    });
+
+    document.getElementById("workerSelector").addEventListener("change", (e) => {
+      if(e.target.value && !selectedWorkersList.includes(e.target.value)) {
+        selectedWorkersList.push(e.target.value); renderWorkerTags();
+      }
+      e.target.value = "";
+    });
+
+    function renderWorkerTags() {
+      document.getElementById("selectedWorkers").innerHTML = selectedWorkersList.map(w => `<span class="worker-tag">${w} <button type="button" class="ml-1 text-red-500" onclick="removeWorker('${w}')">×</button></span>`).join('');
+    }
+    window.removeWorker = (name) => { selectedWorkersList = selectedWorkersList.filter(w => w !== name); renderWorkerTags(); };
+
+    document.getElementById("productionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const saveBtn = document.getElementById("saveBtn");
+      const btnText = document.getElementById("btnText");
+      
+      saveBtn.disabled = true;
+      btnText.innerText = "PROCESSING...";
+
+      const currentId = document.getElementById("currentProdId").value;
+      const pData = {
+        parentProductId: selectedDocId,
+        designName: document.getElementById("p_designName").value,
+        designCode: document.getElementById("p_designCode").value,
+        fabricUsed: Number(document.getElementById("p_fabricUsed").value),
+        threadsUsed: document.getElementById("p_threads").value,
+        machineId: document.getElementById("machineSelector").value,
+        workers: selectedWorkersList,
+        startDate: document.getElementById("p_start").value,
+        endDate: document.getElementById("p_end").value,
+        status: document.getElementById("p_status").value,
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        if(currentId === "new") await addDoc(collection(db, "production_history"), pData);
+        else await updateDoc(doc(db, "production_history", currentId), pData);
+
+        if(isInfoEditing) {
+          await updateDoc(doc(db, "products", selectedDocId), {
+            name: document.getElementById("edit_name").value,
+            fabric: document.getElementById("edit_fabric").value,
+            color: document.getElementById("edit_color").value,
+            quantityValue: Number(document.getElementById("edit_qtyVal").value),
+            quantityUnit: document.getElementById("edit_qtyUnit").value,
+            supplier: document.getElementById("edit_supplier").value,
+            inDate: document.getElementById("edit_inDate").value
+          });
+        }
+        alert("✅ Success!"); location.reload();
+      } catch (err) { alert(err.message); saveBtn.disabled = false; btnText.innerText = "SAVE PRODUCTION"; }
+    });
+  </script>
+</body>
+</html>
