@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Management - A S Embroidery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    #loadingOverlay {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #1d4ed8;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    #toastContainer {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+    }
+    .toast {
+      padding: 12px 24px;
+      border-radius: 8px;
+      color: white;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+  <div id="toastContainer"></div>
+
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+    <p class="mt-4 text-blue-700 font-bold">প্রসেসিং হচ্ছে...</p>
+  </div>
+
+  <main id="mainContent" class="invisible max-w-7xl mx-auto p-4 md:p-6">
+	<div id="as-embroidery-system">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://unpkg.com/lucide@latest"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+	
+	<header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
+	<div class="flex items-center gap-4">
+	<button id="menuButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+	<i data-lucide="menu"></i>
+	</button>
+	<h1 class="text-xl font-semibold">A S Embroidery</h1>
+	</div>
+	
+	<div class="relative">
+	<button id="profileButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+	<i data-lucide="user"></i>
+	</button>
+	
+	<div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded shadow-lg z-50 py-2">
+	<a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="user-circle"></i> My Profile</a>
+	<a href="contact.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="contact"></i> Contact</a> 
+	<hr class="my-2 border-gray-200">
+	<button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
+	<i class="w-4 h-4" data-lucide="log-out"></i> Logout
+	</button>
+	</div>
+	</div>
+	</header>
+	
+	<div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden"></div>
+	
+	<aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-40 pt-16">
+	<div class="p-4 border-b font-bold text-lg text-blue-600 bg-gray-50 flex items-center gap-2">
+	<i data-lucide="layers" class="w-5 h-5"></i> Menu Navigation
+	</div>
+	<nav class="p-2 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
+	<a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="layout-dashboard"></i> Dashboard</a> 
+	<a href="stitch_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="layers"></i> Stitch History</a>
+	<a href="target-settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="target"></i> Users Target</a>
+	<a href="hisab management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="receipt"></i> Transaction History</a>
+	<a href="attendance_entry.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="calendar-check"></i> Attendance </a>
+	<a href="attendance.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="list-checks"></i> Attendance </a>
+	
+	<div id="adminOnlyContent" class="hidden border-t mt-2 pt-2">
+	<p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">Management</p>
+	<a href="product_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="package-plus"></i> Product In</a>
+	<a href="product_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="list"></i> Product List</a>
+	<a href="product_production.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="factory"></i> Production Add</a>
+	<a href="product_delivery.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="truck"></i> Delivery Add</a>
+	<a href="user_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="users"></i> All Users</a>
+	<a href="add-stitch.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="scissors"></i> Add Stitch</a> 
+	</div>
+	</nav>
+	</aside>
+	</div>
+	
+	<script>
+	(function() {
+	/** * ROLE CONFIGURATION 
+	* আপনার বাস্তব প্রজেক্টে এই ভ্যালু সেশন বা লোকাল স্টোরেজ থেকে আসবে।
+	* উদাহরণ: const userRole = localStorage.getItem('role');
+	*/
+	const userRole = "admin"; // Options: 'admin', 'company', 'user'
+	
+	// Function to check role and update UI
+	function applyRolePermissions() {
+	const adminSection = document.getElementById("adminOnlyContent");
+	if (userRole === "admin" || userRole === "company") {
+	adminSection.classList.remove("hidden");
+	} else {
+	adminSection.remove(); // পুরোপুরি রিমুভ করে দেওয়া নিরাপদ
+	}
+	}
+	
+	// Initialize UI Logic
+	applyRolePermissions();
+	lucide.createIcons();
+	
+	const menuBtn = document.getElementById("menuButton");
+	const sidebar = document.getElementById("sidebar");
+	const overlay = document.getElementById("sidebarOverlay");
+	const profileBtn = document.getElementById("profileButton");
+	const profileMenu = document.getElementById("profileMenu");
+	const logoutBtn = document.getElementById("logoutBtn");
+	
+	function notify(msg, type = "success") {
+	Toastify({
+	text: msg,
+	duration: 3000,
+	close: true,
+	gravity: "top",
+	position: "right",
+	style: { 
+	background: type === "success" ? "#2563eb" : "#ef4444",
+	borderRadius: "10px"
+	}
+	}).showToast();
+	}
+	
+	function toggleSidebar() {
+	const isOpen = !sidebar.classList.contains("-translate-x-full");
+	if (isOpen) {
+	sidebar.classList.add("-translate-x-full");
+	overlay.classList.add("hidden");
+	} else {
+	sidebar.classList.remove("-translate-x-full");
+	overlay.classList.remove("hidden");
+	}
+	}
+	
+	menuBtn.addEventListener("click", (e) => {
+	e.stopPropagation();
+	toggleSidebar();
+	});
+	
+	profileBtn.addEventListener("click", (e) => {
+	e.stopPropagation();
+	profileMenu.classList.toggle("hidden");
+	});
+	
+	logoutBtn.addEventListener("click", () => {
+	notify("লগআউট হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।", "success");
+	setTimeout(() => {
+	// Clear session logic here
+	window.location.href = "login.html";
+	}, 2000);
+	});
+	
+	document.addEventListener("click", (e) => {
+	if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+	profileMenu.classList.add("hidden");
+	}
+	if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+	sidebar.classList.add("-translate-x-full");
+	overlay.classList.add("hidden");
+	}
+	});
+	
+	overlay.addEventListener("click", toggleSidebar);
+	})();
+	</script>
+	<div class="h-16"></div>
+	
+	<!--মেইন কন্টেন্ট-->
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+      <h1 class="text-3xl font-bold text-blue-700">👤 User Management</h1>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6 text-center">
+      <div onclick="filterByStatus('all')" class="cursor-pointer bg-blue-600 text-white p-4 rounded-lg shadow hover:scale-105 transition-transform">
+        <h3 class="text-[10px] uppercase font-bold opacity-80">Total Users</h3>
+        <p id="totalUsers" class="text-2xl font-bold">0</p>
+      </div>
+      <div class="bg-indigo-600 text-white p-4 rounded-lg shadow">
+        <h3 class="text-[10px] uppercase font-bold opacity-80">Total Company</h3>
+        <p id="totalCompanies" class="text-2xl font-bold">0</p>
+      </div>
+      <div onclick="filterByStatus('active')" class="cursor-pointer bg-green-600 text-white p-4 rounded-lg shadow hover:scale-105 transition-transform">
+        <h3 class="text-[10px] uppercase font-bold opacity-80">Active</h3>
+        <p id="activeCount" class="text-2xl font-bold">0</p>
+      </div>
+      <div onclick="filterByStatus('request')" class="cursor-pointer bg-orange-500 text-white p-4 rounded-lg shadow hover:scale-105 transition-transform">
+        <h3 class="text-[10px] uppercase font-bold opacity-80">Requested</h3>
+        <p id="requestCount" class="text-2xl font-bold">0</p>
+      </div>
+      <div onclick="filterByStatus('pending')" class="cursor-pointer bg-yellow-500 text-white p-4 rounded-lg shadow hover:scale-105 transition-transform">
+        <h3 class="text-[10px] uppercase font-bold opacity-80">Pending</h3>
+        <p id="pendingCount" class="text-2xl font-bold">0</p>
+      </div>
+      <div onclick="filterByStatus('deactive')" class="cursor-pointer bg-red-600 text-white p-4 rounded-lg shadow hover:scale-105 transition-transform">
+        <h3 class="text-[10px] uppercase font-bold opacity-80">Deactive</h3>
+        <p id="deactiveCount" class="text-2xl font-bold">0</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4 mb-4 bg-white p-4 rounded shadow-sm border border-gray-100">
+      <input id="searchInput" type="text" placeholder="নাম বা মোবাইল..." onkeyup="updateUI()"
+        class="border border-gray-300 rounded px-3 py-2 w-full md:w-64 focus:ring-2 focus:ring-blue-500 outline-none"/>
+      
+      <select id="userTypeFilter" onchange="updateUI()" class="border border-gray-300 rounded px-3 py-2 outline-none">
+        <option value="all">All Roles</option>
+        <option value="worker">Worker</option>
+        <option value="supplier">Supplier</option>
+        <option value="client">Client</option>
+        <option value="company">Company</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <select id="companySelectFilter" onchange="updateUI()" class="hidden border border-gray-300 rounded px-3 py-2 outline-none bg-blue-50 text-blue-700">
+        <option value="all">সকল কোম্পানি</option>
+      </select>
+    </div>
+
+    <div class="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200">
+      <table class="w-full table-auto">
+        <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold">
+          <tr>
+            <th class="px-6 py-4 text-left whitespace-nowrap">ইউজার নাম</th>
+            <th class="px-6 py-4 text-left whitespace-nowrap">মোবাইল</th>
+            <th class="px-6 py-4 text-left whitespace-nowrap">রোল পরিবর্তন</th>
+            <th class="px-6 py-4 text-left whitespace-nowrap">স্ট্যাটাস</th>
+            <th class="px-6 py-4 text-center whitespace-nowrap">অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody" class="text-sm divide-y divide-gray-100"></tbody>
+      </table>
+    </div>
+
+    <div class="mt-4 flex justify-between items-center text-sm text-gray-500">
+      <p id="paginationInfo"></p>
+      <div class="flex gap-2">
+        <button onclick="changePage(-1)" class="px-4 py-1.5 bg-white border rounded shadow-sm hover:bg-gray-50 transition">Prev</button>
+        <button onclick="changePage(1)" class="px-4 py-1.5 bg-white border rounded shadow-sm hover:bg-gray-50 transition">Next</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, getDocs, query, where, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+      authDomain: "asembroidery-5cd5e.firebaseapp.com",
+      projectId: "asembroidery-5cd5e",
+      storageBucket: "asembroidery-5cd5e.appspot.com",
+      messagingSenderId: "592758047307",
+      appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let allUsers = [];
+    let currentUserData = null;
+    let currentPage = 1;
+    let selectedStatusFilter = 'all';
+    const itemsPerPage = 10;
+
+    window.showNotify = (msg, type = 'success') => {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`;
+      toast.innerText = msg;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = "login.html"; return; }
+      const qUser = query(collection(db, "users"), where("uid", "==", user.uid));
+      const snapUser = await getDocs(qUser);
+      if (snapUser.empty) { window.location.href = "login.html"; return; }
+      currentUserData = snapUser.docs[0].data();
+
+      if (currentUserData.role !== 'admin' && currentUserData.role !== 'company') {
+        window.location.href = "dashboard.html";
+        return;
+      }
+
+      if (currentUserData.role === 'admin') {
+        const compFilter = document.getElementById('companySelectFilter');
+        compFilter.classList.remove('hidden');
+        const qComp = query(collection(db, "users"), where("role", "==", "company"));
+        const snapComp = await getDocs(qComp);
+        snapComp.forEach(doc => {
+          const c = doc.data();
+          compFilter.innerHTML += `<option value="${c.userId || c.uid}">${c.name}</option>`;
+        });
+      }
+      
+      await loadUsers();
+      document.getElementById('loadingOverlay').style.display = 'none';
+      document.getElementById('mainContent').classList.remove('invisible');
+      lucide.createIcons();
+    });
+
+    async function loadUsers() {
+      let q = collection(db, "users");
+      if (currentUserData.role === "company") {
+        q = query(collection(db, "users"), where("companyId", "==", currentUserData.userId));
+      }
+      const snapshot = await getDocs(q);
+      allUsers = snapshot.docs.map(doc => ({ firebaseDocId: doc.id, ...doc.data() }));
+      updateUI();
+    }
+
+    // স্ট্যাটাস আপডেট ফাংশন
+    window.updateStatus = async (fDocId, newStatus) => {
+      try {
+        await updateDoc(doc(db, "users", fDocId), { status: newStatus });
+        allUsers = allUsers.map(u => u.firebaseDocId === fDocId ? { ...u, status: newStatus } : u);
+        updateUI();
+        showNotify("স্ট্যাটাস পরিবর্তন সফল হয়েছে।");
+      } catch (e) { showNotify("আপডেট ব্যর্থ হয়েছে!", "error"); }
+    };
+
+    // রোল আপডেট ফাংশন
+    window.updateRole = async (fDocId, newRole) => {
+      try {
+        await updateDoc(doc(db, "users", fDocId), { role: newRole });
+        allUsers = allUsers.map(u => u.firebaseDocId === fDocId ? { ...u, role: newRole } : u);
+        updateUI();
+        showNotify("রোল পরিবর্তন সফল হয়েছে।");
+      } catch (e) { showNotify("রোল আপডেট ব্যর্থ!", "error"); }
+    };
+
+    window.deleteUser = async (fDocId) => {
+      if (confirm("আপনি কি নিশ্চিতভাবে এই ইউজারকে ডিলিট করতে চান?")) {
+        try {
+          await deleteDoc(doc(db, "users", fDocId));
+          allUsers = allUsers.filter(u => u.firebaseDocId !== fDocId);
+          updateUI();
+          showNotify("ইউজার সফলভাবে ডিলিট হয়েছে।");
+        } catch (e) { showNotify("ডিলিট ব্যর্থ হয়েছে!", "error"); }
+      }
+    };
+
+    window.filterByStatus = (status) => {
+      selectedStatusFilter = status;
+      updateUI();
+    };
+
+    window.updateUI = () => {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const roleFilter = document.getElementById('userTypeFilter').value;
+      const compFilter = document.getElementById('companySelectFilter').value;
+
+      const filtered = allUsers.filter(u => {
+        const matchSearch = (u.name || "").toLowerCase().includes(search) || (u.mobile || "").includes(search);
+        const matchRole = roleFilter === 'all' || u.role === roleFilter;
+        const matchStatus = selectedStatusFilter === 'all' || u.status === selectedStatusFilter;
+        let matchComp = true;
+        if (currentUserData.role === 'admin' && compFilter !== 'all') { matchComp = u.companyId === compFilter; }
+        return matchSearch && matchRole && matchStatus && matchComp;
+      });
+
+      renderTable(filtered);
+      renderCards(filtered);
+    };
+
+    function renderTable(data) {
+      const tbody = document.getElementById('userTableBody');
+      const start = (currentPage - 1) * itemsPerPage;
+      const paginated = data.slice(start, start + itemsPerPage);
+
+      if(paginated.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-gray-400">কোনো তথ্য নেই।</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = paginated.map(user => {
+        // রোল ড্রপডাউন লজিক: কোম্পানি লগইন করলে এডমিন অপশন বাদ যাবে
+        const roles = ['worker', 'supplier', 'client', 'company', 'admin'];
+        const roleOptions = roles
+          .filter(r => currentUserData.role === 'admin' || r !== 'admin')
+          .map(r => `<option value="${r}" ${user.role === r ? 'selected' : ''}>${r.charAt(0).toUpperCase() + r.slice(1)}</option>`)
+          .join('');
+
+        return `
+        <tr class="border-b hover:bg-gray-50 transition">
+          <td class="px-6 py-4 font-bold text-gray-700 whitespace-nowrap">${user.name || 'N/A'}</td>
+          <td class="px-6 py-4 text-gray-600 whitespace-nowrap">${user.mobile || 'N/A'}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <select onchange="updateRole('${user.firebaseDocId}', this.value)" class="text-xs border rounded p-1 font-semibold outline-none bg-blue-50 text-blue-700 border-blue-200">
+              ${roleOptions}
+            </select>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <select onchange="updateStatus('${user.firebaseDocId}', this.value)" class="text-xs border rounded p-1.5 font-bold outline-none shadow-sm ${getStatusColor(user.status)}">
+              <option value="active" ${user.status === 'active' ? 'selected' : ''}>Active</option>
+              <option value="request" ${user.status === 'request' ? 'selected' : ''}>Request</option>
+              <option value="pending" ${user.status === 'pending' ? 'selected' : ''}>Pending</option>
+              <option value="deactive" ${user.status === 'deactive' ? 'selected' : ''}>Deactive</option>
+            </select>
+          </td>
+          <td class="px-6 py-4">
+             <div class="flex items-center justify-center gap-2">
+               <button onclick="location.href='profile.html?id=${user.userId || user.firebaseDocId}'" 
+                       class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition" title="View Profile">
+                  <i data-lucide="eye" class="w-5 h-5"></i>
+               </button>
+               <button onclick="deleteUser('${user.firebaseDocId}')" 
+                       class="text-red-400 hover:bg-red-50 p-2 rounded-lg transition" title="Delete">
+                  <i data-lucide="trash-2" class="w-5 h-5"></i>
+               </button>
+             </div>
+          </td>
+        </tr>`;
+      }).join('');
+      document.getElementById('paginationInfo').innerText = `Showing ${paginated.length} of ${data.length}`;
+      lucide.createIcons();
+    }
+
+    function getStatusColor(status) {
+      if (status === 'active') return 'text-green-600 bg-green-50 border-green-200';
+      if (status === 'request') return 'text-orange-600 bg-orange-50 border-orange-200';
+      if (status === 'pending') return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      return 'text-red-600 bg-red-50 border-red-200';
+    }
+
+    function renderCards(data) {
+      document.getElementById('totalUsers').innerText = data.length;
+      document.getElementById('totalCompanies').innerText = allUsers.filter(u => u.role === 'company').length;
+      document.getElementById('activeCount').innerText = data.filter(u => u.status === 'active').length;
+      document.getElementById('requestCount').innerText = data.filter(u => u.status === 'request').length;
+      document.getElementById('pendingCount').innerText = data.filter(u => u.status === 'pending').length;
+      document.getElementById('deactiveCount').innerText = data.filter(u => u.status === 'deactive').length;
+    }
+
+    window.changePage = (dir) => {
+      currentPage += dir;
+      if (currentPage < 1) currentPage = 1;
+      updateUI();
+    };
+
+    window.filterByStatus = filterByStatus;
+    window.updateUI = updateUI;
+    window.updateStatus = updateStatus;
+    window.updateRole = updateRole;
+  </script>
+</body>
+</html>
