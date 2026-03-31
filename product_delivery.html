@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Production & Delivery - A S Embroidery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .active-tab { @apply bg-blue-700 text-white border-blue-700 shadow-lg scale-105 z-10; }
+    .active-deliv-tab { @apply bg-green-700 text-white border-green-700 shadow-lg scale-105 z-10; }
+    .worker-tag { @apply bg-blue-100 text-blue-700 px-2 py-1 rounded-md flex items-center gap-1 text-[10px] font-bold border border-blue-200; }
+    .tab-scroll::-webkit-scrollbar { height: 6px; }
+    .tab-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .data-label { @apply font-black text-gray-900 mr-1; }
+    .data-value { @apply font-medium text-gray-700; }
+  </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+
+  <div id="loader" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
+    <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-600 mb-4"></div>
+    <p class="text-xs font-bold text-blue-800 uppercase">Syncing All Data...</p>
+  </div>
+
+
+  <div id="mainContent" class="max-w-xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden hidden">
+    <div id="as-embroidery-system">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="flex items-center gap-4">
+    <button id="menuButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="menu"></i>
+    </button>
+    <h1 class="text-xl font-semibold">A S Embroidery</h1>
+    </div>
+    
+    <div class="relative">
+    <button id="profileButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+    <i data-lucide="user"></i>
+    </button>
+    
+    <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded shadow-lg z-50 py-2">
+    <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="user-circle"></i> My Profile</a>
+    <a href="contact.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="contact"></i> Contact</a> 
+    <hr class="my-2 border-gray-200">
+    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
+    <i class="w-4 h-4" data-lucide="log-out"></i> Logout
+    </button>
+    </div>
+    </div>
+    </header>
+    
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden"></div>
+    
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-40 pt-16">
+    <div class="p-4 border-b font-bold text-lg text-blue-600 bg-gray-50 flex items-center gap-2">
+    <i data-lucide="layers" class="w-5 h-5"></i> Menu Navigation
+    </div>
+    <nav class="p-2 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
+    <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="layout-dashboard"></i> Dashboard</a> 
+    <a href="stitch_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="layers"></i> Stitch History</a>
+    <a href="target-settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="target"></i> Users Target</a>
+    <a href="hisab management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="receipt"></i> Transaction History</a>
+    
+    <div id="adminOnlyContent" class="hidden border-t mt-2 pt-2">
+    <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">Management</p>
+    <a href="product_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="package-plus"></i> Product In</a>
+    <a href="product_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="list"></i> Product List</a>
+    <a href="production_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="factory"></i> Production Add</a>
+    <a href="product_delivery.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="truck"></i> Delivery Add</a>
+    <a href="user_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="users"></i> All Users</a>
+    <a href="add-stitch.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="scissors"></i> Add Stitch</a> 
+    </div>
+    </nav>
+    </aside>
+    </div>
+    
+    <script>
+    (function() {
+    /** * ROLE CONFIGURATION 
+    * আপনার বাস্তব প্রজেক্টে এই ভ্যালু সেশন বা লোকাল স্টোরেজ থেকে আসবে।
+    * উদাহরণ: const userRole = localStorage.getItem('role');
+    */
+    const userRole = "admin"; // Options: 'admin', 'company', 'user'
+    
+    // Function to check role and update UI
+    function applyRolePermissions() {
+    const adminSection = document.getElementById("adminOnlyContent");
+    if (userRole === "admin" || userRole === "company") {
+    adminSection.classList.remove("hidden");
+    } else {
+    adminSection.remove(); // পুরোপুরি রিমুভ করে দেওয়া নিরাপদ
+    }
+    }
+    
+    // Initialize UI Logic
+    applyRolePermissions();
+    lucide.createIcons();
+    
+    const menuBtn = document.getElementById("menuButton");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const profileBtn = document.getElementById("profileButton");
+    const profileMenu = document.getElementById("profileMenu");
+    const logoutBtn = document.getElementById("logoutBtn");
+    
+    function notify(msg, type = "success") {
+    Toastify({
+    text: msg,
+    duration: 3000,
+    close: true,
+    gravity: "top",
+    position: "right",
+    style: { 
+    background: type === "success" ? "#2563eb" : "#ef4444",
+    borderRadius: "10px"
+    }
+    }).showToast();
+    }
+    
+    function toggleSidebar() {
+    const isOpen = !sidebar.classList.contains("-translate-x-full");
+    if (isOpen) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    } else {
+    sidebar.classList.remove("-translate-x-full");
+    overlay.classList.remove("hidden");
+    }
+    }
+    
+    menuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleSidebar();
+    });
+    
+    profileBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    profileMenu.classList.toggle("hidden");
+    });
+    
+    logoutBtn.addEventListener("click", () => {
+    notify("লগআউট হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।", "success");
+    setTimeout(() => {
+    // Clear session logic here
+    window.location.href = "login.html";
+    }, 2000);
+    });
+    
+    document.addEventListener("click", (e) => {
+    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+    profileMenu.classList.add("hidden");
+    }
+    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    }
+    });
+    
+    overlay.addEventListener("click", toggleSidebar);
+    })();
+    </script>
+    <div class="h-16"></div>
+    
+    <!--মেইন কন্টেন্ট-->
+    <div class="p-5 bg-white border-b">
+        <select id="codeSelector" class="w-full border-2 border-blue-100 p-3 rounded-xl font-bold text-gray-800 bg-blue-50 outline-none focus:border-blue-500 transition-all">
+            <option value="">-- Select Product Code --</option>
+        </select>
+    </div>
+
+    <div id="dataSection" class="hidden animate-in fade-in duration-500">
+      
+      <div class="p-6 space-y-2">
+        <div class="flex justify-between items-center mb-2">
+            <h2 class="text-blue-600 font-black text-lg uppercase">Product Details</h2>
+            <button id="toggleInfoEdit" class="text-[10px] font-bold bg-gray-100 px-3 py-1 rounded-md hover:bg-blue-600 hover:text-white">EDIT INFO</button>
+        </div>
+        <div class="grid grid-cols-1 gap-1 text-[15px]">
+            <p><span class="data-label">Product Name:</span> <span id="v_name" class="p-view-mode data-value">-</span> <input type="text" id="edit_name" class="p-edit-mode hidden border rounded px-1 w-full"/></p>
+            <p><span class="data-label">Fabric Type:</span> <span id="v_fabric" class="p-view-mode data-value">-</span> <input type="text" id="edit_fabric" class="p-edit-mode hidden border rounded px-1 w-full"/></p>
+            <p><span class="data-label">Color:</span> <span id="v_color" class="p-view-mode data-value">-</span> <input type="text" id="edit_color" class="p-edit-mode hidden border rounded px-1 w-full"/></p>
+            <p><span class="data-label">Quantity:</span> <span id="v_qty" class="p-view-mode data-value">-</span> <input type="number" id="edit_qty" class="p-edit-mode hidden border rounded px-1 w-full"/></p>
+            <p><span class="data-label">Supplied By (Client):</span> <span id="v_supplier" class="p-view-mode data-value">-</span> 
+                <select id="edit_supplier" class="p-edit-mode hidden border rounded px-1 w-full">
+                    <option value="">-- Select Client --</option>
+                </select>
+            </p>
+            <p><span class="data-label">In Date:</span> <span id="v_inDate" class="p-view-mode data-value">-</span> <input type="date" id="edit_inDate" class="p-edit-mode hidden border rounded px-1 w-full"/></p>
+        </div>
+        <button id="saveInfoBtn" class="p-edit-mode hidden w-full bg-blue-600 text-white py-2 rounded-lg font-bold mt-2">UPDATE PRODUCT INFO</button>
+      </div>
+
+      <hr class="border-gray-100">
+
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-blue-600 font-black text-lg uppercase">Production Info</h2>
+            <div class="flex gap-2">
+                <button id="toggleProdEdit" class="text-[10px] font-bold bg-gray-100 px-3 py-1 rounded-md hover:bg-blue-600 hover:text-white">EDIT DESIGN</button>
+                <button id="addNewDesignBtn" class="bg-blue-600 text-white p-1.5 rounded-lg"><i data-lucide="plus" class="w-4 h-4"></i></button>
+            </div>
+        </div>
+        <div id="prodTabContainer" class="flex gap-2 overflow-x-auto pb-3 mb-4 tab-scroll"></div>
+        <form id="productionForm" class="space-y-3 bg-gray-50 p-5 rounded-2xl border border-gray-100">
+            <input type="hidden" id="currentProdId" value="new">
+            <div class="grid grid-cols-1 gap-2 text-[14px]">
+                <p><span class="data-label">Design Name:</span> <span id="vp_designName" class="prod-view-mode data-value">-</span> <input type="text" id="p_designName" class="prod-edit-mode hidden w-full p-1 border rounded" required/></p>
+                <p><span class="data-label">Design Code:</span> <span id="vp_designCode" class="prod-view-mode data-value font-mono">-</span> <input type="text" id="p_designCode" class="prod-edit-mode hidden w-full p-1 border rounded" required/></p>
+                <p><span class="data-label">Fabric Used:</span> <span id="vp_fabricUsed" class="prod-view-mode data-value">-</span> <input type="number" id="p_fabricUsed" class="prod-edit-mode hidden w-full p-1 border rounded"/></p>
+                <p><span class="data-label">Threads Used:</span> <span id="vp_threads" class="prod-view-mode data-value">-</span> <input type="text" id="p_threads" class="prod-edit-mode hidden w-full p-1 border rounded"/></p>
+                <div>
+                    <span class="data-label">Workers:</span>
+                    <div id="vp_workers" class="prod-view-mode data-value inline">-</div>
+                    <div id="selectedWorkers" class="prod-edit-mode hidden flex flex-wrap gap-1 my-1"></div>
+                    <select id="workerSelector" class="prod-edit-mode hidden w-full p-1 border rounded bg-white mt-1"><option value="">-- Add Worker --</option></select>
+                </div>
+                <p><span class="data-label">Machine ID:</span> <span id="vp_machine" class="prod-view-mode data-value">-</span> <input type="text" id="p_machine" class="prod-edit-mode hidden w-full p-1 border rounded"/></p>
+                <p><span class="data-label">Status:</span> <span id="vp_status" class="prod-view-mode font-bold text-blue-700">-</span>
+                    <select id="p_status" class="prod-edit-mode hidden w-full p-1 border rounded">
+                        <option value="Stocks">Stocks</option>
+                        <option value="Running">Running</option>
+                        <option value="Checking">Checking</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Complete">Complete</option>
+                    </select>
+                </p>
+                <div class="grid grid-cols-2 gap-2">
+                    <p><span class="data-label">Start Date:</span> <span id="vp_start" class="prod-view-mode data-value">-</span> <input type="date" id="p_start" class="prod-edit-mode hidden w-full p-1 border rounded"/></p>
+                    <p><span class="data-label">End Date:</span> <span id="vp_end" class="prod-view-mode data-value">-</span> <input type="date" id="p_end" class="prod-edit-mode hidden w-full p-1 border rounded"/></p>
+                </div>
+            </div>
+            <button type="submit" class="prod-edit-mode hidden w-full bg-blue-700 text-white py-3 rounded-xl font-black">UPDATE PRODUCTION</button>
+        </form>
+      </div>
+
+      <hr class="border-gray-100">
+
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-green-600 font-black text-lg uppercase">Delivery & Payment</h2>
+            <div class="flex gap-2">
+                <button id="toggleDelivEdit" class="text-[10px] font-bold bg-gray-100 px-3 py-1 rounded-md hover:bg-green-600 hover:text-white">EDIT</button>
+                <button id="addNewDelivBtn" class="bg-green-600 text-white p-1.5 rounded-lg"><i data-lucide="plus" class="w-4 h-4"></i></button>
+            </div>
+        </div>
+        <div id="delivTabContainer" class="flex gap-2 overflow-x-auto pb-3 mb-4 tab-scroll"></div>
+        <form id="deliveryForm" class="space-y-3 bg-green-50 p-5 rounded-2xl border border-green-100">
+            <input type="hidden" id="currentDelivId" value="new">
+            <div class="grid grid-cols-1 gap-2 text-[14px]">
+                <p><span class="data-label">Deliv. Date:</span> <span id="vd_date" class="deliv-view-mode data-value">-</span> <input type="date" id="d_date" class="deliv-edit-mode hidden w-full p-1 border rounded"/></p>
+                <p><span class="data-label">Status:</span> <span id="vd_status" class="deliv-view-mode font-bold text-green-700">-</span> 
+                    <select id="d_status" class="deliv-edit-mode hidden w-full p-1 border rounded bg-white">
+                        <option value="Pending">Pending</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                    </select>
+                </p>
+                <div class="grid grid-cols-2 gap-2 border-t pt-2">
+                    <p><span class="data-label">Price/Pc:</span> <span id="vd_price" class="deliv-view-mode data-value">-</span> <input type="number" id="d_price" class="deliv-edit-mode hidden w-full p-1 border rounded" oninput="calculateDeliv()"/></p>
+                    <p><span class="data-label">Pcs:</span> <span id="vd_pcs" class="deliv-view-mode data-value">-</span> <input type="number" id="d_pcs" class="deliv-edit-mode hidden w-full p-1 border rounded" oninput="calculateDeliv()"/></p>
+                </div>
+                <p><span class="data-label">Net Total:</span> <span id="vd_net" class="deliv-view-mode font-black">-</span> <input type="number" id="d_net" class="deliv-edit-mode hidden w-full p-1 border rounded bg-gray-50" readonly/></p>
+                <div class="grid grid-cols-2 gap-2">
+                    <p><span class="data-label">Paid:</span> <span id="vd_paid" class="deliv-view-mode text-blue-700 font-bold">-</span> <input type="number" id="d_paid" class="deliv-edit-mode hidden w-full p-1 border rounded" oninput="calculateDeliv()"/></p>
+                    <p><span class="data-label">Due:</span> <span id="vd_due" class="deliv-view-mode text-red-600 font-bold">-</span> <input type="number" id="d_due" class="deliv-edit-mode hidden w-full p-1 border rounded bg-gray-50" readonly/></p>
+                </div>
+                <p><span class="data-label">Notes:</span> <span id="vd_remarks" class="deliv-view-mode data-value">-</span> <textarea id="d_remarks" class="deliv-edit-mode hidden w-full p-1 border rounded"></textarea></p>
+            </div>
+            <button type="submit" class="deliv-edit-mode hidden w-full bg-green-700 text-white py-3 rounded-xl font-black">UPDATE DELIVERY</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+      authDomain: "asembroidery-5cd5e.firebaseapp.com",
+      projectId: "asembroidery-5cd5e",
+      storageBucket: "asembroidery-5cd5e.appspot.com",
+      messagingSenderId: "592758047307",
+      appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    lucide.createIcons();
+
+    let allProducts = {}, allProduction = [], allDelivery = [], selectedWorkersList = [];
+    let selectedDocId = "";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      const [pSnap, uSnap, prodSnap, delivSnap] = await Promise.all([
+        getDocs(collection(db, "products")),
+        getDocs(collection(db, "users")),
+        getDocs(collection(db, "production_history")),
+        getDocs(collection(db, "delivery_history"))
+      ]);
+      
+      const pSel = document.getElementById("codeSelector");
+      const sSel = document.getElementById("edit_supplier");
+      const wSel = document.getElementById("workerSelector");
+
+      pSnap.forEach(d => { allProducts[d.id] = {id: d.id, ...d.data()}; pSel.innerHTML += `<option value="${d.id}">${d.data().code || d.id}</option>`; });
+      uSnap.forEach(d => { 
+          const u = d.data();
+          if(u.role === 'client') sSel.innerHTML += `<option value="${u.name}">${u.name}</option>`;
+          if(u.role === 'worker') wSel.innerHTML += `<option value="${u.name}">${u.name}</option>`;
+      });
+      prodSnap.forEach(d => allProduction.push({id: d.id, ...d.data()}));
+      delivSnap.forEach(d => allDelivery.push({id: d.id, ...d.data()}));
+
+      document.getElementById("loader").classList.add("hidden");
+      document.getElementById("mainContent").classList.remove("hidden");
+    });
+
+    window.calculateDeliv = () => {
+        const price = Number(document.getElementById("d_price").value) || 0;
+        const pcs = Number(document.getElementById("d_pcs").value) || 0;
+        const paid = Number(document.getElementById("d_paid").value) || 0;
+        const total = price * pcs;
+        document.getElementById("d_net").value = total;
+        document.getElementById("d_due").value = total - paid;
+    };
+
+    document.getElementById("codeSelector").addEventListener("change", (e) => {
+      selectedDocId = e.target.value;
+      if(!selectedDocId) { document.getElementById("dataSection").classList.add("hidden"); return; }
+      
+      const p = allProducts[selectedDocId];
+      document.getElementById("v_name").innerText = document.getElementById("edit_name").value = p.name || '-';
+      document.getElementById("v_fabric").innerText = document.getElementById("edit_fabric").value = p.fabric || '-';
+      document.getElementById("v_color").innerText = document.getElementById("edit_color").value = p.color || '-';
+      document.getElementById("v_qty").innerText = document.getElementById("edit_qty").value = p.quantityValue || 0;
+      document.getElementById("v_supplier").innerText = document.getElementById("edit_supplier").value = p.supplier || '';
+      document.getElementById("v_inDate").innerText = document.getElementById("edit_inDate").value = p.inDate || '';
+
+      renderTabs('prod');
+      renderTabs('deliv');
+      document.getElementById("dataSection").classList.remove("hidden");
+    });
+
+    // --- Fixed Tab Rendering Logic ---
+    function renderTabs(type) {
+        const container = document.getElementById(type === 'prod' ? 'prodTabContainer' : 'delivTabContainer');
+        container.innerHTML = "";
+        
+        // Filter data for the selected product
+        const filteredData = (type === 'prod' ? allProduction : allDelivery)
+            .filter(x => x.parentProductId === selectedDocId);
+        
+        filteredData.forEach((item, idx) => {
+            const btn = document.createElement("button");
+            btn.innerText = (type === 'prod' ? 'Design ' : 'Entry ') + (idx + 1);
+            btn.className = "px-4 py-1.5 border rounded-full text-[10px] font-bold bg-white whitespace-nowrap transition-all";
+            btn.id = `${type}-tab-${item.id}`;
+            btn.onclick = () => {
+                if(type === 'prod') switchProd(item.id);
+                else switchDeliv(item.id);
+            };
+            container.appendChild(btn);
+        });
+
+        // Auto-select first tab if exists, otherwise show new form
+        if(filteredData.length > 0) {
+            if(type === 'prod') switchProd(filteredData[0].id);
+            else switchDeliv(filteredData[0].id);
+        } else {
+            if(type === 'prod') addNewProd();
+            else addNewDeliv();
+        }
+    }
+
+    function switchProd(id) {
+        const d = allProduction.find(x => x.id === id);
+        if(!d) return;
+        document.querySelectorAll("#prodTabContainer button").forEach(b => b.classList.remove("active-tab"));
+        document.getElementById(`prod-tab-${id}`)?.classList.add("active-tab");
+        
+        document.getElementById("currentProdId").value = d.id;
+        document.getElementById("vp_designName").innerText = document.getElementById("p_designName").value = d.designName || '';
+        document.getElementById("vp_designCode").innerText = document.getElementById("p_designCode").value = d.designCode || '';
+        document.getElementById("vp_fabricUsed").innerText = document.getElementById("p_fabricUsed").value = d.fabricUsed || '';
+        document.getElementById("vp_threads").innerText = document.getElementById("p_threads").value = d.threadsUsed || '';
+        document.getElementById("vp_machine").innerText = document.getElementById("p_machine").value = d.machineId || '';
+        document.getElementById("vp_status").innerText = document.getElementById("p_status").value = d.status || 'Stocks';
+        document.getElementById("vp_start").innerText = document.getElementById("p_start").value = d.startDate || '';
+        document.getElementById("vp_end").innerText = document.getElementById("p_end").value = d.endDate || '';
+        selectedWorkersList = d.workers || [];
+        renderWorkers();
+        toggleMode('prod', false);
+    }
+
+    function switchDeliv(id) {
+        const d = allDelivery.find(x => x.id === id);
+        if(!d) return;
+        document.querySelectorAll("#delivTabContainer button").forEach(b => b.classList.remove("active-deliv-tab"));
+        document.getElementById(`deliv-tab-${id}`)?.classList.add("active-deliv-tab");
+        
+        document.getElementById("currentDelivId").value = d.id;
+        document.getElementById("vd_date").innerText = document.getElementById("d_date").value = d.delivDate || '';
+        document.getElementById("vd_status").innerText = document.getElementById("d_status").value = d.status || 'Pending';
+        document.getElementById("vd_price").innerText = document.getElementById("d_price").value = d.price || 0;
+        document.getElementById("vd_pcs").innerText = document.getElementById("d_pcs").value = d.delivQty || 0;
+        document.getElementById("vd_net").innerText = document.getElementById("d_net").value = d.netTotal || 0;
+        document.getElementById("vd_paid").innerText = document.getElementById("d_paid").value = d.paid || 0;
+        document.getElementById("vd_due").innerText = document.getElementById("d_due").value = d.due || 0;
+        document.getElementById("vd_remarks").innerText = document.getElementById("d_remarks").value = d.remarks || '';
+        toggleMode('deliv', false);
+    }
+
+    function addNewProd() { 
+        document.getElementById("productionForm").reset(); 
+        document.getElementById("currentProdId").value="new"; 
+        selectedWorkersList=[]; 
+        renderWorkers(); 
+        toggleMode('prod', true); 
+        document.querySelectorAll("#prodTabContainer button").forEach(b => b.classList.remove("active-tab"));
+    }
+    
+    function addNewDeliv() { 
+        document.getElementById("deliveryForm").reset(); 
+        document.getElementById("currentDelivId").value="new"; 
+        toggleMode('deliv', true); 
+        document.querySelectorAll("#delivTabContainer button").forEach(b => b.classList.remove("active-deliv-tab"));
+    }
+
+    function toggleMode(type, edit) {
+        document.querySelectorAll(`.${type}-view-mode`).forEach(el => el.classList.toggle("hidden", edit));
+        document.querySelectorAll(`.${type}-edit-mode`).forEach(el => el.classList.toggle("hidden", !edit));
+    }
+
+    function renderWorkers() {
+        document.getElementById("selectedWorkers").innerHTML = selectedWorkersList.map(w => `<span class="worker-tag">${w} <button type="button" onclick="removeWorker('${w}')">×</button></span>`).join('');
+        document.getElementById("vp_workers").innerText = selectedWorkersList.join(", ") || "-";
+    }
+    window.removeWorker = (n) => { selectedWorkersList = selectedWorkersList.filter(x => x !== n); renderWorkers(); };
+    document.getElementById("workerSelector").onchange = (e) => { if(e.target.value && !selectedWorkersList.includes(e.target.value)) { selectedWorkersList.push(e.target.value); renderWorkers(); } e.target.value = ""; };
+
+    // --- Submission Logic ---
+    document.getElementById("productionForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("currentProdId").value;
+        const data = {
+            parentProductId: selectedDocId,
+            designName: document.getElementById("p_designName").value,
+            designCode: document.getElementById("p_designCode").value,
+            fabricUsed: document.getElementById("p_fabricUsed").value,
+            threadsUsed: document.getElementById("p_threads").value,
+            machineId: document.getElementById("p_machine").value,
+            status: document.getElementById("p_status").value,
+            startDate: document.getElementById("p_start").value,
+            endDate: document.getElementById("p_end").value,
+            workers: selectedWorkersList
+        };
+        if(id === "new") await addDoc(collection(db, "production_history"), data);
+        else await updateDoc(doc(db, "production_history", id), data);
+        location.reload();
+    };
+
+    document.getElementById("deliveryForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("currentDelivId").value;
+        const data = {
+            parentProductId: selectedDocId,
+            delivDate: document.getElementById("d_date").value,
+            status: document.getElementById("d_status").value,
+            price: Number(document.getElementById("d_price").value),
+            delivQty: Number(document.getElementById("d_pcs").value),
+            netTotal: Number(document.getElementById("d_net").value),
+            paid: Number(document.getElementById("d_paid").value),
+            due: Number(document.getElementById("d_due").value),
+            remarks: document.getElementById("d_remarks").value
+        };
+        if(id === "new") await addDoc(collection(db, "delivery_history"), data);
+        else await updateDoc(doc(db, "delivery_history", id), data);
+        location.reload();
+    };
+
+    document.getElementById("saveInfoBtn").onclick = async () => {
+        const data = {
+            name: document.getElementById("edit_name").value,
+            fabric: document.getElementById("edit_fabric").value,
+            color: document.getElementById("edit_color").value,
+            quantityValue: document.getElementById("edit_qty").value,
+            supplier: document.getElementById("edit_supplier").value,
+            inDate: document.getElementById("edit_inDate").value
+        };
+        await updateDoc(doc(db, "products", selectedDocId), data);
+        location.reload();
+    };
+
+    document.getElementById("toggleInfoEdit").onclick = () => {
+        const isEdit = !document.getElementById("saveInfoBtn").classList.contains("hidden");
+        document.querySelectorAll(".p-view-mode").forEach(el => el.classList.toggle("hidden", !isEdit));
+        document.querySelectorAll(".p-edit-mode").forEach(el => el.classList.toggle("hidden", isEdit));
+    };
+    document.getElementById("toggleProdEdit").onclick = () => toggleMode('prod', true);
+    document.getElementById("toggleDelivEdit").onclick = () => toggleMode('deliv', true);
+    document.getElementById("addNewDesignBtn").onclick = addNewProd;
+    document.getElementById("addNewDelivBtn").onclick = addNewDeliv;
+  </script>
+</body>
+</html>
