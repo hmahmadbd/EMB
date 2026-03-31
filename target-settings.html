@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কন্ট্রোল প্যানেল - AS Embroidery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+        body { font-family: 'Hind Siliguri', sans-serif; overflow-x: hidden; }
+        .animate-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .read-only-mode input { pointer-events: none; background-color: #f3f4f6 !important; border-color: #e5e7eb !important; color: #4b5563 !important; font-weight: 700; }
+        .read-only-mode button:not(#homeBtn) { display: none !important; }
+        label { margin-left: 4px; margin-bottom: 2px; display: block; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen pb-10">
+
+<div id="loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="flex flex-col items-center gap-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-600"></div>
+        <p class="text-sm font-bold text-indigo-600">ভেরিফাই হচ্ছে...</p>
+    </div>
+</div>
+
+<header class="bg-white sticky top-0 z-40 px-6 py-4 border-b flex justify-between items-center shadow-sm">
+    <h1 class="text-xl font-bold text-indigo-800 flex items-center gap-2">
+        <i data-lucide="settings-2"></i> কন্ট্রোল প্যানেল
+    </h1>
+    <div class="flex items-center gap-3">
+        <span id="displayCompany" class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-1 rounded-lg font-bold uppercase tracking-wider">লোড হচ্ছে...</span>
+        <a href="index.html" id="homeBtn" class="p-2 bg-gray-100 rounded-full text-gray-600 transition hover:bg-gray-200"><i data-lucide="home" class="w-5 h-5"></i></a>
+    </div>
+</header>
+
+<main id="mainContent" class="max-w-md mx-auto p-4 space-y-6 hidden">
+	    <div id="as-embroidery-system">
+	    <script src="https://cdn.tailwindcss.com"></script>
+	    <script src="https://unpkg.com/lucide@latest"></script>
+	    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+	    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+	    
+	    <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
+	    <div class="flex items-center gap-4">
+	    <button id="menuButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+	    <i data-lucide="menu"></i>
+	    </button>
+	    <h1 class="text-xl font-semibold">A S Embroidery</h1>
+	    </div>
+	    
+	    <div class="relative">
+	    <button id="profileButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
+	    <i data-lucide="user"></i>
+	    </button>
+	    
+	    <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded shadow-lg z-50 py-2">
+	    <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="user-circle"></i> My Profile</a>
+	    <a href="contact.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="contact"></i> Contact</a> 
+	    <hr class="my-2 border-gray-200">
+	    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
+	    <i class="w-4 h-4" data-lucide="log-out"></i> Logout
+	    </button>
+	    </div>
+	    </div>
+	    </header>
+	    
+	    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden"></div>
+	    
+	    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-40 pt-16">
+	    <div class="p-4 border-b font-bold text-lg text-blue-600 bg-gray-50 flex items-center gap-2">
+	    <i data-lucide="layers" class="w-5 h-5"></i> Menu Navigation
+	    </div>
+	    <nav class="p-2 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
+	    <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="layout-dashboard"></i> Dashboard</a> 
+	    <a href="stitch_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="layers"></i> Stitch History</a>
+	    <a href="target-settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="target"></i> Users Target</a>
+	    <a href="hisab management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="receipt"></i> Transaction History</a>
+	    <a href="attendance_entry.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="calendar-check"></i> Attendance </a>
+	    <a href="attendance.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="list-checks"></i> Attendance </a>
+	    
+	    <div id="adminOnlyContent" class="hidden border-t mt-2 pt-2">
+	    <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">Management</p>
+	    <a href="product_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="package-plus"></i> Product In</a>
+	    <a href="product_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="list"></i> Product List</a>
+	    <a href="product_production.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="factory"></i> Production Add</a>
+	    <a href="product_delivery.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="truck"></i> Delivery Add</a>
+	    <a href="user_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="users"></i> All Users</a>
+	    <a href="add-stitch.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="scissors"></i> Add Stitch</a> 
+	    </div>
+	    </nav>
+	    </aside>
+	    </div>
+	    
+	    <script>
+	    (function() {
+	    /** * ROLE CONFIGURATION 
+	    * আপনার বাস্তব প্রজেক্টে এই ভ্যালু সেশন বা লোকাল স্টোরেজ থেকে আসবে।
+	    * উদাহরণ: const userRole = localStorage.getItem('role');
+	    */
+	    const userRole = "admin"; // Options: 'admin', 'company', 'user'
+	    
+	    // Function to check role and update UI
+	    function applyRolePermissions() {
+	    const adminSection = document.getElementById("adminOnlyContent");
+	    if (userRole === "admin" || userRole === "company") {
+	    adminSection.classList.remove("hidden");
+	    } else {
+	    adminSection.remove(); // পুরোপুরি রিমুভ করে দেওয়া নিরাপদ
+	    }
+	    }
+	    
+	    // Initialize UI Logic
+	    applyRolePermissions();
+	    lucide.createIcons();
+	    
+	    const menuBtn = document.getElementById("menuButton");
+	    const sidebar = document.getElementById("sidebar");
+	    const overlay = document.getElementById("sidebarOverlay");
+	    const profileBtn = document.getElementById("profileButton");
+	    const profileMenu = document.getElementById("profileMenu");
+	    const logoutBtn = document.getElementById("logoutBtn");
+	    
+	    function notify(msg, type = "success") {
+	    Toastify({
+	    text: msg,
+	    duration: 3000,
+	    close: true,
+	    gravity: "top",
+	    position: "right",
+	    style: { 
+	    background: type === "success" ? "#2563eb" : "#ef4444",
+	    borderRadius: "10px"
+	    }
+	    }).showToast();
+	    }
+	    
+	    function toggleSidebar() {
+	    const isOpen = !sidebar.classList.contains("-translate-x-full");
+	    if (isOpen) {
+	    sidebar.classList.add("-translate-x-full");
+	    overlay.classList.add("hidden");
+	    } else {
+	    sidebar.classList.remove("-translate-x-full");
+	    overlay.classList.remove("hidden");
+	    }
+	    }
+	    
+	    menuBtn.addEventListener("click", (e) => {
+	    e.stopPropagation();
+	    toggleSidebar();
+	    });
+	    
+	    profileBtn.addEventListener("click", (e) => {
+	    e.stopPropagation();
+	    profileMenu.classList.toggle("hidden");
+	    });
+	    
+	    logoutBtn.addEventListener("click", () => {
+	    notify("লগআউট হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।", "success");
+	    setTimeout(() => {
+	    // Clear session logic here
+	    window.location.href = "login.html";
+	    }, 2000);
+	    });
+	    
+	    document.addEventListener("click", (e) => {
+	    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+	    profileMenu.classList.add("hidden");
+	    }
+	    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
+	    sidebar.classList.add("-translate-x-full");
+	    overlay.classList.add("hidden");
+	    }
+	    });
+	    
+	    overlay.addEventListener("click", toggleSidebar);
+	    })();
+	    </script>
+	    <div class="h-16"></div>
+	    
+	    <!--মেইন কন্টেন্ট-->
+    <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-gray-100">
+        
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-gray-500 uppercase">মেশিন নির্বাচন</label>
+                <div class="flex gap-2">
+                    <div class="flex-1 relative">
+                        <select id="machineSelector" class="w-full p-4 bg-gray-50 border-2 border-indigo-50 rounded-2xl focus:border-indigo-400 outline-none font-bold text-gray-700 appearance-none transition-all">
+                            <option value="">মেশিন পছন্দ করুন</option>
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <button id="addMachineBtn" onclick="showAddMachineModal()" class="p-4 bg-indigo-600 text-white rounded-2xl shadow-lg active:scale-90 transition">
+                        <i data-lucide="plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="targetSection" class="hidden animate-in space-y-8 pt-4 border-t border-dashed">
+                
+                <section class="space-y-4">
+                    <h3 class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                        <i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i> প্রোডাকশন স্টেজ ও বোনাস
+                    </h3>
+                    <div id="targetRowsContainer" class="space-y-4"></div>
+                    <button id="addStageBtn" onclick="addTargetRow()" class="w-full py-3 border-2 border-dashed border-indigo-200 text-indigo-600 rounded-2xl font-bold text-xs flex items-center justify-center gap-2">
+                        <i data-lucide="list-plus"></i> নতুন স্টেজ যোগ করুন
+                    </button>
+                </section>
+
+                <div class="bg-indigo-900 p-6 rounded-[2.5rem] text-white shadow-xl">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-bold opacity-70 uppercase tracking-widest">গড় টার্গেট (Auto)</label>
+                            <input type="number" id="averageTargetDisplay" readonly value="0" class="bg-transparent text-xl font-black w-full outline-none text-indigo-200">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-bold opacity-70 uppercase tracking-widest">মাস্টার স্যালারি</label>
+                            <input type="number" id="salary_master" oninput="updateAllDynamicCalculations(true)" placeholder="00000" class="bg-transparent text-xl font-black w-full border-b border-white/20 outline-none focus:border-white">
+                        </div>
+                    </div>
+                </div>
+
+                <section class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                            <i data-lucide="award" class="w-4 h-4 text-purple-500"></i> পদবী ভিত্তিক সেটিংস
+                        </h3>
+                        <div class="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1 border">
+                             <input type="number" id="calculationDays" value="28" oninput="updateAllDynamicCalculations(true)" class="w-7 bg-transparent text-center font-bold text-indigo-600 outline-none">
+                             <span class="text-[9px] font-bold text-gray-400 uppercase">দিন</span>
+                        </div>
+                    </div>
+                    <div id="rankRowsContainer" class="space-y-4"></div>
+                    <button id="addRankBtn" onclick="addRankRow()" class="w-full py-4 border-2 border-dashed border-purple-200 text-purple-600 rounded-[1.5rem] font-bold text-xs flex items-center justify-center gap-2">
+                        <i data-lucide="user-plus"></i> নতুন পদবী যোগ করুন
+                    </button>
+                </section>
+
+                <button id="saveConfigBtn" onclick="saveMachineConfig()" class="w-full py-5 bg-indigo-600 text-white rounded-[2rem] font-bold shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="save"></i> সেটিংস সেভ করুন
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="addMachineModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 items-center justify-center p-6">
+    <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-6 shadow-2xl animate-in">
+        <h3 class="text-lg font-bold mb-4">নতুন মেশিন নাম</h3>
+        <input type="text" id="newMachineName" placeholder="যেমন: M-01" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none font-bold mb-4">
+        <div class="flex gap-2">
+            <button onclick="hideAddMachineModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold">বাতিল</button>
+            <button onclick="addNewMachineToSystem()" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold">যোগ করুন</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+        authDomain: "asembroidery-5cd5e.firebaseapp.com",
+        projectId: "asembroidery-5cd5e",
+        storageBucket: "asembroidery-5cd5e.appspot.com",
+        messagingSenderId: "592758047307",
+        appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentCompanyId = null;
+    let isAdmin = false;
+
+    const loader = document.getElementById('loader');
+    const selector = document.getElementById('machineSelector');
+    const targetContainer = document.getElementById('targetRowsContainer');
+    const rankContainer = document.getElementById('rankRowsContainer');
+    const avgDisplay = document.getElementById('averageTargetDisplay');
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const q = query(collection(db, "users"), where("email", "==", user.email));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    const userData = snap.docs[0].data();
+                    currentCompanyId = userData.companyId;
+                    isAdmin = (userData.role === 'admin' || userData.role === 'company');
+                    
+                    document.getElementById('displayCompany').textContent = "ID: " + currentCompanyId;
+                    document.getElementById('mainContent').classList.remove('hidden');
+                    
+                    if (!isAdmin) document.body.classList.add('read-only-mode');
+                    
+                    await fetchAllMachines();
+
+                    // অটো-মেশিন লোড লজিক (ওয়ার্কারের জন্য)
+                    if (userData.machineNo) {
+                        selector.value = userData.machineNo;
+                        loadMachineData(userData.machineNo);
+                    }
+                }
+            } catch (e) { console.error(e); } finally { loader.classList.add('hidden'); lucide.createIcons(); }
+        } else { window.location.href = "login.html"; }
+    });
+
+    // ১. স্টেজ রো
+    window.addTargetRow = (s = '', t = '', b = '', r = '') => {
+        const div = document.createElement('div');
+        div.className = "bg-gray-50 p-4 rounded-[2rem] border border-gray-100 relative animate-in space-y-3";
+        div.innerHTML = `
+            <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase">স্টিজ</label>
+                    <input type="number" placeholder="0" value="${s}" class="stitch-input w-full p-3 bg-white rounded-xl text-sm font-bold outline-none border border-gray-200">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase text-indigo-500">টার্গেট</label>
+                    <input type="number" placeholder="0" value="${t}" oninput="updateAllDynamicCalculations(true)" class="target-input w-full p-3 bg-indigo-50 rounded-xl text-sm font-black text-indigo-700 outline-none">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase text-green-600">টার্গেট বোনাস</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 font-bold text-xs">৳</span>
+                        <input type="number" placeholder="0" value="${b}" class="bonus-input w-full p-3 pl-6 bg-green-50 rounded-xl text-xs font-bold text-green-700 outline-none">
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase text-orange-600">ওভারেস্টিজ রেট</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-orange-600 font-bold text-xs">R</span>
+                        <input type="number" placeholder="0" value="${r}" class="rate-input w-full p-3 pl-6 bg-orange-50 rounded-xl text-xs font-bold text-orange-700 outline-none">
+                    </div>
+                </div>
+            </div>
+            ${isAdmin ? `<button onclick="this.parentElement.remove(); updateAllDynamicCalculations(true);" class="absolute -top-1 -right-1 bg-white text-red-500 p-1 rounded-full shadow border"><i data-lucide="x" class="w-3 h-3"></i></button>` : ''}
+        `;
+        targetContainer.appendChild(div);
+        lucide.createIcons();
+        updateAllDynamicCalculations(true);
+    };
+
+    // ২. পদবী রো
+    window.addRankRow = (name = '', pct = '', customSalary = null, customTarget = null) => {
+        const div = document.createElement('div');
+        div.className = "bg-white p-5 rounded-[2.5rem] border border-purple-100 relative animate-in space-y-4 shadow-sm";
+        div.innerHTML = `
+            <div class="flex gap-3">
+                <div class="flex-1 space-y-1">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase">পদবীর নাম</label>
+                    <input type="text" placeholder="নাম" value="${name}" class="rank-name w-full p-3 bg-purple-50 rounded-2xl text-sm font-bold outline-none">
+                </div>
+                <div class="w-24 space-y-1">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase">শতকরা (%)</label>
+                    <input type="number" value="${pct}" oninput="updateAllDynamicCalculations(true)" class="rank-percent w-full p-3 bg-purple-100 rounded-2xl text-center font-black text-purple-700 outline-none">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase">নির্ধারিত স্যালারি</label>
+                    <input type="number" value="${customSalary || 0}" class="rank-salary-input w-full p-3 bg-indigo-600 text-white rounded-2xl text-center font-black text-sm outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-gray-400 uppercase">পদবী টার্গেট</label>
+                    <input type="number" value="${customTarget || 0}" class="rank-target-input w-full p-3 bg-gray-100 text-purple-800 rounded-2xl text-center font-black text-sm outline-none">
+                </div>
+            </div>
+            ${isAdmin ? `<button onclick="this.parentElement.remove()" class="absolute -top-1 -right-1 bg-white text-red-500 p-1.5 rounded-full shadow-lg border border-red-50"><i data-lucide="x" class="w-4 h-4"></i></button>` : ''}
+        `;
+        rankContainer.appendChild(div);
+        lucide.createIcons();
+    };
+
+    async function fetchAllMachines() {
+        const docSnap = await getDoc(doc(db, "companies", currentCompanyId));
+        selector.innerHTML = '<option value="">মেশিন পছন্দ করুন</option>';
+        if (docSnap.exists() && docSnap.data().machines) {
+            docSnap.data().machines.sort().forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m; opt.textContent = m;
+                selector.appendChild(opt);
+            });
+        }
+    }
+
+    async function loadMachineData(mNo) {
+        if (!mNo) { document.getElementById('targetSection').classList.add('hidden'); return; }
+        loader.classList.remove('hidden');
+        document.getElementById('targetSection').classList.remove('hidden');
+        targetContainer.innerHTML = "";
+        rankContainer.innerHTML = "";
+        const snap = await getDoc(doc(db, "machineConfigs", `${currentCompanyId}_${mNo}`));
+        if (snap.exists()) {
+            const d = snap.data();
+            document.getElementById('salary_master').value = d.masterSalary || "";
+            document.getElementById('calculationDays').value = d.calculationDays || 28;
+            d.targets?.forEach(t => addTargetRow(t.stitch, t.targetValue, t.bonus, t.rate));
+            d.ranks?.forEach(r => addRankRow(r.name, r.percent, r.salary, r.target));
+            updateAllDynamicCalculations(false);
+        } else if(isAdmin) { addTargetRow(); addRankRow(); }
+        loader.classList.add('hidden');
+    }
+
+    selector.onchange = () => loadMachineData(selector.value);
+
+    window.updateAllDynamicCalculations = (isAutoTrigger = false) => {
+        const targetInputs = targetContainer.querySelectorAll('.target-input');
+        let totalAvg = 0, countAvg = 0;
+        targetInputs.forEach(i => { if(i.value > 0){ totalAvg += parseFloat(i.value); countAvg++; }});
+        const currentAvg = countAvg > 0 ? Math.round(totalAvg / countAvg) : 0;
+        avgDisplay.value = currentAvg;
+
+        if(!isAutoTrigger) return;
+        const masterSalary = parseFloat(document.getElementById('salary_master').value) || 0;
+        const totalDays = parseInt(document.getElementById('calculationDays').value) || 0;
+
+        document.querySelectorAll('#rankRowsContainer > div').forEach(row => {
+            const pct = parseFloat(row.querySelector('.rank-percent').value) || 0;
+            row.querySelector('.rank-salary-input').value = Math.round((masterSalary * pct) / 100);
+            row.querySelector('.rank-target-input').value = Math.round((currentAvg * totalDays * pct) / 100);
+        });
+    }
+
+    window.saveMachineConfig = async () => {
+        const mNo = selector.value;
+        if(!mNo) return alert("মেশিন সিলেক্ট করুন!");
+        const configData = {
+            machineNo: mNo, companyId: currentCompanyId,
+            averageTarget: parseFloat(avgDisplay.value),
+            masterSalary: parseFloat(document.getElementById('salary_master').value) || 0,
+            calculationDays: parseInt(document.getElementById('calculationDays').value),
+            targets: [], ranks: [], updatedAt: new Date().toISOString()
+        };
+        targetContainer.querySelectorAll('.animate-in').forEach(row => {
+            configData.targets.push({
+                stitch: row.querySelector('.stitch-input').value,
+                targetValue: row.querySelector('.target-input').value,
+                bonus: row.querySelector('.bonus-input').value,
+                rate: row.querySelector('.rate-input').value
+            });
+        });
+        rankContainer.querySelectorAll('#rankRowsContainer > div').forEach(row => {
+            configData.ranks.push({
+                name: row.querySelector('.rank-name').value,
+                percent: row.querySelector('.rank-percent').value,
+                salary: row.querySelector('.rank-salary-input').value,
+                target: row.querySelector('.rank-target-input').value
+            });
+        });
+        loader.classList.remove('hidden');
+        await setDoc(doc(db, "machineConfigs", `${currentCompanyId}_${mNo}`), configData);
+        alert("সফলভাবে সেভ হয়েছে!");
+        loader.classList.add('hidden');
+    };
+
+    window.addNewMachineToSystem = async () => {
+        const name = document.getElementById('newMachineName').value.trim();
+        if(!name) return;
+        loader.classList.remove('hidden');
+        await updateDoc(doc(db, "companies", currentCompanyId), { machines: arrayUnion(name) });
+        await fetchAllMachines();
+        hideAddMachineModal();
+        loader.classList.add('hidden');
+    };
+
+    window.showAddMachineModal = () => document.getElementById('addMachineModal').classList.remove('hidden');
+    window.hideAddMachineModal = () => document.getElementById('addMachineModal').classList.add('hidden');
+</script>
+</body>
+</html>
