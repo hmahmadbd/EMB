@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>প্রোডাকশন এন্ট্রি - এএস এমব্রয়ডারি</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+  #mainContent { display: none; font-family: 'Inter', sans-serif; }
+  #loader { position: fixed; inset: 0; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+  .spinner { width: 45px; height: 45px; border: 5px solid #f3f3f3; border-top: 5px solid #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  .production-row { border-left: 5px solid #6366f1; transition: 0.3s; }
+  input, select, textarea { font-size: 14px !important; outline: none; }
+  .grid-input-group { display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body class="bg-gray-50 min-h-screen p-3 md:p-6 text-gray-800">
+
+<div id="loader">
+    <div class="spinner"></div>
+    <p class="mt-4 text-indigo-700 font-bold animate-pulse uppercase tracking-widest text-[10px]">সিস্টেম লোড হচ্ছে...</p>
+</div>
+
+<div id="mainContent" class="w-full max-w-2xl mx-auto">
+    <div class="bg-white shadow-2xl rounded-3xl p-6 border-t-[10px] border-indigo-700">
+        <div class="flex flex-col items-center justify-center mb-6 border-b pb-4">
+            <h1 class="text-xl font-black text-indigo-900 flex items-center gap-2 uppercase">
+                <i data-lucide="activity" class="w-6 h-6 text-indigo-600"></i> Production Entry
+            </h1>
+        </div>
+
+        <form id="productionForm" class="space-y-5">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="grid-input-group">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase px-1">তারিখ</label>
+                    <input type="date" id="date" class="border-2 rounded-xl p-3 w-full border-gray-100 bg-gray-50 focus:border-indigo-300">
+                </div>
+                <div class="grid-input-group">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase px-1">ওয়ার্কার</label>
+                    <select id="worker" class="border-2 rounded-xl p-3 w-full border-gray-100 bg-gray-50 focus:border-indigo-300" required>
+                        <option value="">লোডিং...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="grid-input-group">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase px-1">মেশিন</label>
+                    <select id="machine" class="border-2 rounded-xl p-3 w-full border-gray-100 bg-gray-50 focus:border-indigo-300"></select>
+                </div>
+                <div class="grid-input-group">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase px-1">বন্ধের সময়</label>
+                    <input type="time" id="stopTime" class="border-2 rounded-xl p-3 text-center border-gray-100 bg-gray-50 font-mono w-full" value="00:00">
+                </div>
+            </div>
+
+            <div id="rowContainer" class="space-y-4 pt-2"></div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-gray-500 uppercase px-1">মন্তব্য / নোট</label>
+                <textarea id="note" rows="2" class="border-2 rounded-xl p-3 w-full border-gray-100 bg-gray-50 placeholder:text-gray-300" placeholder="নোট লিখুন..."></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 pt-6 border-t-2 border-dashed border-gray-100">
+                <div class="p-3 bg-gray-50 rounded-2xl text-center">
+                    <p class="text-[8px] text-gray-400 font-bold uppercase">টোটাল ব্যাচ</p>
+                    <p id="totalBatchDisp" class="text-md font-black text-gray-700">0</p>
+                </div>
+                <div class="p-3 bg-indigo-50/50 rounded-2xl text-center border border-indigo-100">
+                    <p class="text-[8px] text-indigo-400 font-bold uppercase">গড় স্টিজ</p>
+                    <p id="avgStitchDisp" class="text-md font-black text-indigo-800">0</p>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-2xl text-center border border-blue-100">
+                    <p class="text-[8px] text-blue-500 font-bold uppercase">নির্ধারিত টার্গেট</p>
+                    <p id="targetValDisp" class="text-md font-black text-blue-700">0</p>
+                </div>
+                <div class="p-3 bg-purple-50 rounded-2xl text-center border border-purple-100">
+                    <p class="text-[8px] text-purple-500 font-bold uppercase">নির্ধারিত বেতন</p>
+                    <p id="monthlySalaryDisp" class="text-md font-black text-purple-700">৳ 0</p>
+                </div>
+                <div class="p-3 bg-yellow-50 rounded-2xl text-center border border-yellow-100">
+                    <p class="text-[8px] text-yellow-600 font-bold uppercase">মোট বোনাস</p>
+                    <p id="bonusDisp" class="text-md font-black text-yellow-700">৳ 0</p>
+                </div>
+                <div class="p-3 bg-red-50 rounded-2xl text-center border border-red-100">
+                    <p id="stopTimeLabel" class="text-[7px] text-red-500 font-bold uppercase">0:00-0:00 LOSS</p>
+                    <p id="stopLossValue" class="text-md font-black text-red-700">৳ 0</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="p-4 bg-gray-100 rounded-2xl text-center">
+                    <p class="text-[9px] text-gray-500 font-bold uppercase">মোট স্টিজ</p>
+                    <p id="grandTotalDisp" class="text-xl font-black text-gray-800">0</p>
+                </div>
+                <div class="p-4 bg-indigo-700 text-white rounded-2xl shadow-xl text-center border-b-4 border-indigo-900">
+                    <p class="text-[9px] font-bold uppercase opacity-80">প্রাপ্য বেতন</p>
+                    <p id="finalSalaryDisp" class="text-2xl font-black">৳ 0</p>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:bg-indigo-800 uppercase mt-4">
+                Save & Next Entry
+            </button>
+        </form>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, setDoc, serverTimestamp, getDocs, query, where, doc, getDoc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+  authDomain: "asembroidery-5cd5e.firebaseapp.com",
+  projectId: "asembroidery-5cd5e",
+  storageBucket: "asembroidery-5cd5e.appspot.com",
+  messagingSenderId: "592758047307",
+  appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const companyId = "U013";
+
+let targetRules = [];
+let activeMasterSalary = 0;
+let userRole = ""; 
+let currentAttendanceMinutes = 720; // Default 12h
+
+function timeToMin(t) { if(!t) return 0; const [h, m] = t.split(':').map(Number); return (h * 60) + m; }
+function minToTime(totalMinutes) {
+    const h = Math.floor(Math.abs(totalMinutes) / 60);
+    const m = Math.floor(Math.abs(totalMinutes) % 60);
+    return `${h}:${m < 10 ? '0' : ''}${m}`;
+}
+
+// Attendance থেকে সময় বের করার লজিক
+async function fetchAttendanceTime(workerId, date) {
+    if(!workerId || !date) return 720;
+    try {
+        const attId = `${date}_${workerId}`;
+        const attSnap = await getDoc(doc(db, "attendance", attId));
+        if(attSnap.exists()) {
+            const logs = attSnap.data().timeLogs || [];
+            let totalMins = 0;
+            logs.forEach(log => {
+                if(log.in && log.out) {
+                    totalMins += (timeToMin(log.out) - timeToMin(log.in));
+                }
+            });
+            return totalMins > 0 ? totalMins : 720;
+        }
+    } catch(e) { console.error(e); }
+    return 720;
+}
+
+function getDaysInMonth(dateString) {
+    const d = new Date(dateString);
+    return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+}
+
+async function loadTargets(mName) {
+    if (!mName) return;
+    try {
+        const snap = await getDoc(doc(db, "machineConfigs", `${companyId}_${mName.trim()}`));
+        if (snap.exists()) {
+            const data = snap.data();
+            targetRules = data.targets || [];
+            activeMasterSalary = parseFloat(data.masterSalary) || 0;
+        }
+    } catch (e) { console.error(e); }
+    runCalculations();
+}
+
+async function runCalculations() {
+    let totalStitch = 0; let totalBatch = 0;
+    document.querySelectorAll(".prod-row").forEach(row => {
+        const s = parseFloat(row.querySelector(".st-input").value) || 0;
+        const b = parseFloat(row.querySelector(".ba-input").value) || 0;
+        totalStitch += (s * b); totalBatch += b;
+        row.querySelector(".row-total").value = Math.round(s * b).toLocaleString();
+    });
+    
+    const avg = totalBatch > 0 ? (totalStitch / totalBatch) : 0;
+    const wSelect = document.getElementById("worker");
+    const opt = wSelect.options[wSelect.selectedIndex];
+    const selectedDate = document.getElementById("date").value;
+    const workerId = wSelect.value;
+
+    // হাজিরা চেক
+    currentAttendanceMinutes = await fetchAttendanceTime(workerId, selectedDate);
+    
+    const stopMins = timeToMin(document.getElementById("stopTime").value || "00:00");
+    const activeMins = currentAttendanceMinutes - stopMins;
+
+    let matched = null;
+    if (targetRules.length > 0) {
+        const sorted = [...targetRules].sort((a, b) => Number(a.stitch) - Number(b.stitch));
+        for (let rule of sorted) { 
+            if (avg <= Number(rule.stitch)) { matched = rule; break; } 
+        }
+        if (!matched) matched = sorted[sorted.length - 1];
+    }
+
+    let earnedSalary = 0; 
+    let tVal = matched ? Number(matched.targetValue) : 0;
+    let totalBonus = 0;
+    let monthlyToUse = 0;
+    let stopLossAmount = 0;
+
+    if (opt && opt.value) {
+        monthlyToUse = parseFloat(opt.getAttribute('data-rank-salary')) || activeMasterSalary;
+
+        if (tVal > 0) {
+            const daysInMonth = getDaysInMonth(selectedDate);
+            const dailyBase = monthlyToUse / daysInMonth;
+            const perfPercent = (totalStitch / tVal); 
+            
+            // ১. মূল প্রোডাকশন স্যালারি (আপনার অরিজিনাল লজিক)
+            earnedSalary = (dailyBase * (perfPercent > 1 ? 1 : perfPercent));
+
+            // ২. স্টপ লস ক্যালকুলেশন (অ্যাক্টিভ টাইমের রেট অনুযায়ী)
+            const hourlyRate = activeMins > 0 ? (earnedSalary / (activeMins / 60)) : 0;
+            stopLossAmount = (stopMins / 60) * hourlyRate;
+
+            // ৩. বোনাস ক্যালকুলেশন (আপনার অরিজিনাল লজিক)
+            if (perfPercent >= 1) {
+                const fixedBonus = Number(matched.bonus || 0);
+                const rate = Number(matched.rate || 0);
+                let extraIncentive = 0;
+                if (totalStitch > tVal) {
+                    extraIncentive = ((totalStitch - tVal) / 1000) * rate;
+                }
+                totalBonus = fixedBonus + extraIncentive;
+            }
+        }
+    }
+
+    // UI আপডেট
+    document.getElementById("stopTimeLabel").textContent = `${minToTime(activeMins)}-${minToTime(stopMins)} LOSS`;
+    document.getElementById("stopLossValue").textContent = "৳ " + Math.round(stopLossAmount).toLocaleString();
+    document.getElementById("totalBatchDisp").textContent = totalBatch.toFixed(2);
+    document.getElementById("avgStitchDisp").textContent = Math.round(avg).toLocaleString();
+    document.getElementById("targetValDisp").textContent = tVal.toLocaleString();
+    document.getElementById("monthlySalaryDisp").textContent = "৳ " + monthlyToUse.toLocaleString();
+    document.getElementById("bonusDisp").textContent = "৳ " + Math.round(totalBonus).toLocaleString();
+    document.getElementById("grandTotalDisp").textContent = Math.round(totalStitch).toLocaleString();
+    document.getElementById("finalSalaryDisp").textContent = "৳ " + Math.round(earnedSalary + totalBonus + stopLossAmount).toLocaleString();
+}
+
+function addRow() {
+    const div = document.createElement("div");
+    div.className = "prod-row production-row bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-sm space-y-3";
+    div.innerHTML = `
+        <div class="grid grid-cols-2 gap-3">
+            <select class="border rounded-xl p-2 bg-gray-50 w-full"><option>বডি</option><option>অন্যান্য</option></select>
+            <input type="number" class="st-input border rounded-xl p-2 w-full font-bold" placeholder="স্টিজ">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <input type="number" step="0.01" class="ba-input border rounded-xl p-2 w-full font-bold" placeholder="ব্যাচ">
+            <input type="text" class="row-total border-0 rounded-xl p-2 w-full bg-indigo-50 font-black text-right text-indigo-700" readonly value="0">
+        </div>
+        <div class="flex justify-between items-center border-t pt-2">
+            <button type="button" class="rem text-red-400 text-[10px] font-bold flex items-center gap-1 uppercase"><i data-lucide="trash-2" class="w-3 h-3"></i> মুছুন</button>
+            <button type="button" class="add text-indigo-600 text-[10px] font-bold flex items-center gap-1 uppercase"><i data-lucide="plus" class="w-3 h-3"></i> যোগ</button>
+        </div>
+    `;
+    document.getElementById("rowContainer").appendChild(div);
+    div.querySelectorAll("input").forEach(i => i.oninput = runCalculations);
+    div.querySelector(".rem").onclick = () => { if(document.querySelectorAll(".prod-row").length > 1) { div.remove(); runCalculations(); } };
+    div.querySelector(".add").onclick = addRow;
+    lucide.createIcons();
+}
+
+onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = "login.html"; return; }
+    try {
+        const uSnap = await getDoc(doc(db, "users", user.uid));
+        if(uSnap.exists()) {
+            userRole = uSnap.data().role;
+            if(userRole === "worker") {
+                document.getElementById("submitBtn").style.display = "none";
+            }
+        }
+
+        const cSnap = await getDoc(doc(db, "companies", companyId));
+        if (cSnap.exists()) {
+            const machines = cSnap.data().machines || [];
+            document.getElementById("machine").innerHTML = machines.map(m => `<option value="${m}">${m}</option>`).join('');
+            const wSnap = await getDocs(query(collection(db, "users"), where("companyId", "==", companyId), where("role", "==", "worker")));
+            let wH = '<option value="">ওয়ার্কার বেছে নিন</option>';
+            wSnap.forEach(d => { wH += `<option value="${d.id}" data-rank-salary="${d.data().rankSalary || 0}">${d.data().name}</option>`; });
+            document.getElementById("worker").innerHTML = wH;
+            if(machines.length > 0) await loadTargets(machines[0]);
+            document.getElementById("date").valueAsDate = new Date();
+            addRow();
+            document.getElementById("loader").style.display = "none";
+            document.getElementById("mainContent").style.display = "block";
+            lucide.createIcons();
+        }
+    } catch (e) { console.error(e); }
+});
+
+document.getElementById("machine").onchange = (e) => loadTargets(e.target.value);
+document.getElementById("worker").onchange = runCalculations;
+document.getElementById("date").onchange = runCalculations;
+document.getElementById("stopTime").onchange = runCalculations;
+
+document.getElementById("productionForm").onsubmit = async (e) => {
+    e.preventDefault();
+    if(userRole === "worker") return;
+
+    const btn = document.getElementById("submitBtn");
+    const workerId = document.getElementById("worker").value;
+    const date = document.getElementById("date").value;
+    const machineName = document.getElementById("machine").value;
+
+    if(!workerId) { Swal.fire('Error', 'ওয়ার্কার সিলেক্ট করুন', 'error'); return; }
+    btn.disabled = true; btn.innerHTML = `Saving...`;
+    
+    const newWorks = [];
+    document.querySelectorAll(".prod-row").forEach(row => {
+        const s = Number(row.querySelector(".st-input").value);
+        const b = Number(row.querySelector(".ba-input").value);
+        if(s > 0) newWorks.push({ product: row.querySelector("select").value, stitch: s, count: b, total: s * b, entryTime: new Date().toLocaleTimeString() });
+    });
+
+    try {
+        const docId = `${date}_${workerId}_${machineName}`;
+        const docRef = doc(db, "stitch production", docId);
+        const payload = {
+            works: arrayUnion(...newWorks),
+            grandStitch: increment(Number(document.getElementById("grandTotalDisp").textContent.replace(/,/g, ''))),
+            stopTime: document.getElementById("stopTime").value,
+            attendanceMins: currentAttendanceMinutes,
+            stopLossAmount: Number(document.getElementById("stopLossValue").textContent.replace(/[৳, ]/g, '')),
+            totalEarned: Number(document.getElementById("finalSalaryDisp").textContent.replace(/[৳, ]/g, '')),
+            lastUpdated: serverTimestamp()
+        };
+
+        const snap = await getDoc(docRef);
+        if (snap.exists()) await updateDoc(docRef, payload);
+        else await setDoc(docRef, { ...payload, workerId, machine: machineName, date, companyId, createdAt: serverTimestamp() });
+
+        Swal.fire('সফল!', 'ডাটা সেভ হয়েছে।', 'success').then(() => location.reload());
+    } catch (e) { Swal.fire('Error', e.message, 'error'); btn.disabled = false; }
+};
+</script>
+</body>
+</html>
