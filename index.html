@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading System...</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
     <style>
         :root {
             --primary-color: #4f46e5; /* Indigo-600 */
@@ -152,6 +154,13 @@
                 }
             }
         });
+    </script>
+    <script>
+    if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/EMB/service-worker.js')
+    .then(() => console.log('SW Registered'))
+    .catch(err => console.log('SW Error', err));
+    }
     </script>
 </body>
 </html>
