@@ -1,453 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>User Dashboard – Monthly / Daily Metrics (fixed)</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Worker Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-gray-50 min-h-screen p-4">
-  
-  <div id="as-embroidery-system">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  
-  <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
-  <div class="flex items-center gap-4">
-  <button id="menuButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
-  <i data-lucide="menu"></i>
-  </button>
-  <h1 class="text-xl font-semibold">A S Embroidery</h1>
+<body class="bg-gray-100 p-2 md:p-4 text-gray-800">
+
+  <div class="max-w-md mx-auto">
+    
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100 mb-3">
+      <div class="flex justify-between items-center mb-3">
+        <div>
+          <h1 id="userName" class="text-xl font-bold text-gray-800 leading-none">লোড হচ্ছে...</h1>
+          <p id="userRank" class="text-xs text-blue-600 font-semibold mt-1 uppercase">পদবি লোড হচ্ছে...</p>
+        </div>
+        <div class="text-right">
+          <p class="text-[10px] text-gray-400 uppercase font-bold">Main Balance</p>
+          <p id="mainBalance" class="text-xl font-black text-green-600">0 ৳</p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-2 border-t pt-3">
+        <div class="bg-blue-50 p-2 rounded-lg text-center">
+          <p class="text-[9px] text-blue-400 font-bold uppercase">User ID</p>
+          <p id="displayUserId" class="text-sm font-bold text-blue-700">--</p>
+        </div>
+        <div class="bg-indigo-50 p-2 rounded-lg text-center">
+          <p class="text-[9px] text-indigo-400 font-bold uppercase">Company ID</p>
+          <p id="displayCompId" class="text-sm font-bold text-indigo-700">--</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mb-3">
+      <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-500">
+        <p class="text-[10px] text-gray-400 font-bold">প্রাপ্য স্যালারি</p>
+        <p id="rankSalary" class="text-lg font-bold text-gray-800">0 ৳</p>
+      </div>
+      <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-purple-500">
+        <p class="text-[10px] text-gray-400 font-bold">সমন্বয় স্যালারি</p>
+        <p id="adjSalary" class="text-lg font-bold text-purple-600">0 ৳</p>
+      </div>
+      <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-400">
+        <p class="text-[10px] text-gray-400 font-bold">বোনাস</p>
+        <p id="totalBonus" class="text-lg font-bold text-gray-800">0 ৳</p>
+      </div>
+      <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-red-500">
+        <p class="text-[10px] text-gray-400 font-bold">লস স্যালারি</p>
+        <p id="lossSalary" class="text-lg font-bold text-red-600">0 ৳</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mb-4">
+      <div class="bg-green-100 p-2 rounded-lg flex justify-between items-center px-4">
+        <span class="text-[11px] text-green-700 font-bold">উপস্থিত:</span>
+        <span id="attCount" class="text-sm font-black text-green-700">0</span>
+      </div>
+      <div class="bg-red-100 p-2 rounded-lg flex justify-between items-center px-4">
+        <span class="text-[11px] text-red-700 font-bold">অনুপস্থিত:</span>
+        <span id="absentCount" class="text-sm font-black text-red-700">0</span>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-gray-50 p-3 border-b flex items-center justify-between">
+        <h2 class="text-[11px] font-bold text-gray-500 uppercase">ডেইলি রিপোর্ট</h2>
+        <div class="flex gap-1">
+          <input type="date" id="dateFrom" class="text-[10px] border p-1 rounded outline-none w-24">
+          <input type="date" id="dateTo" class="text-[10px] border p-1 rounded outline-none w-24">
+        </div>
+      </div>
+
+      <div class="max-h-60 overflow-y-auto">
+        <table class="w-full text-[12px] text-left">
+          <thead class="bg-gray-100 sticky top-0">
+            <tr>
+              <th class="p-2 border-b text-gray-500">তারিখ</th>
+              <th class="p-2 border-b text-gray-500">অবস্থা</th>
+              <th class="p-2 border-b text-right text-gray-500">ব্যালেন্স</th>
+            </tr>
+          </thead>
+          <tbody id="dataTableBody" class="divide-y"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <button onclick="firebase.auth().signOut()" class="w-full mt-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest py-2 hover:text-red-500 transition">Log Out Account</button>
   </div>
-  
-  <div class="relative">
-  <button id="profileButton" class="text-white text-2xl focus:outline-none hover:bg-blue-700 p-1 rounded transition">
-  <i data-lucide="user"></i>
-  </button>
-  
-  <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded shadow-lg z-50 py-2">
-  <a href="profile.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="user-circle"></i> My Profile</a>
-  <a href="contact.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="contact"></i> Contact</a> 
-  <hr class="my-2 border-gray-200">
-  <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
-  <i class="w-4 h-4" data-lucide="log-out"></i> Logout
-  </button>
-  </div>
-  </div>
-  </header>
-  
-  <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-40 z-30 hidden"></div>
-  
-  <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-40 pt-16">
-  <div class="p-4 border-b font-bold text-lg text-blue-600 bg-gray-50 flex items-center gap-2">
-  <i data-lucide="layers" class="w-5 h-5"></i> Menu Navigation
-  </div>
-  <nav class="p-2 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
-  <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="layout-dashboard"></i> Dashboard</a> 
-  <a href="stitch_management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="layers"></i> Stitch History</a>
-  <a href="target-settings.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="target"></i> Users Target</a>
-  <a href="hisab management.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="receipt"></i> Transaction History</a>
-  <a href="attendance_entry.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="calendar-check"></i> Attendance </a>
-  <a href="attendance.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="list-checks"></i> Attendance </a>
-  
-  <div id="adminOnlyContent" class="hidden border-t mt-2 pt-2">
-  <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">Management</p>
-  <a href="product_add.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="package-plus"></i> Product In</a>
-  <a href="product_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="list"></i> Product List</a>
-  <a href="product_production.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="factory"></i> Production Add</a>
-  <a href="product_delivery.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="truck"></i> Delivery Add</a>
-  <a href="user_list.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i class="w-5 h-5" data-lucide="users"></i> All Users</a>
-  <a href="add-stitch.html" class="flex items-center gap-3 px-4 py-2 text-gray-800 hover:bg-gray-100 transition"><i class="w-4 h-4" data-lucide="scissors"></i> Add Stitch</a> 
-  </div>
-  </nav>
-  </aside>
-  </div>
-  
+
   <script>
-  (function() {
-  /** * ROLE CONFIGURATION 
-  * আপনার বাস্তব প্রজেক্টে এই ভ্যালু সেশন বা লোকাল স্টোরেজ থেকে আসবে।
-  * উদাহরণ: const userRole = localStorage.getItem('role');
-  */
-  const userRole = "admin"; // Options: 'admin', 'company', 'user'
-  
-  // Function to check role and update UI
-  function applyRolePermissions() {
-  const adminSection = document.getElementById("adminOnlyContent");
-  if (userRole === "admin" || userRole === "company") {
-  adminSection.classList.remove("hidden");
-  } else {
-  adminSection.remove(); // পুরোপুরি রিমুভ করে দেওয়া নিরাপদ
-  }
-  }
-  
-  // Initialize UI Logic
-  applyRolePermissions();
-  lucide.createIcons();
-  
-  const menuBtn = document.getElementById("menuButton");
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("sidebarOverlay");
-  const profileBtn = document.getElementById("profileButton");
-  const profileMenu = document.getElementById("profileMenu");
-  const logoutBtn = document.getElementById("logoutBtn");
-  
-  function notify(msg, type = "success") {
-  Toastify({
-  text: msg,
-  duration: 3000,
-  close: true,
-  gravity: "top",
-  position: "right",
-  style: { 
-  background: type === "success" ? "#2563eb" : "#ef4444",
-  borderRadius: "10px"
-  }
-  }).showToast();
-  }
-  
-  function toggleSidebar() {
-  const isOpen = !sidebar.classList.contains("-translate-x-full");
-  if (isOpen) {
-  sidebar.classList.add("-translate-x-full");
-  overlay.classList.add("hidden");
-  } else {
-  sidebar.classList.remove("-translate-x-full");
-  overlay.classList.remove("hidden");
-  }
-  }
-  
-  menuBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  toggleSidebar();
-  });
-  
-  profileBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  profileMenu.classList.toggle("hidden");
-  });
-  
-  logoutBtn.addEventListener("click", () => {
-  notify("লগআউট হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন।", "success");
-  setTimeout(() => {
-  // Clear session logic here
-  window.location.href = "login.html";
-  }, 2000);
-  });
-  
-  document.addEventListener("click", (e) => {
-  if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-  profileMenu.classList.add("hidden");
-  }
-  if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
-  sidebar.classList.add("-translate-x-full");
-  overlay.classList.add("hidden");
-  }
-  });
-  
-  overlay.addEventListener("click", toggleSidebar);
-  })();
+    // ১. Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdVxsSPUirznH-67MoHln3kdyPS1SMB94",
+        authDomain: "asembroidery-5cd5e.firebaseapp.com",
+        projectId: "asembroidery-5cd5e",
+        storageBucket: "asembroidery-5cd5e.appspot.com",
+        messagingSenderId: "592758047307",
+        appId: "1:592758047307:web:d4f7d69bcd9f0398ac83ce"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // ২. ডেট ফিল্টার সেটআপ
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+    const now = new Date();
+    dateFrom.value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    dateTo.value = now.toISOString().split('T')[0];
+
+    // ৩. ডাটা ফেচিং
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) { window.location.href = "login.html"; return; }
+        db.collection("users").where("uid", "==", user.uid).onSnapshot(snapshot => {
+            if(!snapshot.empty) updateUI(snapshot.docs[0].data());
+        });
+    });
+
+    function updateUI(d) {
+        document.getElementById('userName').innerText = d.name || "N/A";
+        document.getElementById('userRank').innerText = d.rank || "Staff";
+        document.getElementById('displayUserId').innerText = d.userId || '--';
+        document.getElementById('displayCompId').innerText = d.companyId || '--';
+        document.getElementById('rankSalary').innerText = `${d.rankSalary || 0} ৳`;
+        document.getElementById('mainBalance').innerText = `${d.balance || 0} ৳`;
+
+        renderTable(d.logs || []);
+    }
+
+    function renderTable(logs) {
+        const tbody = document.getElementById('dataTableBody');
+        tbody.innerHTML = '';
+        
+        let bonusTotal = 0, lossTotal = 0, adjTotal = 0, pDays = 0, aDays = 0;
+        const start = dateFrom.value;
+        const end = dateTo.value;
+
+        logs.forEach(log => {
+            if (log.date >= start && log.date <= end) {
+                if (log.status === 'Present') pDays++; else aDays++;
+                
+                bonusTotal += (log.bonus || 0);
+                lossTotal += (log.loss || 0);
+                adjTotal += (log.adjSalary || 0);
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-2 border-b">${log.date.substring(5)}</td>
+                        <td class="p-2 border-b font-bold ${log.status === 'Present' ? 'text-green-600' : 'text-red-500'}">${log.status}</td>
+                        <td class="p-2 border-b text-right font-medium">${(log.bonus || 0) + (log.adjSalary || 0) - (log.loss || 0)} ৳</td>
+                    </tr>`;
+            }
+        });
+
+        document.getElementById('totalBonus').innerText = bonusTotal + ' ৳';
+        document.getElementById('lossSalary').innerText = lossTotal + ' ৳';
+        document.getElementById('adjSalary').innerText = adjTotal + ' ৳';
+        document.getElementById('attCount').innerText = pDays;
+        document.getElementById('absentCount').innerText = aDays;
+    }
+
+    dateFrom.addEventListener('change', () => location.reload());
+    dateTo.addEventListener('change', () => location.reload());
   </script>
-  <div class="h-16"></div>
-  
-  <!--মেইন কন্টেন্ট-->
-  <div class="max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold text-blue-700 mb-6 text-center">🙋‍♂️ Worker Dashboard</h1>
-
-
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-blue-100 p-4 rounded-lg shadow text-center">
-        <h3 class="text-sm font-semibold text-blue-700">🎯 Target (pcs)</h3>
-        <p id="targetProduction" class="text-2xl font-bold text-blue-900">0</p>
-      </div>
-      <div class="bg-green-100 p-4 rounded-lg shadow text-center">
-        <h3 class="text-sm font-semibold text-green-700">✅ Produced (pcs)</h3>
-        <p id="totalProduction" class="text-2xl font-bold text-green-900">0</p>
-      </div>
-      <div class="bg-yellow-100 p-4 rounded-lg shadow text-center">
-        <h3 class="text-sm font-semibold text-yellow-700">📅 Days Present</h3>
-        <p id="daysPresent" class="text-2xl font-bold text-yellow-900">0</p>
-      </div>
-      <div class="bg-purple-100 p-4 rounded-lg shadow text-center">
-        <h3 class="text-sm font-semibold text-purple-700">🏆 Rank</h3>
-        <p id="workerRank" class="text-2xl font-bold text-purple-900">-</p>
-      </div>
-    </div>
-
-	<!-- Global Selectors -->
-	<div class="flex flex-row flex-wrap items-center justify-center gap-4 mb-6 text-sm">
-	
-	<div class="flex flex-col items-center">
-	<label class="font-medium mb-1 text-center" for="globalMonth">Month:</label>
-	<input type="month" id="globalMonth" class="border p-1 rounded w-36 text-center" />
-	</div>
-	
-	<div class="flex flex-col items-center">
-	<label class="font-medium mb-1 text-center" for="globalDay">Day:</label>
-	<input type="date" id="globalDay" class="border p-1 rounded w-36 text-center" />
-	</div>
-	
-	</div>
-    <!-- Production History -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 class="text-xl font-semibold text-gray-700 text-center">🏭 Production History</h2>
-      <p id="prodPeriodLabel" class="text-gray-500 text-sm mb-4 text-center"></p>
-      <div class="overflow-x-auto">
-        <table class="min-w-full table-auto text-sm">
-          <thead class="bg-gray-100 text-gray-700">
-            <tr>
-              <th class="px-4 py-2">Date</th>
-              <th class="px-4 py-2">Item</th>
-              <th class="px-4 py-2">Quantity</th>
-              <th class="px-4 py-2">Status</th>
-            </tr>
-          </thead>
-          <tbody id="productionTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Attendance History -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 class="text-xl font-semibold text-gray-700 text-center">🗓 Attendance</h2>
-      <p id="attPeriodLabel" class="text-gray-500 text-sm mb-4 text-center"></p>
-      <div class="overflow-x-auto">
-        <table class="min-w-full table-auto text-sm">
-          <thead class="bg-gray-100 text-gray-700">
-            <tr>
-              <th class="px-4 py-2">Date</th>
-              <th class="px-4 py-2">Status</th>
-              <th class="px-4 py-2">Note</th>
-            </tr>
-          </thead>
-          <tbody id="attendanceTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Payment History -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 class="text-xl font-semibold text-gray-700 text-center">📋 Payment History</h2>
-      <p id="payPeriodLabel" class="text-gray-500 text-sm mb-4 text-center"></p>
-      <div class="overflow-x-auto">
-        <table class="min-w-full table-auto text-sm">
-          <thead class="bg-gray-100 text-gray-700">
-            <tr>
-              <th class="px-4 py-2">Date</th>
-              <th class="px-4 py-2">Amount</th>
-              <th class="px-4 py-2">Method</th>
-              <th class="px-4 py-2">Note</th>
-            </tr>
-          </thead>
-          <tbody id="paymentTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Worker Ranking -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 class="text-xl font-semibold text-gray-700 text-center">🏆 Worker Ranking</h2>
-      <p id="rankPeriodLabel" class="text-gray-500 text-sm mb-4 text-center"></p>
-      <div class="overflow-x-auto">
-        <table class="min-w-full table-auto text-sm">
-          <thead class="bg-gray-100 text-gray-700">
-            <tr>
-              <th class="px-4 py-2">#</th>
-              <th class="px-4 py-2">Worker Name</th>
-              <th class="px-4 py-2">Total Production</th>
-              <th class="px-4 py-2">Member Rank</th>
-            </tr>
-          </thead>
-          <tbody id="rankingTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Notification -->
-    <div id="userNote" class="hidden bg-red-100 text-red-800 p-3 rounded mb-6 text-center font-semibold"></div>
-  </div>
-
-<script>
-/* ========= SAMPLE DATA ========= */
-const monthlyTarget = 1000;          // pieces
-const selfRank             = 3;      // Static example
-
-// Per-worker daily target (fallback 500)
-const DEFAULT_DAILY_TARGET = 500;
-const dailyTarget = { 1: 480, 2: 550, 3: 600 }; 
-
-// Production, attendance, payments for the **logged-in** worker
-const productions = [
-  { date:'2025-06-01', item:'Shirt', qty:50,  status:'Completed' },
-  { date:'2025-06-05', item:'Saree', qty:40,  status:'Completed' },
-  { date:'2025-06-10', item:'Kurta', qty:60,  status:'In&nbsp;Progress' },
-  { date:'2025-05-22', item:'Scarf', qty:70,  status:'Completed' }
-];
-const attendance = [
-  { date:'2025-06-01', status:'Present', note:'' },
-  { date:'2025-06-02', status:'Present', note:'' },
-  { date:'2025-06-03', status:'Absent',  note:'Sick' },
-  { date:'2025-05-25', status:'Present', note:'' }
-];
-const payments = [
-  { date:'2025-06-10', amount:5000,  method:'Cash', note:'Advance' },
-  { date:'2025-06-25', amount:7000,  method:'Bank', note:'Salary'  },
-  { date:'2025-05-28', amount:14000, method:'Cash', note:'May Salary' }
-];
-
-// ---------- Organisation-wide production logs (for ranking) ----------
-const productionLogs = [
-  { date:'2025-06-01', workerId:1, name:'Hasan', qty:50 },
-  { date:'2025-06-02', workerId:2, name:'Sajid', qty:60 },
-  { date:'2025-06-02', workerId:1, name:'Hasan', qty:70 },
-  { date:'2025-06-05', workerId:3, name:'Nadim', qty:55 },
-  { date:'2025-06-10', workerId:4, name:'Lima',  qty:80 },
-  { date:'2025-06-10', workerId:5, name:'Arif',  qty:75 },
-  { date:'2025-05-22', workerId:2, name:'Sajid', qty:70 }
-];
-
-// ---------- Rank badge colours ----------
-const rankColors = {
-  Diamond: 'bg-blue-600 text-white',
-  Platinum:'bg-gray-400 text-black',
-  Gold:    'bg-yellow-400 text-black',
-  Silver:  'bg-gray-300 text-black',
-  Bronze:  'bg-orange-300 text-black',
-  Standard:'bg-green-200 text-black',
-  Basic:   'bg-white text-black border',
-  Unranked:'bg-slate-100 text-slate-500'
-};
-const rankTiers = ['Diamond','Platinum','Gold','Silver','Bronze','Standard','Basic'];
-
-/* ========= INPUTS & INIT ========= */
-const monthInput = document.getElementById('globalMonth');
-const dayInput   = document.getElementById('globalDay');
-if (!monthInput.value) monthInput.value = new Date().toISOString().slice(0,7);
-
-monthInput.addEventListener('change', () => {
-  if (monthInput.value) dayInput.value = '';
-  refreshDashboard();
-});
-dayInput.addEventListener('change', () => {
-  if (dayInput.value) monthInput.value = '';
-  refreshDashboard();
-});
-
-/* ========= CORE ========= */
-function refreshDashboard() {
-  const dayVal   = dayInput.value;
-  const monthVal = dayVal ? dayVal.slice(0,7) : monthInput.value;
-  if (!monthVal && !dayVal) return;
-
-  const periodLabel = dayVal ? formatDate(dayVal) : formatMonth(monthVal);
-
-  // ----- Summary -----
-  document.getElementById('targetProduction').innerText = monthlyTarget;
-  document.getElementById('workerRank').innerText       = `#${selfRank}`;
-
-  // ----- Production -----
-  document.getElementById('prodPeriodLabel').textContent = periodLabel;
-  const prodRows = dayVal
-    ? productions.filter(p => p.date === dayVal)
-    : productions.filter(p => p.date.startsWith(monthVal));
-  renderTable('productionTable', prodRows, r => `
-    <td class="border px-4 py-2">${r.date}</td>
-    <td class="border px-4 py-2">${r.item}</td>
-    <td class="border px-4 py-2 text-center">${r.qty}</td>
-    <td class="border px-4 py-2">${r.status}</td>`);
-  const totalProd = prodRows.reduce((s, r) => s + r.qty, 0);
-  document.getElementById('totalProduction').innerText = totalProd;
-
-  // ----- Attendance -----
-  document.getElementById('attPeriodLabel').textContent = periodLabel;
-  const attRows = dayVal
-    ? attendance.filter(a => a.date === dayVal)
-    : attendance.filter(a => a.date.startsWith(monthVal));
-  renderTable('attendanceTable', attRows, r => `
-    <td class="border px-4 py-2">${r.date}</td>
-    <td class="border px-4 py-2">${r.status}</td>
-    <td class="border px-4 py-2">${r.note || '-'}</td>`);
-  const presentDays = dayVal
-    ? (attRows[0] && attRows[0].status === 'Present' ? 1 : 0)
-    : attRows.filter(r => r.status === 'Present').length;
-  document.getElementById('daysPresent').innerText = presentDays;
-
-  // ----- Payments -----
-  document.getElementById('payPeriodLabel').textContent = periodLabel;
-  const payRows = dayVal
-    ? payments.filter(p => p.date === dayVal)
-    : payments.filter(p => p.date.startsWith(monthVal));
-  renderTable('paymentTable', payRows, r => `
-    <td class="border px-4 py-2">${r.date}</td>
-    <td class="border px-4 py-2">৳${r.amount.toLocaleString()}</td>
-    <td class="border px-4 py-2">${r.method}</td>
-    <td class="border px-4 py-2">${r.note}</td>`);
-
-  // ----- Ranking (org-wide) -----
-  document.getElementById('rankPeriodLabel').textContent = periodLabel;
-  const periodProdLogs = dayVal
-    ? productionLogs.filter(p => p.date === dayVal)
-    : productionLogs.filter(p => p.date.startsWith(monthVal));
-
-  const rankAgg = {};
-  periodProdLogs.forEach(p => {
-    if (!rankAgg[p.workerId]) rankAgg[p.workerId] = { name:p.name, total:0, days:new Set() };
-    rankAgg[p.workerId].total += p.qty;
-    rankAgg[p.workerId].days.add(p.date);
-  });
-
-  const rankedArr = Object.values(rankAgg)
-      .filter(r => r.days.size >= 1)                       // adjust to 25 if needed
-      .sort((a,b) => b.total - a.total);
-
-  const rankingBody = rankedArr.length
-    ? rankedArr.map((r,i) => {
-        const tier = rankTiers[i] || 'Unranked';
-        return `<tr class="hover:bg-gray-50">
-          <td class="border px-4 py-2 text-center font-semibold">#${i+1}</td>
-          <td class="border px-4 py-2 text-center">${r.name}</td>
-          <td class="border px-4 py-2 text-center">${r.total}</td>
-          <td class="border px-4 py-2 text-center">
-            <span class="inline-block rounded-full px-3 py-1 text-xs font-bold ${rankColors[tier]}">${tier}</span>
-          </td>
-        </tr>`;
-      }).join('')
-    : `<tr><td colspan="4" class="text-center py-4">No ranking data</td></tr>`;
-  document.getElementById('rankingTable').innerHTML = rankingBody;
-
-  // ----- Target Alert -----
-  const selectedMonthEnd = new Date(monthVal + '-01');
-  selectedMonthEnd.setMonth(selectedMonthEnd.getMonth() + 1, 0); // last day of month
-  const today = new Date();
-  const note  = document.getElementById('userNote');
-  if (today > selectedMonthEnd && totalProd < monthlyTarget) {
-    note.classList.remove('hidden');
-    note.textContent = `⚠️ Target not met for ${periodLabel}. Produced ${totalProd}/${monthlyTarget} pcs.`;
-  } else {
-    note.classList.add('hidden');
-  }
-}
-
-/* ========= HELPERS ========= */
-function renderTable(tbodyId, rows, tpl) {
-  const tbody = document.getElementById(tbodyId);
-  tbody.innerHTML = rows.length
-    ? rows.map(r => `<tr>${tpl(r)}</tr>`).join('')
-    : `<tr><td class="border px-4 py-2 text-center" colspan="4">No data</td></tr>`;
-}
-function formatMonth(ym) {
-  const [y,m] = ym.split('-');
-  return new Date(y, m-1).toLocaleString('default', { month:'long', year:'numeric' });
-}
-function formatDate(d) {
-  return new Date(d).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
-}
-
-// Initial load
-refreshDashboard();
-</script>
 </body>
 </html>
