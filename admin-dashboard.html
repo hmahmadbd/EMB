@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – A S Embroidery Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script> 
+  <style>
+    /* Ensure progress bar animation */
+    #stitchPercentBar { transition: width .3s; }
+    /* Simple hover effects for cards */
+    .card-hover {
+      transition: all 0.25s ease-in-out;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <header class="flex justify-between items-center p-4 bg-indigo-600 text-white shadow-lg fixed top-0 left-0 right-0 z-30">
+    <button id="menuButton" class="text-white text-2xl">
+      <i data-lucide="menu"></i>
+    </button>
+    <a href="index.html" id="pageheading" ><h1 class="text-xl font-semibold">AS Embroidery</h1></a>
+    <div class="flex items-center gap-4"> 
+        <button id="notificationButton" class="text-white text-2xl focus:outline-none relative">
+            <i data-lucide="bell"></i>
+            <span class="absolute top-0 right-0 inline-block w-3 h-3 bg-red-500 border-2 border-indigo-600 rounded-full"></span>
+        </button>
+        <div class="relative">
+            <button id="profileButton" class="text-white text-2xl focus:outline-none">
+                <i data-lucide="user"></i>
+            </button>
+            <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded-lg shadow-xl z-50 overflow-hidden">
+                <a href="profile.html" class="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-gray-100"><i data-lucide="user-circle" class="w-5 h-5"></i> My Profile</a>
+                <a href="#" class="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-gray-100"><i data-lucide="settings" class="w-5 h-5"></i> Settings</a>
+                <a href="#" class="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-gray-100"><i data-lucide="key" class="w-5 h-5"></i> Password</a>
+                <a href="#" class="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-gray-100"><i data-lucide="shield" class="w-5 h-5"></i> Security</a>
+                <hr class="my-1">
+                <a href="#" id="logoutButton" class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50"><i data-lucide="log-out" class="w-5 h-5"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+  </header>
+
+  <aside id="sidebar" class="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white shadow-xl transform -translate-x-full transition-transform duration-300 z-20 overflow-y-auto">
+    <div class="p-4 border-b font-bold text-lg text-indigo-600">Main Menu</div>
+    <ul class="p-4 space-y-2">
+      <li><a href="index.html" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50 hover:text-indigo-700 font-medium text-indigo-600"><i data-lucide="home" class="w-5 h-5"></i> Home</a></li>
+      <li><a href="index.html" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a></li>
+      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="package-plus" class="w-5 h-5"></i> Product In</a></li>
+      <li><a href="add-stitch.html" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="plus" class="w-5 h-5"></i> Add Stitch</a></li>
+      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="list" class="w-5 h-5"></i> Product List</a></li>
+      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="needle" class="w-5 h-5"></i> Production</a></li>
+      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="truck" class="w-5 h-5"></i> Delivery</a></li>
+      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="users" class="w-5 h-5"></i> Customers</a></li>
+      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="user-cog" class="w-5 h-5"></i> Workers</a></li>
+      <li><a href="transaction.html" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="credit-card" class="w-5 h-5"></i> Transaction</a></li>
+      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="file-bar-chart" class="w-5 h-5"></i> Reports</a></li>
+    </ul>
+  </aside>
+
+  <div class="h-16"></div> 
+  <main id="mainContent" class="flex-1 max-w-6xl mx-auto py-10 px-4 space-y-10"> 
+  
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold text-gray-700 flex items-center justify-center gap-2 text-center">
+        <i data-lucide="shopping-bag" class="w-6 h-6 text-indigo-600"></i> Products Management
+      </h2>
+      <div class="flex justify-center gap-6">
+        <div class="relative inline-block text-left">
+          <button id="addButton"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-md flex items-center gap-2 transition">
+            <i data-lucide="plus-circle" class="w-5 h-5"></i> Add Data
+          </button>
+          <div id="addDropdown"
+            class="hidden absolute z-20 mt-2 w-48 origin-top-right bg-white rounded-md shadow-lg border border-gray-100 divide-y divide-gray-100">
+            <a href="product_add.html"
+              class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"><i data-lucide="box" class="w-4 h-4"></i> Add Product</a>
+            <a href="production_add.html"
+              class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"><i data-lucide="workflow" class="w-4 h-4"></i> Add Production</a>
+            <a href="delivery_add.html"
+              class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"><i data-lucide="truck" class="w-4 h-4"></i> Add Delivery</a>
+          </div>
+        </div>
+        <div class="relative inline-block text-left">
+          <button id="viewButton"
+            class="bg-white border border-gray-300 px-5 py-2.5 rounded-xl shadow-md flex items-center gap-2 hover:bg-gray-50 transition">
+            <i data-lucide="list-checks" class="w-5 h-5"></i> View Data
+          </button>
+          <div id="viewDropdown"
+            class="hidden absolute z-20 mt-2 w-48 origin-top-right bg-white rounded-md shadow-lg border border-gray-100 divide-y divide-gray-100">
+            <a href="product_list.html" id="viewProductsLink"
+              class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4"></i> View Products</a>
+            <a href="production_list.html" id="viewProductionsLink"
+              class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"><i data-lucide="workflow" class="w-4 h-4"></i> View Productions</a>
+            <a href="delivery_list.html" id="viewDeliveriesLink"
+              class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"><i data-lucide="package-check" class="w-4 h-4"></i> View Deliveries</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 max-w-5xl mx-auto pt-6">
+        <div class="bg-blue-100 rounded-xl p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-blue-700 mb-1 flex items-center justify-center gap-1">
+            <i data-lucide="boxes" class="w-4 h-4"></i> Products Stock
+          </h3>
+          <p id="totalProducts" class="text-2xl font-bold text-blue-900">0</p>
+        </div>
+        
+        <div class="bg-green-100 rounded-xl p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-green-700 mb-1 flex items-center justify-center gap-1">
+            <i data-lucide="settings" class="w-4 h-4"></i> Product Running
+          </h3>
+          <p id="runningCount" class="text-2xl font-bold text-green-900">0</p>
+        </div>
+        
+        <div class="bg-yellow-100 rounded-xl p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-yellow-700 mb-1 flex items-center justify-center gap-1">
+            <i data-lucide="check-square" class="w-4 h-4"></i> Product Completed
+          </h3>
+          <p id="completeCount" class="text-2xl font-bold text-yellow-900">0</p>
+        </div>
+        
+        <div class="bg-red-100 rounded-xl p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-red-700 mb-1 flex items-center justify-center gap-1">
+            <i data-lucide="clock" class="w-4 h-4"></i> Delivery Pending
+          </h3>
+          <p id="pendingCount" class="text-2xl font-bold text-red-900">0</p>
+        </div>
+        
+        <div class="bg-purple-100 rounded-xl p-3 text-center card-hover col-span-2 sm:col-span-1">
+          <h3 class="text-sm font-medium text-purple-700 mb-1 flex items-center justify-center gap-1">
+            <i data-lucide="package-check" class="w-4 h-4"></i> Delivery Completed
+          </h3>
+          <p id="deliveryCompleteCount" class="text-2xl font-bold text-purple-900">0</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-8">
+      <h2 class="text-2xl font-semibold text-gray-700 flex items-center justify-center gap-2">
+        <i data-lucide="spool" class="w-6 h-6 text-indigo-600"></i>
+        Stitch Management
+      </h2>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="stitch_add.html"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-md flex items-center gap-2 transition">
+          <i data-lucide="plus-circle" class="w-5 h-5"></i>
+          <span>Add Stitch</span>
+        </a>
+        <a href="stitch_management.html"
+          class="bg-white border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-gray-700 px-5 py-2.5 rounded-xl shadow-md flex items-center gap-2 transition">
+          <i data-lucide="list-ordered" class="w-5 h-5"></i>
+          <span>View Stitch</span>
+        </a>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-5 max-w-4xl mx-auto">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center shadow-sm hover:shadow-lg transition card-hover">
+          <h3 class="text-sm font-medium text-blue-700 mb-1 flex items-center justify-center gap-1">
+            <i data-lucide="layers" class="w-4 h-4"></i> Total Stitches
+          </h3>
+          <p id="totalStitch" class="text-3xl font-bold text-blue-900">0</p>
+        </div>
+        <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center shadow-sm hover:shadow-lg transition card-hover">
+          <h3 class="text-sm font-medium text-green-700 mb-1 flex items-center justify-center gap-1">
+            <i data-lucide="target" class="w-4 h-4"></i> Daily Target
+          </h3>
+          <p id="targetStitch" class="text-3xl font-bold text-green-900">0</p>
+        </div>
+        <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center shadow-sm hover:shadow-lg transition card-hover">
+          <h3 class="text-sm font-medium text-purple-700 mb-1 flex items-center justify-center gap-1">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Avg. Production
+          </h3>
+          <p id="averageStitch" class="text-3xl font-bold text-purple-900">0</p>
+        </div>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center shadow-sm hover:shadow-lg transition card-hover">
+          <h3 class="text-sm font-medium text-yellow-700 mb-1 flex items-center justify-center gap-1">
+            <i data-lucide="percent" class="w-4 h-4"></i> Target Complete
+          </h3>
+          <p id="stitchPercentText" class="text-3xl font-bold text-yellow-900">0%</p>
+          <div class="w-full bg-yellow-200 h-2 rounded-full mt-2 overflow-hidden">
+            <div id="stitchPercentBar" class="bg-yellow-500 h-2" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold text-gray-700 flex items-center justify-center gap-2 text-center">
+        <i data-lucide="calendar-check" class="w-6 h-6"></i> Attendance Management
+      </h2>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="worker_attendance_add.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5"></i> Mark Attendance
+        </a>
+        <a href="worker_attendance.html" class="bg-white border px-4 py-2 rounded-lg shadow hover:bg-gray-50 flex items-center gap-2">
+          <i data-lucide="list-checks" class="w-5 h-5"></i> View Attendance History
+        </a>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+        <div class="bg-green-100 rounded-lg p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-green-700 mb-1 flex items-center justify-center gap-1"><i data-lucide="user-check" class="w-4 h-4"></i> Total Present</h3>
+          <p id="totalPresent" class="text-2xl font-bold text-green-900">0</p>
+        </div>
+        <div class="bg-red-100 rounded-lg p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-red-700 mb-1 flex items-center justify-center gap-1"><i data-lucide="user-x" class="w-4 h-4"></i> Total Absent</h3>
+          <p id="totalAbsent" class="text-2xl font-bold text-red-900">0</p>
+        </div>
+        <div class="bg-blue-100 rounded-lg p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-blue-700 mb-1 flex items-center justify-center gap-1"><i data-lucide="percent-square" class="w-4 h-4"></i> Attendance Rate</h3>
+          <p id="attendanceRate" class="text-2xl font-bold text-blue-900">0%</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold text-gray-700 flex items-center justify-center gap-2 text-center">
+        <i data-lucide="hand-coins" class="w-6 h-6"></i> Salary Management
+      </h2>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="salary_process.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2">
+          <i data-lucide="table" class="w-5 h-5"></i> Process & View Salary
+        </a>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+        <div class="bg-blue-100 rounded-lg p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-blue-700 mb-1 flex items-center justify-center gap-1"><i data-lucide="wallet" class="w-4 h-4"></i> Total Paid</h3>
+          <p id="totalSalaryPaid" class="text-2xl font-bold text-blue-900">0</p>
+        </div>
+        <div class="bg-red-100 rounded-lg p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-red-700 mb-1 flex items-center justify-center gap-1"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Total Due</h3>
+          <p id="totalSalaryDue" class="text-2xl font-bold text-red-900">0</p>
+        </div>
+        <div class="bg-green-100 rounded-lg p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-green-700 mb-1 flex items-center justify-center gap-1"><i data-lucide="users-round" class="w-4 h-4"></i> Workers Paid</h3>
+          <p id="paidWorkers" class="text-2xl font-bold text-green-900">0</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold text-gray-700 flex items-center justify-center gap-2 text-center">
+        <i data-lucide="store" class="w-6 h-6"></i> Supplier & Purchase Management
+      </h2>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="supplier-payment.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2">
+          <i data-lucide="credit-card" class="w-5 h-5"></i> Make Payment
+        </a>
+        <a href="supplier-dashboard.html" class="bg-white border px-4 py-2 rounded-lg shadow hover:bg-gray-50 flex items-center gap-2">
+          <i data-lucide="archive" class="w-5 h-5"></i> View Supplier Dashboard
+        </a>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+        <div class="bg-purple-100 rounded-lg p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-purple-700 mb-1 flex items-center justify-center gap-1"><i data-lucide="shopping-bag" class="w-4 h-4"></i> Total Purchase</h3>
+          <p id="supplierPurchase" class="text-2xl font-bold text-purple-900">0</p>
+        </div>
+        <div class="bg-emerald-100 rounded-lg p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-emerald-700 mb-1 flex items-center justify-center gap-1"><i data-lucide="check-check" class="w-4 h-4"></i> Total Paid</h3>
+          <p id="supplierPaid" class="text-2xl font-bold text-emerald-900">0</p>
+        </div>
+        <div class="bg-red-100 rounded-lg p-3 text-center card-hover">
+          <h3 class="text-sm font-medium text-red-700 mb-1 flex items-center justify-center gap-1"><i data-lucide="alert-circle" class="w-4 h-4"></i> Total Due</h3>
+          <p id="supplierDue" class="text-2xl font-bold text-red-900">0</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold text-gray-700 flex items-center justify-center gap-2 text-center">
+        <i data-lucide="users" class="w-6 h-6"></i> Staff & User Management
+      </h2>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="add-user.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5"></i> Add User
+        </a>
+        <a href="user_list.html" class="bg-white border px-4 py-2 rounded-lg shadow hover:bg-gray-50 flex items-center gap-2">
+          <i data-lucide="users-round" class="w-5 h-5"></i> View All Users
+        </a>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+        <div class="cursor-pointer bg-blue-600 text-white p-4 rounded-lg shadow hover:shadow-lg text-center card-hover">
+          <h3 class="text-sm flex items-center justify-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> Total Users</h3>
+          <p id="totalUsers" class="text-2xl font-bold">0</p>
+        </div>
+        <div class="cursor-pointer bg-green-600 text-white p-4 rounded-lg shadow hover:shadow-lg text-center card-hover">
+          <h3 class="text-sm flex items-center justify-center gap-1"><i data-lucide="briefcase" class="w-4 h-4"></i> Workers</h3>
+          <p id="workerCount" class="text-2xl font-bold">0</p>
+        </div>
+        <div class="cursor-pointer bg-yellow-500 text-white p-4 rounded-lg shadow hover:shadow-lg text-center card-hover">
+          <h3 class="text-sm flex items-center justify-center gap-1"><i data-lucide="shopping-bag" class="w-4 h-4"></i> Suppliers</h3>
+          <p id="supplierCount" class="text-2xl font-bold">0</p>
+        </div>
+        <div class="cursor-pointer bg-purple-600 text-white p-4 rounded-lg shadow hover:shadow-lg text-center card-hover">
+          <h3 class="text-sm flex items-center justify-center gap-1"><i data-lucide="user-check" class="w-4 h-4"></i> Clients</h3>
+          <p id="clientCount" class="text-2xl font-bold">0</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="loader" class="fixed inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
+    <div class="flex flex-col items-center">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600"></div>
+      <p class="mt-4 text-indigo-600 font-semibold">Loading data...</p>
+    </div>
+  </div>
+
+  <script>
+  // === LOADER FUNCTIONS ===
+  const loader = document.getElementById('loader');
+  function showLoader() {
+  loader.classList.remove('hidden');
+  }
+  function hideLoader() {
+  // Delay hiding the loader slightly to ensure smooth loading simulation
+  setTimeout(() => {
+  loader.classList.add('hidden');
+  }, 500); 
+  }
+  
+  // Immediately show loader when script starts
+  showLoader();
+  
+  // === LOGIN CHECK & REDIRECT LOGIC (FIXED) ===
+  function checkLoginStatus() {
+  const token = localStorage.getItem('authToken');
+  const isLoggedIn = (token === 'admin_verified_token'); 
+  
+  const currentPath = window.location.pathname + window.location.search;
+  
+  if (!isLoggedIn) {
+  sessionStorage.setItem('redirectAfterLogin', currentPath);
+  window.location.href = 'login.html'; 
+  return false;
+  } else {
+  const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+  const loginPage = '/login.html';
+  
+  if (redirectUrl && redirectUrl !== currentPath && currentPath.indexOf(loginPage) === -1) {
+  sessionStorage.removeItem('redirectAfterLogin'); 
+  window.location.href = redirectUrl;
+  }
+  }
+  return true;
+  }
+  
+  // *** PLACEHOLDER for DEMO ***: 
+  localStorage.setItem('authToken', 'admin_verified_token'); 
+  
+  // Check login status immediately
+  checkLoginStatus(); 
+  
+  // === UI & DATA LOGIC ===
+  document.addEventListener('DOMContentLoaded', () => {
+  
+  // Initialize Lucide icons
+  lucide.createIcons();
+  
+  // --- UI Element Selectors ---
+  const menuButton = document.getElementById('menuButton');
+  const sidebar = document.getElementById('sidebar');
+  const profileButton = document.getElementById('profileButton');
+  const profileMenu = document.getElementById('profileMenu');
+  const logoutButton = document.getElementById('logoutButton');
+  
+  // Add/View Buttons 
+  const addBtn = document.getElementById('addButton');
+  const addDropdown = document.getElementById('addDropdown');
+  const viewBtn = document.getElementById('viewButton'); 
+  const viewDropdown = document.getElementById('viewDropdown'); 
+  
+  // --- Dropdown Link Clicks (Ensuring no header interaction) ---
+  // Fix: Use stopPropagation on the button clicks (already done) and the link clicks.
+  
+  document.querySelectorAll('#viewDropdown a').forEach(link => {
+  link.addEventListener('click', (e) => {
+  // এই লাইনটি নিশ্চিত করছে যে লিংকে ক্লিক ইভেন্টটি যেন হেডার পর্যন্ত না পৌঁছায়
+  e.stopPropagation(); 
+  });
+  });
+  document.querySelectorAll('#addDropdown a').forEach(link => {
+  link.addEventListener('click', (e) => {
+  e.stopPropagation(); 
+  });
+  });
+  
+  // --- Sidebar Toggle Logic ---
+  menuButton.addEventListener('click', (e) => {
+  e.stopPropagation(); // অতিরিক্ত সুরক্ষা
+  sidebar.classList.toggle('-translate-x-full');
+  });
+  
+  // --- Profile Menu Toggle Logic ---
+  profileButton.addEventListener('click', (e) => {
+  e.stopPropagation(); 
+  profileMenu.classList.toggle('hidden');
+  });
+  
+  // --- Dropdown Toggle Logic (Add/View Buttons fixed!) ---
+  addBtn.addEventListener('click', (e) => {
+  e.stopPropagation(); 
+  addDropdown.classList.toggle('hidden');
+  viewDropdown.classList.add('hidden'); 
+  });
+  
+  // Fix: Stop propagation for the View Button as well, just to be safe.
+  viewBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  viewDropdown.classList.toggle('hidden');
+  addDropdown.classList.add('hidden');
+  });
+  
+  
+  // Close all dropdowns when clicking outside
+  document.addEventListener('click', (e) => {
+  if (!profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
+  profileMenu.classList.add('hidden');
+  }
+  // নিশ্চিত করা হচ্ছে যে ক্লিকটি Add/View ড্রপডাউনের বাইরে হচ্ছে 
+  if (!addBtn.contains(e.target) && !addDropdown.contains(e.target)) {
+  addDropdown.classList.add('hidden');
+  }
+  if (!viewBtn.contains(e.target) && !viewDropdown.contains(e.target)) {
+  viewDropdown.classList.add('hidden');
+  }
+  });
+  
+  // --- Logout Logic ---
+  logoutButton.addEventListener('click', (e) => {
+  e.preventDefault(); 
+  localStorage.removeItem('authToken'); 
+  sessionStorage.removeItem('redirectAfterLogin'); 
+  window.location.href = 'login.html'; 
+  });
+  
+  
+  // --- DYNAMIC COUNTS (Demo Data) ---
+  const counts = {
+  // Overview 
+  totalProducts: 120,    
+  runningCount: 8,       
+  completeCount: 95,     
+  pendingCount: 25,      
+  deliveryCompleteCount: 70, 
+  
+  // Stitch Management
+  totalStitch: 5000000,
+  targetStitch: 10000000,
+  averageStitch: 150000,
+  
+  // Attendance
+  totalPresent: 22,
+  totalAbsent: 3,
+  
+  // Salary
+  totalSalaryPaid: 120000,
+  totalSalaryDue: 30000,
+  paidWorkers: 20,
+  
+  // Supplier
+  supplierPurchase: 80000,
+  supplierPaid: 50000,
+  supplierDue: 30000,
+  
+  // User
+  totalUsers: 50,
+  workerCount: 30,
+  supplierCount: 10,
+  clientCount: 10
+  };
+  
+  // Calculate Attendance Rate and Stitch Percentage
+  const totalWorkers = counts.totalPresent + counts.totalAbsent;
+  const attendanceRate = totalWorkers > 0 ? Math.round((counts.totalPresent / totalWorkers) * 100) : 0;
+  counts.attendanceRate = `${attendanceRate}%`;
+  
+  const stitchPercent = counts.targetStitch > 0 ? Math.round((counts.totalStitch / counts.targetStitch) * 100) : 0;
+  
+  // Update Elements
+  Object.entries(counts).forEach(([id, val]) => {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+  });
+  
+  // Update calculated fields
+  const attendanceRateEl = document.getElementById('attendanceRate');
+  if (attendanceRateEl) attendanceRateEl.textContent = counts.attendanceRate;
+  
+  // STITCH PROGRESS BAR
+  const stitchPercentTextEl = document.getElementById('stitchPercentText');
+  const stitchPercentBarEl = document.getElementById('stitchPercentBar');
+  
+  if (stitchPercentTextEl) stitchPercentTextEl.textContent = `${stitchPercent}%`;
+  if (stitchPercentBarEl) stitchPercentBarEl.style.width = `${stitchPercent}%`;
+  
+  // Hide loader after all data and elements are updated (simulating data fetch completion)
+  hideLoader(); 
+  });
+  </script>
+</body>
+</html>
