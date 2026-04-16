@@ -18,8 +18,176 @@
 <body class="bg-[#F8FAFC] p-3 text-slate-800 pb-20 md:pb-10">
 
   <div class="max-w-md mx-auto space-y-3">
+    <div id="as-embroidery-system">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <style>
+    #sidebar-nav::-webkit-scrollbar { width: 4px; }
+    #sidebar-nav::-webkit-scrollbar-track { background: #f1f1f1; }
+    #sidebar-nav::-webkit-scrollbar-thumb { background: #bfdbfe; border-radius: 10px; }
+    #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .no-scroll { overflow: hidden; }
+    </style>
+    
+    <!-- HEADER -->
+    <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50 h-16">
+    
+    <!-- MENU -->
+    <div class="flex items-center z-10">
+    <button id="menuButton" class="hover:bg-blue-700 p-2 rounded-full active:scale-90">
+    <i data-lucide="menu"></i>
+    </button>
+    </div>
+    
+    <!-- TITLE -->
+    <div class="absolute left-1/2 -translate-x-1/2 text-center w-[60%] overflow-hidden">
+    <a href="index.html" id="headerTitle"
+    class="text-lg md:text-2xl font-bold tracking-tight whitespace-nowrap">
+    EMB SHEBA
+    </a>
+    </div>
+    
+    <!-- PROFILE -->
+    <div class="relative z-10">
+    <button id="profileButton" class="hover:bg-blue-700 p-2 rounded-full active:scale-90">
+    <i data-lucide="user"></i>
+    </button>
+    
+    <div id="profileMenu" class="hidden absolute right-0 top-14 w-48 bg-white border rounded-xl shadow-2xl py-2">
+    <a href="profile.html" class="flex items-center gap-3 px-4 py-2 hover:bg-blue-50">
+    <i class="w-4 h-4" data-lucide="user-circle"></i> Profile
+    </a>
+    <a href="contact.html" class="flex items-center gap-3 px-4 py-2 hover:bg-blue-50">
+    <i class="w-4 h-4" data-lucide="contact"></i> Contact
+    </a>
+    <hr class="my-2">
+    <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50">
+    <i class="w-4 h-4" data-lucide="log-out"></i> Logout
+    </button>
+    </div>
+    </div>
+    </header>
+    
+    <!-- OVERLAY -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 hidden z-30"></div>
+    
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white shadow-2xl -translate-x-full z-40 flex flex-col">
+    
+    <div class="p-5 border-b mt-16 bg-blue-50 font-bold">
+    Menu Navigation
+    </div>
+    
+    <nav id="sidebar-nav" class="flex-1 overflow-y-auto p-3 space-y-1">
+    <a href="index.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Dashboard</a>
+    <a href="stitch_management.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Stitch History</a>
+    <a href="target-settings.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Users Target</a>
+    <a href="transaction.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Transactions</a>
+    <a href="attendance.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Attendance</a>
+    
+    <div id="companyOnlyContent" class="hidden mt-4 pt-4 border-t">
+    <p class="px-4 text-xs font-bold text-blue-400 mb-2">Management Area</p>
+    <a href="product_add.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Product In</a>
+    <a href="product_list.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Product List</a>
+    <a href="product_production.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Production Add</a>
+    <a href="product_delivery.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Delivery Add</a>
+    <a href="user_list.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">All Users</a>
+    <a href="add-stitch.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Add Stitch</a>
+    </div>
+    </nav>
+    
+    <div class="p-4 border-t text-center text-sm">
+    HM Ahmad Hasan
+    </div>
+    </aside>
+    </div>
+    
+    <script>
+    (function(){
+    
+    // ✅ FAST LOAD (LocalStorage)
+    const headerTitle = document.getElementById("headerTitle");
+    const savedName = localStorage.getItem("companyName");
+    
+    if (savedName) {
+    headerTitle.innerText = savedName;
+    }
+    
+    // ✅ Firebase Sync (Optional update)
+    async function updateCompanyName(){
+    const userId = localStorage.getItem("userId");
+    if(!userId) return;
+    
+    try{
+    const doc = await db.collection("users").doc(userId).get();
+    if(doc.exists && doc.data().companyName){
+    const name = doc.data().companyName;
+    headerTitle.innerText = name;
+    localStorage.setItem("companyName", name);
+    }
+    }catch(e){
+    console.log("Header error:", e);
+    }
+    }
+    
+    updateCompanyName();
+    
+    // ✅ Role Control
+    const role = localStorage.getItem("userRole") || "worker";
+    if(role.toLowerCase().trim() === "company"){
+    document.getElementById("companyOnlyContent")?.classList.remove("hidden");
+    } else {
+    document.getElementById("companyOnlyContent")?.remove();
+    }
+    
+    // UI
+    const menuBtn = document.getElementById("menuButton");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const profileBtn = document.getElementById("profileButton");
+    const profileMenu = document.getElementById("profileMenu");
+    
+    menuBtn.onclick = ()=> {
+    sidebar.classList.toggle("-translate-x-full");
+    overlay.classList.toggle("hidden");
+    };
+    
+    overlay.onclick = ()=> {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    };
+    
+    profileBtn.onclick = (e)=> {
+    e.stopPropagation();
+    profileMenu.classList.toggle("hidden");
+    };
+    
+    document.addEventListener("click", (e)=>{
+    if(!profileMenu.contains(e.target) && !profileBtn.contains(e.target)){
+    profileMenu.classList.add("hidden");
+    }
+    });
+    
+    document.getElementById("logoutBtn").onclick = ()=>{
+    localStorage.clear();
+    window.location.href = "login.html";
+    };
+    
+    lucide.createIcons();
+    
+    })();
+    </script>
+    
+    <div class="h-20"></div>
     
     <div class="main-card p-5 rounded-[1.5rem] text-white shadow-xl backdrop-blur bg-gradient-to-br from-indigo-600 to-blue-700">
+      
       <div class="flex items-center gap-4">
         <div class="relative">
           <img id="profilePhoto" src="https://i.ibb.co/4pDNDk1/avatar.png" class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md">
@@ -144,7 +312,7 @@
       <button id="withdrawBtn" disabled class="w-full bg-slate-200 text-slate-500 font-bold py-4 rounded-2xl transition-all cursor-not-allowed">
         রিকোয়েস্ট পাঠান
       </button>
-      <p id="withdrawNotice" class="text-[10px] text-center font-bold text-rose-500 hidden bg-rose-50 p-2 rounded-lg">⚠️ টাকা উত্তোলনের জন্য এই মাসে কমপক্ষে ১০ দিন হাজিরা প্রয়োজন।</p>
+      <p id="withdrawNotice" class="text-[10px] text-center font-bold text-rose-500 hidden bg-rose-50 p-2 rounded-lg">⚠️ টাকা উত্তোলনের জন্য এই মাসে কমপক্ষে ১০ দিন হাজিরা প্রয়োজন।</p>
     </div>
 
     <div class="hidden md:block pt-2">
@@ -223,25 +391,34 @@
     const monthSelect = document.getElementById('reportMonth');
     const yearSelect = document.getElementById('reportYear');
     let userRankSalary = 0;
-    
-    // উইথড্র জন্য ভ্যারিয়েবল
     let currentMainBalance = 0;
     let maxAllowedLimit = 0;
     let totalPresentDays = 0;
+
+    // লিসেনার হ্যান্ডলার (এগুলো ডাটা ওভারল্যাপ হওয়া আটকাবে)
+    let userUnsub = null;
+    let prodUnsub = null;
+    let attUnsub = null;
 
     const today = new Date();
     monthSelect.value = String(today.getMonth() + 1).padStart(2, '0');
     yearSelect.value = today.getFullYear();
 
     auth.onAuthStateChanged(user => {
+        // লগআউট বা ইউজার পরিবর্তন হলে আগের লিসেনার বন্ধ করো
+        if(userUnsub) userUnsub();
+        if(prodUnsub) prodUnsub();
+        if(attUnsub) attUnsub();
+
         if (!user) return;
-        db.collection("users").where("uid", "==", user.uid).onSnapshot(snap => {
+
+        // বর্তমান লগইন করা ইউজারের ডাটা লিসেন করো
+        userUnsub = db.collection("users").where("uid", "==", user.uid).onSnapshot(snap => {
             if(!snap.empty) {
                 const u = snap.docs[0].data();
                 userRankSalary = Number(u.rankSalary || 0);
                 currentMainBalance = Number(u.balance || 0);
                 
-                // মেইন ব্যালেন্সের ৭০% ক্যালকুলেশন
                 maxAllowedLimit = Math.floor(currentMainBalance * 0.7);
                 document.getElementById('withdrawAmount').value = maxAllowedLimit;
 
@@ -253,12 +430,17 @@
                 document.getElementById('displayCompId').innerText = `CID: ${u.companyId || '--'}`;
                 document.getElementById('rankSalaryVal').innerText = `${userRankSalary} ৳`;
                 if(u.photoURL) document.getElementById('profilePhoto').src = u.photoURL;
+                
                 loadMonthlyData(u.userId);
             }
         });
     });
 
     function loadMonthlyData(userId) {
+        // রিফ্রেশ করার সময় আগের সাবস্ক্রিপশন বন্ধ করো
+        if(prodUnsub) prodUnsub();
+        if(attUnsub) attUnsub();
+
         const month = monthSelect.value;
         const year = yearSelect.value;
         const prefix = `${year}-${month}`;
@@ -266,15 +448,18 @@
         const daysInMonth = new Date(year, month, 0).getDate();
         const dailyRate = userRankSalary / daysInMonth;
         
-        db.collection("stitch production")
+        prodUnsub = db.collection("stitch production")
         .where("__name__", ">=", `${prefix}-01_${userId}`)
         .where("__name__", "<=", `${prefix}-31_${userId}\uf8ff`)
         .onSnapshot(prodSnap => {
-            db.collection("attendance")
+            
+            attUnsub = db.collection("attendance")
             .where("__name__", ">=", `${prefix}-01_${userId}`)
             .where("__name__", "<=", `${prefix}-31_${userId}\uf8ff`)
             .onSnapshot(attSnap => {
+                
                 let totals = { bonus: 0, fine: 0, stopL: 0, base: 0, workedMins: 0, absentMins: 0, entries: 0 };
+                
                 prodSnap.forEach(doc => {
                     const d = doc.data();
                     totals.bonus += Number(d.bonusAmount || 0);
@@ -283,6 +468,7 @@
                     totals.base += Number(d.baseEarnedSalary || 0);
                     totals.entries++;
                 });
+                
                 attSnap.forEach(doc => {
                     const d = doc.data();
                     totals.workedMins += Number(d.totalWorkedMinutes || 0);
@@ -290,7 +476,7 @@
                 });
 
                 const presentDays = (totals.workedMins / MINS_PER_DAY);
-                totalPresentDays = presentDays; // এখানে গ্লোবাল ভ্যারিয়েবল আপডেট হচ্ছে
+                totalPresentDays = presentDays;
 
                 document.getElementById('presentDays').innerText = presentDays.toFixed(1);
                 document.getElementById('absentDays').innerText = (totals.absentMins / MINS_PER_DAY).toFixed(1);
@@ -301,13 +487,13 @@
                 document.getElementById('stopLossAmount').innerText = `${totals.stopL} ৳`;
                 document.getElementById('totalEarned').innerText = `${(totals.bonus + totals.base + totals.stopL).toLocaleString()} ৳`;
 
-                // লস ক্যালকুলেশন
                 const expectedIncome = (userRankSalary / daysInMonth) * totals.entries;
                 let lossPercent = expectedIncome > 0 ? ((expectedIncome - totals.base) / expectedIncome) * 100 : 0;
                 lossPercent = lossPercent < 0 ? 0 : lossPercent;
                 const lossTextElem = document.getElementById('lossPercentageText');
                 const lossBoxElem = document.getElementById('lossBox');
                 lossTextElem.innerText = `${lossPercent.toFixed(1)}%`;
+                
                 if(lossPercent > 5) {
                     lossBoxElem.className = "bg-red-50 p-3 rounded-xl border border-red-100 text-center transition-colors";
                     lossTextElem.className = "text-sm font-bold text-red-600";
@@ -316,20 +502,17 @@
                     lossTextElem.className = "text-sm font-bold text-slate-700";
                 }
 
-                // উইথড্র বাটন ভ্যালিডেশন কল
                 validateWithdrawAction();
                 document.getElementById('noDataMsg').classList.toggle('hidden', !prodSnap.empty || !attSnap.empty);
             });
         });
     }
 
-    // উইথড্র বাটন এবং কন্ডিশন চেক ফাংশন
     function validateWithdrawAction() {
         const reqAmt = Number(document.getElementById('withdrawAmount').value);
         const btn = document.getElementById('withdrawBtn');
         const notice = document.getElementById('withdrawNotice');
         
-        // শর্ত: হাজির ১০ দিন হতে হবে এবং ব্যালেন্স ৭০% এর বেশি হওয়া যাবে না
         const isPresentOk = totalPresentDays >= 10;
         const isAmountOk = reqAmt > 0 && reqAmt <= maxAllowedLimit;
 
@@ -348,7 +531,6 @@
         }
     }
 
-    // ইনপুট চেঞ্জ হলে রিয়েল টাইম চেক
     document.getElementById('withdrawAmount').addEventListener('input', validateWithdrawAction);
 
     [monthSelect, yearSelect].forEach(item => {
