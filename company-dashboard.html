@@ -21,50 +21,174 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-  <header class="flex justify-between items-center p-4 bg-indigo-600 text-white shadow-lg fixed top-0 left-0 right-0 z-30">
-    <button id="menuButton" class="text-white text-2xl">
-      <i data-lucide="menu"></i>
-    </button>
-    <a href="index.html" id="pageheading" ><h1 class="text-xl font-semibold">AS Embroidery</h1></a>
-    <div class="flex items-center gap-4"> 
-        <button id="notificationButton" class="text-white text-2xl focus:outline-none relative">
-            <i data-lucide="bell"></i>
-            <span class="absolute top-0 right-0 inline-block w-3 h-3 bg-red-500 border-2 border-indigo-600 rounded-full"></span>
-        </button>
-        <div class="relative">
-            <button id="profileButton" class="text-white text-2xl focus:outline-none">
-                <i data-lucide="user"></i>
-            </button>
-            <div id="profileMenu" class="hidden absolute right-0 top-12 w-56 bg-white border rounded-lg shadow-xl z-50 overflow-hidden">
-                <a href="profile.html" class="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-gray-100"><i data-lucide="user-circle" class="w-5 h-5"></i> My Profile</a>
-                <a href="#" class="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-gray-100"><i data-lucide="settings" class="w-5 h-5"></i> Settings</a>
-                <a href="#" class="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-gray-100"><i data-lucide="key" class="w-5 h-5"></i> Password</a>
-                <a href="#" class="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-gray-100"><i data-lucide="shield" class="w-5 h-5"></i> Security</a>
-                <hr class="my-1">
-                <a href="#" id="logoutButton" class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50"><i data-lucide="log-out" class="w-5 h-5"></i> Logout</a>
-            </div>
-        </div>
-    </div>
+  <div id="as-embroidery-system">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  
+  <style>
+  #sidebar-nav::-webkit-scrollbar { width: 4px; }
+  #sidebar-nav::-webkit-scrollbar-track { background: #f1f1f1; }
+  #sidebar-nav::-webkit-scrollbar-thumb { background: #bfdbfe; border-radius: 10px; }
+  #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  .no-scroll { overflow: hidden; }
+  </style>
+  
+  <!-- HEADER -->
+  <header class="flex justify-between items-center p-4 bg-blue-600 text-white shadow-md fixed top-0 left-0 right-0 z-50 h-16">
+  
+  <!-- MENU -->
+  <div class="flex items-center z-10">
+  <button id="menuButton" class="hover:bg-blue-700 p-2 rounded-full active:scale-90">
+  <i data-lucide="menu"></i>
+  </button>
+  </div>
+  
+  <!-- TITLE -->
+  <div class="absolute left-1/2 -translate-x-1/2 text-center w-[60%] overflow-hidden">
+  <a href="index.html" id="headerTitle"
+  class="text-lg md:text-2xl font-bold tracking-tight whitespace-nowrap">
+  EMB SHEBA
+  </a>
+  </div>
+  
+  <!-- PROFILE -->
+  <div class="relative z-10">
+  <button id="profileButton" class="hover:bg-blue-700 p-2 rounded-full active:scale-90">
+  <i data-lucide="user"></i>
+  </button>
+  
+  <div id="profileMenu" class="hidden absolute right-0 top-14 w-48 bg-white border rounded-xl shadow-2xl py-2">
+  <a href="profile.html" class="flex items-center gap-3 px-4 py-2 hover:bg-blue-50">
+  <i class="w-4 h-4" data-lucide="user-circle"></i> Profile
+  </a>
+  <a href="contact.html" class="flex items-center gap-3 px-4 py-2 hover:bg-blue-50">
+  <i class="w-4 h-4" data-lucide="contact"></i> Contact
+  </a>
+  <hr class="my-2">
+  <button id="logoutBtn" class="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50">
+  <i class="w-4 h-4" data-lucide="log-out"></i> Logout
+  </button>
+  </div>
+  </div>
   </header>
-
-  <aside id="sidebar" class="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white shadow-xl transform -translate-x-full transition-transform duration-300 z-20 overflow-y-auto">
-    <div class="p-4 border-b font-bold text-lg text-indigo-600">Main Menu</div>
-    <ul class="p-4 space-y-2">
-      <li><a href="index.html" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50 hover:text-indigo-700 font-medium text-indigo-600"><i data-lucide="home" class="w-5 h-5"></i> Home</a></li>
-      <li><a href="index.html" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard</a></li>
-      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="package-plus" class="w-5 h-5"></i> Product In</a></li>
-      <li><a href="add-stitch.html" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="plus" class="w-5 h-5"></i> Add Stitch</a></li>
-      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="list" class="w-5 h-5"></i> Product List</a></li>
-      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="needle" class="w-5 h-5"></i> Production</a></li>
-      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="truck" class="w-5 h-5"></i> Delivery</a></li>
-      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="users" class="w-5 h-5"></i> Customers</a></li>
-      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="user-cog" class="w-5 h-5"></i> Workers</a></li>
-      <li><a href="transaction.html" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="credit-card" class="w-5 h-5"></i> Transaction</a></li>
-      <li><a href="#" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-indigo-50"><i data-lucide="file-bar-chart" class="w-5 h-5"></i> Reports</a></li>
-    </ul>
+  
+  <!-- OVERLAY -->
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 hidden z-30"></div>
+  
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white shadow-2xl -translate-x-full z-40 flex flex-col">
+  
+  <div class="p-5 border-b mt-16 bg-blue-50 font-bold">
+  Menu Navigation
+  </div>
+  
+  <nav id="sidebar-nav" class="flex-1 overflow-y-auto p-3 space-y-1">
+  <a href="index.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Dashboard</a>
+  <a href="stitch_management.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Stitch History</a>
+  <a href="target-settings.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Users Target</a>
+  <a href="transaction.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Transactions</a>
+  <a href="attendance.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Attendance</a>
+  
+  <div id="companyOnlyContent" class="hidden mt-4 pt-4 border-t">
+  <p class="px-4 text-xs font-bold text-blue-400 mb-2">Management Area</p>
+  <a href="product_add.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Product In</a>
+  <a href="product_list.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Product List</a>
+  <a href="product_production.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Production Add</a>
+  <a href="product_delivery.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Delivery Add</a>
+  <a href="user_list.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">All Users</a>
+  <a href="add-stitch.html" class="block px-4 py-3 rounded-xl hover:bg-blue-600 hover:text-white">Add Stitch</a>
+  </div>
+  </nav>
+  
+  <div class="p-4 border-t text-center text-sm">
+  HM Ahmad Hasan
+  </div>
   </aside>
-
-  <div class="h-16"></div> 
+  </div>
+  
+  <script>
+  (function(){
+  
+  // ✅ FAST LOAD (LocalStorage)
+  const headerTitle = document.getElementById("headerTitle");
+  const savedName = localStorage.getItem("companyName");
+  
+  if (savedName) {
+  headerTitle.innerText = savedName;
+  }
+  
+  // ✅ Firebase Sync (Optional update)
+  async function updateCompanyName(){
+  const userId = localStorage.getItem("userId");
+  if(!userId) return;
+  
+  try{
+  const doc = await db.collection("users").doc(userId).get();
+  if(doc.exists && doc.data().companyName){
+  const name = doc.data().companyName;
+  headerTitle.innerText = name;
+  localStorage.setItem("companyName", name);
+  }
+  }catch(e){
+  console.log("Header error:", e);
+  }
+  }
+  
+  updateCompanyName();
+  
+  // ✅ Role Control
+  const role = localStorage.getItem("userRole") || "worker";
+  if(role.toLowerCase().trim() === "company"){
+  document.getElementById("companyOnlyContent")?.classList.remove("hidden");
+  } else {
+  document.getElementById("companyOnlyContent")?.remove();
+  }
+  
+  // UI
+  const menuBtn = document.getElementById("menuButton");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
+  const profileBtn = document.getElementById("profileButton");
+  const profileMenu = document.getElementById("profileMenu");
+  
+  menuBtn.onclick = ()=> {
+  sidebar.classList.toggle("-translate-x-full");
+  overlay.classList.toggle("hidden");
+  };
+  
+  overlay.onclick = ()=> {
+  sidebar.classList.add("-translate-x-full");
+  overlay.classList.add("hidden");
+  };
+  
+  profileBtn.onclick = (e)=> {
+  e.stopPropagation();
+  profileMenu.classList.toggle("hidden");
+  };
+  
+  document.addEventListener("click", (e)=>{
+  if(!profileMenu.contains(e.target) && !profileBtn.contains(e.target)){
+  profileMenu.classList.add("hidden");
+  }
+  });
+  
+  document.getElementById("logoutBtn").onclick = ()=>{
+  localStorage.clear();
+  window.location.href = "login.html";
+  };
+  
+  lucide.createIcons();
+  
+  })();
+  </script>
+  
+  <div class="h-20"></div>
+  
   <main id="mainContent" class="flex-1 max-w-6xl mx-auto py-10 px-4 space-y-10"> 
   
     <section class="space-y-6">
