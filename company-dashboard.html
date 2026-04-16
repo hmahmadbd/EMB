@@ -21,6 +21,8 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
 
+  <main id="mainContent" class="flex-1 max-w-6xl mx-auto py-10 px-4 space-y-10"> 
+  
   <div id="as-embroidery-system">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -186,10 +188,6 @@
   
   })();
   </script>
-  
-  <div class="h-20"></div>
-  
-  <main id="mainContent" class="flex-1 max-w-6xl mx-auto py-10 px-4 space-y-10"> 
   
     <section class="space-y-6">
       <h2 class="text-2xl font-semibold text-gray-700 flex items-center justify-center gap-2 text-center">
@@ -514,18 +512,6 @@
   });
   });
   
-  // --- Sidebar Toggle Logic ---
-  menuButton.addEventListener('click', (e) => {
-  e.stopPropagation(); // অতিরিক্ত সুরক্ষা
-  sidebar.classList.toggle('-translate-x-full');
-  });
-  
-  // --- Profile Menu Toggle Logic ---
-  profileButton.addEventListener('click', (e) => {
-  e.stopPropagation(); 
-  profileMenu.classList.toggle('hidden');
-  });
-  
   // --- Dropdown Toggle Logic (Add/View Buttons fixed!) ---
   addBtn.addEventListener('click', (e) => {
   e.stopPropagation(); 
@@ -555,16 +541,7 @@
   }
   });
   
-  // --- Logout Logic ---
-  logoutButton.addEventListener('click', (e) => {
-  e.preventDefault(); 
-  localStorage.removeItem('authToken'); 
-  sessionStorage.removeItem('redirectAfterLogin'); 
-  window.location.href = 'login.html'; 
-  });
-  
-  
-  // --- DYNAMIC COUNTS (Demo Data) ---
+
   const counts = {
   // Overview 
   totalProducts: 120,    
@@ -623,9 +600,6 @@
   if (stitchPercentTextEl) stitchPercentTextEl.textContent = `${stitchPercent}%`;
   if (stitchPercentBarEl) stitchPercentBarEl.style.width = `${stitchPercent}%`;
   
-  // Hide loader after all data and elements are updated (simulating data fetch completion)
-  hideLoader(); 
-  });
   </script>
 </body>
 </html>
